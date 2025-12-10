@@ -5,7 +5,7 @@
     <title>NetoNerd</title>
 
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
-    <link rel="stylesheet" type="text/css" href="css/main.css">
+    <link rel="stylesheet" type="text/css" href="../src/css/main.css">
     <style>
       .card-login {
         padding: 30px 0 0 0;
@@ -28,65 +28,7 @@
     </style>
   </head>
   <body>
-  <nav class="navbar navbar-expand-lg navbar-custom bg-primary">
-      <a class="navbar-brand" href="#">
-        <img class="logo" src="imagens/logoNetoNerd.jpg" alt="Logo NetoNerd" >
-      </a>
-      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-        <span class="navbar-toggler-icon"></span>
-      </button>
-      <div class="collapse navbar-collapse LinksNav" id="navbarNav">
-      <ul class="navbar-nav ml-auto align-items-lg-center">
-        <li class="nav-item dropdown">
-          <a class="nav-link dropdown-toggle" href="#" id="produtosDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-            Produtos
-          </a>
-          <div class="dropdown-menu dropdown-menu-right" aria-labelledby="produtosDropdown">
-            <a class="dropdown-item" href="apresenta_myhealth/apresenta_myhealth.php">MyHealth</a>
-            <a class="dropdown-item" href="escritorius.php">Escritorius</a>
-            <a class="dropdown-item" href="stylemanager.php">Style Manager</a>
-            <div class="dropdown-divider"></div>
-            <a class="dropdown-item" href="pj.php">NetoNerd PJ</a>
-          </div>
-        </li>
-
-        <li class="nav-item">
-          <a class="nav-link" href="atendimento.php">Atendimento</a>
-        </li>
-
-        <li class="nav-item">
-          <a class="nav-link" href="planos.php">Planos</a>
-        </li>
-
-        <li class="nav-item">
-          <a class="nav-link" href="contato.php">Contato</a>
-        </li>
-
-        <li class="nav-item">
-          <a class="nav-link" href="quemsomo.php">Quem somos</a>
-        </li>
-
-        <!-- Call-to-action (shown on larger screens) -->
-        <li class="nav-item d-none d-lg-block ml-3">
-          <a class="btn btn-outline-light rounded" href="contato.php" title="Solicitar orçamento">Solicitar Orçamento</a>
-        </li>
-
-        <!-- Auth buttons with clear visual hierarchy -->
-        <li class="nav-item ml-2">
-          <a class="btn btn-light text-dark rounded" href="login.php" role="button" aria-label="Entrar">Login</a>
-        </li>
-
-        <li class="nav-item ml-2">
-          <a class="btn btn-outline-dark text-white rounded" href="loginTecnico.php" role="button" aria-label="Acesso técnico">Técnico</a>
-        </li>
-
-        <!-- Quick contact for small screens -->
-        <li class="nav-item d-lg-none mt-2">
-          <a class="nav-link pl-0" href="tel:+5521XXXXXXXX" title="Ligar para suporte"><i class="fas fa-phone mr-2"></i>(21) XXXXX-XXXX</a>
-        </li>
-      </ul>
-    </div>
-  </nav>
+ <?php include_once('../routes/header.php')?>
 
   <!-- Seção - História da NetoNerd -->
   <div class="container mt-5 mb-5">
@@ -100,13 +42,13 @@
             <div class="row align-items-center">
               <div class="col-md-4 text-center mb-3 mb-md-0">
           <figure class="figure">
-            <img src="imagens/logoNetoNerd.jpg" class="figure-img img-fluid rounded" alt="Logo NetoNerd" style="max-height:140px; object-fit:contain;">
+            <img src="../src/imagens/logoNetoNerd.jpg" class="figure-img img-fluid rounded" alt="Logo NetoNerd" style="max-height:140px; object-fit:contain;">
             <figcaption class="figure-caption mt-2"><strong>Produto: NetoNerd</strong></figcaption>
           </figure>
               </div>
               <div class="col-md-4 text-center mb-3 mb-md-0">
           <figure class="figure">
-            <img src="imagens/foto_CEO.jpeg" class="figure-img img-fluid rounded-circle" alt="Rondineli Oliveira" style="width:140px; height:140px; object-fit:cover;">
+            <img src="../src/imagens/foto_CEO.jpeg" class="figure-img img-fluid rounded-circle" alt="Rondineli Oliveira" style="width:140px; height:140px; object-fit:cover;">
             <figcaption class="figure-caption mt-2"><strong>Rondineli Oliveira</strong><br><small class="text-muted">CEO</small></figcaption>
           </figure>
               </div>
@@ -130,7 +72,7 @@
         <div class="card h-100 border-0 shadow-sm" style="border-top: 4px solid #007bff;">
           <div class="card-body text-center p-3">
             <div class="mb-3" style="height:140px; overflow:hidden; border-radius:10px; display:flex; align-items:center; justify-content:center;">
-              <img src="imagens/Logo_MyHealth.png" alt="MyHealth" style="width:70%; height:100%; object-fit:cover; object-position:center; display:block;">
+              <img src="../src/imagens/Logo_MyHealth.png" alt="MyHealth" style="width:70%; height:100%; object-fit:cover; object-position:center; display:block;">
             </div>
             <!-- <h5 class="card-title">MyHealth</h5> -->
             <p class="card-text">Plataforma para gerenciamento de prontuários eletrônicos.</p>
@@ -143,7 +85,7 @@
         <div class="card h-100 border-0 shadow-sm" style="border-top: 4px solid #28a745;">
           <div class="card-body text-center">
             <div class="mb-3" style="height:140px; overflow:hidden; border-radius:10px; display:flex; align-items:center; justify-content:center;">
-              <img src="imagens/Logo_Escritorius.png" alt="MyHealth" style="width:70%; height:100%; object-fit:cover; object-position:center; display:block;">
+              <img src="../src/imagens/Logo_Escritorius.png" alt="MyHealth" style="width:70%; height:100%; object-fit:cover; object-position:center; display:block;">
             </div>
             <!-- <h5 class="card-title">Escritorius</h5> -->
             <p class="card-text">Sistema de gerenciamento de escritórios de advocacia.</p>
@@ -156,7 +98,7 @@
         <div class="card h-100 border-0 shadow-sm" style="border-top: 4px solid #28a745;">
           <div class="card-body text-center">
             <div class="mb-3" style="height:140px; overflow:hidden; border-radius:10px; display:flex; align-items:center; justify-content:center;">
-              <img src="imagens/Logo_StyleManager.png" alt="MyHealth" style="width:70%; height:100%; object-fit:cover; object-position:center; display:block;">
+              <img src="../src/imagens/Logo_StyleManager.png" alt="MyHealth" style="width:70%; height:100%; object-fit:cover; object-position:center; display:block;">
             </div>
             <!-- <h5 class="card-title">Escritorius</h5> -->
             <p class="card-text">Sistema de gerenciamento de escritórios de advocacia.</p>
@@ -169,7 +111,7 @@
         <div class="card h-100 border-0 shadow-sm" style="border-top: 4px solid #ffc107;">
           <div class="card-body text-center">
             <div class="mb-3" style="height:140px; overflow:hidden; border-radius:10px; display:flex; align-items:center; justify-content:center;">
-              <img src="imagens/logoNetoNerd.jpg" alt="MyHealth" style="width:40%; height:100%; object-fit:cover; object-position:center; display:block;">
+              <img src="../src/imagens/logoNetoNerd.jpg" alt="MyHealth" style="width:40%; height:100%; object-fit:cover; object-position:center; display:block;">
             </div>
             <h5 class="card-title">NetoNerd PJ</h5>
             <p class="card-text">Suporte tecnológico especializado para empresas com planos personalizados.</p>
@@ -254,34 +196,9 @@
     <!-- Scripts necessários para o funcionamento do Bootstrap -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script> <!-- jQuery Completo -->
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.bundle.min.js"></script> <!-- Inclui Popper.js e Bootstrap JS -->
-    <!-- Footer -->
-    <footer class="bg-primary text-white text-center py-4 mt-5">
-  <div class="container">
-    <!-- Copyright -->
-    <p class="mb-2">© 2025 Four_BA - Todos os direitos reservados</p>
-    
-    <!-- Links do Site -->
-    <div class="footer-links mb-3">
-      <a href="#atendimento" class="text-white mx-3">Atendimento</a>
-      <a href="#planos" class="text-white mx-3">Planos</a>
-      <a href="#contato" class="text-white mx-3">Contato</a>
-      <a href="#login" class="text-white mx-3">Login</a>
-    </div>
-    
-    <!-- Social Links -->
-    <div class="social-links">
-      <a href="https://facebook.com" target="_blank" class="text-white mx-3">
-        <i class="bg-dark fab fa-facebook fa-2x"></i>
-      </a>
-      <a href="https://twitter.com" target="_blank" class="text-white mx-3">
-        <i class="bg-dark fab fa-twitter fa-2x"></i>
-      </a>
-      <a href="https://instagram.com" target="_blank" class="text-white mx-3">
-        <i class="bg-dark fab fa-instagram fa-2x"></i>
-      </a>
-    </div>
-  </div>
-</footer>
+    <?php
+    include_once('../routes/footer.php')
+    ?>
 
 <!-- Scripts FontAwesome (para os ícones de redes sociais) -->
 <script src="https://kit.fontawesome.com/a076d05399.js"></script>
