@@ -33,6 +33,7 @@
       </button>
       <div class="collapse navbar-collapse LinksNav" id="navbarNav">
       <ul class="navbar-nav ml-auto">
+        <li class="nav-item"><a class="nav-link" href="index.php">Inicio</a></li>
         <li class="nav-item"><a class="nav-link" href="atendimento.php">Atendimento</a></li>
         <li class="nav-item"><a class="nav-link" href="planos.php">Planos</a></li>
         <li class="nav-item"><a class="nav-link" href="contato.php">Contato</a></li>
@@ -44,7 +45,7 @@
 
   <!-- Conteúdo Principal -->
   <div class="container mt-5">
-    <h4 class="d-block w-100 p-4 bg-primary text-center text-white">Atendimentos - Modalidades</h4>
+    <h4 class="d-block w-100 p-4 bg-primary text-center text-white border border-primary border-3">Atendimentos - Modalidades</h4>
 
     <!-- Descrição do Atendimento -->
     <div class="card-atendimento">
@@ -88,24 +89,25 @@
   <!-- Footer -->
   <footer class="bg-primary text-white text-center py-4 mt-5">
     <div class="container">
-      <p class="mb-2">© 2025 Four_BA - Todos os direitos reservados</p>
-      <div class="footer-links mb-3">
-        <a href="#atendimento" class="text-white mx-3">Atendimento</a>
-        <a href="#planos" class="text-white mx-3">Planos</a>
-        <a href="#contato" class="text-white mx-3">Contato</a>
-        <a href="#login" class="text-white mx-3">Login</a>
+      <p class="mb-3"><strong>© 2025 Neto Nerd</strong> - Suporte Tecnológico Profissional</p>
+      <div class="footer-links mb-4">
+      <a href="atendimento.php" class="text-white mx-3">Atendimento</a>
+      <a href="planos.php" class="text-white mx-3">Planos</a>
+      <a href="contato.php" class="text-white mx-3">Contato</a>
+      <a href="index.php" class="text-white mx-3">Início</a>
       </div>
-      <div class="social-links">
-        <a href="https://facebook.com" target="_blank" class="text-white mx-3">
-          <i class="bg-dark fab fa-facebook fa-2x"></i>
-        </a>
-        <a href="https://twitter.com" target="_blank" class="text-white mx-3">
-          <i class="bg-dark fab fa-twitter fa-2x"></i>
-        </a>
-        <a href="https://instagram.com" target="_blank" class="text-white mx-3">
-          <i class="bg-dark fab fa-instagram fa-2x"></i>
-        </a>
+      <div class="social-links mb-3">
+      <a href="https://facebook.com/netonerd" target="_blank" class="text-white mx-2" title="Facebook">
+        <i class="fab fa-facebook-f"></i>
+      </a>
+      <a href="https://twitter.com/netonerd" target="_blank" class="text-white mx-2" title="Twitter">
+        <i class="fab fa-twitter"></i>
+      </a>
+      <a href="https://instagram.com/netonerd" target="_blank" class="text-white mx-2" title="Instagram">
+        <i class="fab fa-instagram"></i>
+      </a>
       </div>
+      <p class="text-muted small">Todos os direitos reservados.</p>
     </div>
   </footer>
 

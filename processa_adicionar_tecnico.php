@@ -22,15 +22,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 
     // Prepara a consulta SQL para inserir os dados na tabela chamados
-    $sql = "INSERT INTO tecnicos (nome, email, status_tecnico, Ativo, matricula, carro_do_dia, senha_hash) 
-            VALUES (?, ?, ?, ?, ?, ?, ?)";
+   $sql = "INSERT INTO tecnicos (nome, email, status_tecnico, matricula, carro_do_dia, senha_hash) 
+        VALUES (?, ?, ?, ?, ?, ?)";
 
     // Prepara a declaração
     $stmt = $conn->prepare($sql);
 
     if ($stmt) {
         // Vincula os parâmetros
-        $stmt->bind_param('sssssss', $nome, $email, $status, $ativo, $matricula, $veiculo, $senha);
+        $stmt->bind_param('ssssss', $nome, $email, $ativo, $matricula, $veiculo, $senha);
 
         // Executa a consulta
         if ($stmt->execute()) {
