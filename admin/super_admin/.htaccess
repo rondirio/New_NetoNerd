@@ -1,0 +1,14 @@
+RewriteEngine On
+
+# Redirecionar API JWT
+RewriteRule ^api/jwt/generate$ api_jwt.php?action=generate [L,QSA]
+RewriteRule ^api/jwt/validate$ api_jwt.php?action=validate [L,QSA]
+RewriteRule ^api/jwt/revoke$ api_jwt.php?action=revoke [L,QSA]
+RewriteRule ^api/jwt/list$ api_jwt.php?action=list [L,QSA]
+RewriteRule ^api/jwt/stats$ api_jwt.php?action=stats [L,QSA]
+
+# Segurança: Bloquear acesso a arquivos sensíveis
+<FilesMatch "\.(env|sql|md|json)$">
+    Order allow,deny
+    Deny from all
+</FilesMatch>

@@ -15,11 +15,9 @@
     </style>
   </head>
   <body>
-    <nav class="navbar navbar-expand-lg navbar-custom bg-primary">
-      <a class="navbar-brand" href="#">
-        <img class="logo" src="imagens/logoNetoNerd.jpg" alt="Logo NetoNerd">
-      </a>
-    </nav>
+    <?php 
+      include_once('../routes/header.php')
+    ?>
 
     <div class="container mt-5">
       <div class="card-cadastro">
@@ -61,7 +59,9 @@
         </div>
       </div>
     </div>
-
+      <?php 
+      include_once('../routes/footer.php')
+    ?>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.bundle.min.js"></script>
   </body>
