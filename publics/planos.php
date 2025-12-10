@@ -8,7 +8,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="css/main.css">
     <style>
-        body {
+        /* body {
             background-color: #111;
             color: #fff;
             font-family: 'Arial', sans-serif;
@@ -78,7 +78,7 @@
           padding: 80px 20px;
           background: linear-gradient(135deg, #007bff, #00c3ff);
           color: white;
-        }
+        } */
     </style>
     
 </head>
@@ -87,23 +87,9 @@
   <!-- Navbar -->
   
     <div class="hero">
-    <nav class="navbar navbar-expand-lg navbar-custom" >
-    <a class="navbar-brand" href="index.php">
-      <img class="logo" src="imagens/logoNetoNerd.jpg" alt="Logo NetoNerd" >
-    </a>
-    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-      <span class="navbar-toggler-icon"></span>
-    </button>
-    <div class="collapse navbar-collapse LinksNav" id="navbarNav">
-      <ul class="navbar-nav ml-auto">
-        <li class="nav-item"><a class="nav-link" href="atendimento.php">Atendimento</a></li>
-        <li class="nav-item"><a class="nav-link" href="planos.php">Planos</a></li>
-        <li class="nav-item"><a class="nav-link" href="contato.php">Contato</a></li>
-        <li class="nav-item"><a class="nav-link" href="quemsomo.php">Quem somos</a></li>
-        <li class="nav-item"><a class="nav-link btn btn-light text-white bg-dark ml-2" href="#login">Login</a></li>
-      </ul>
-    </div>
-  </nav>
+    <?php 
+      include_once('../routes/header.php')
+    ?>
         <h1>Planos NetoNerd</h1>
         <p>Escolha a melhor opção para garantir a máxima performance e segurança para seus computadores!</p>
     </div>
@@ -146,5 +132,9 @@
         <a href="https://wa.me/+5521977395867?text=Olá, gostaria de conhecer mais sobre o plano Avançado" class="plan-btn">Contratar</a>
       </div>
     </div>
+
+    <?php 
+      include_once('../routes/footer.php')
+    ?>
 </body>
 </html>

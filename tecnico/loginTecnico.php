@@ -24,24 +24,7 @@
         </style>
     </head>
     <body>
-        <nav class="navbar navbar-expand-lg navbar-custom bg-primary">
-            <a class="navbar-brand" href="#">
-                <img class="logo" src="imagens/logoNetoNerd.jpg" alt="Logo NetoNerd">
-            </a>
-            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse LinksNav" id="navbarNav">
-                <ul class="navbar-nav ml-auto">
-                    <li class="nav-item"><a class="nav-link" href="atendimento.php">Atendimento</a></li>
-                    <!-- <li class="nav-item"><a class="nav-link" href="planos.php">Planos</a></li>
-                    <li class="nav-item"><a class="nav-link" href="contato.php">Contato</a></li>
-                    <li class="nav-item"><a class="nav-link" href="quemsomo.php">Quem somos</a></li> -->
-                    <!-- <li class="nav-item"><a class="nav-link btn btn-light text-white bg-dark ml-2" href="login.php">Login</a></li> -->
-                    <!-- <li class="nav-item"><a class="nav-link btn btn-light text-white bg-dark ml-2" href="loginTecnico.php">Técnico</a></li> -->
-                </ul>
-            </div>
-        </nav>
+        <?php include_once('../routes/header.php')?>
         <div class="text-center mt-4" style="color: #555; font-size: 1.5rem; font-weight: bold;">
             Vamos ver os chamados de hoje
         </div>
@@ -87,11 +70,7 @@
             </div>
         </div>
         
-        <footer class="alinhamentoFooter">
-            <div class="">
-                <p class="">© 2025 Four_BA - Todos os direitos reservados</p>
-            </div>
-        </footer>
+        <?php include_once('../routes/header.php')?>
 
         <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
         <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.bundle.min.js"></script>
