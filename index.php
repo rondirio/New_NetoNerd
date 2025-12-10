@@ -36,101 +36,219 @@
         <span class="navbar-toggler-icon"></span>
       </button>
       <div class="collapse navbar-collapse LinksNav" id="navbarNav">
-      <ul class="navbar-nav ml-auto">
-        <li class="nav-item"><a class="nav-link" href="atendimento.php">Atendimento</a></li>
-        <li class="nav-item"><a class="nav-link" href="planos.php">Planos</a></li>
-        <li class="nav-item"><a class="nav-link" href="contato.php">Contato</a></li>
-        <li class="nav-item"><a class="nav-link" href="quemsomo.php">Quem somos</a></li>
-        <li class="nav-item"><a class="nav-link btn btn-light text-white bg-dark ml-2" href="#login">Login</a></li>
-        <li class="nav-item"><a class="nav-link btn btn-light text-white bg-dark ml-2" href="loginTecnico.php">Tecnico</a></li>
+      <ul class="navbar-nav ml-auto align-items-lg-center">
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle" href="#" id="produtosDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            Produtos
+          </a>
+          <div class="dropdown-menu dropdown-menu-right" aria-labelledby="produtosDropdown">
+            <a class="dropdown-item" href="apresenta_myhealth/apresenta_myhealth.php">MyHealth</a>
+            <a class="dropdown-item" href="escritorius.php">Escritorius</a>
+            <a class="dropdown-item" href="stylemanager.php">Style Manager</a>
+            <div class="dropdown-divider"></div>
+            <a class="dropdown-item" href="pj.php">NetoNerd PJ</a>
+          </div>
+        </li>
+
+        <li class="nav-item">
+          <a class="nav-link" href="atendimento.php">Atendimento</a>
+        </li>
+
+        <li class="nav-item">
+          <a class="nav-link" href="planos.php">Planos</a>
+        </li>
+
+        <li class="nav-item">
+          <a class="nav-link" href="contato.php">Contato</a>
+        </li>
+
+        <li class="nav-item">
+          <a class="nav-link" href="quemsomo.php">Quem somos</a>
+        </li>
+
+        <!-- Call-to-action (shown on larger screens) -->
+        <li class="nav-item d-none d-lg-block ml-3">
+          <a class="btn btn-outline-light rounded" href="contato.php" title="Solicitar orçamento">Solicitar Orçamento</a>
+        </li>
+
+        <!-- Auth buttons with clear visual hierarchy -->
+        <li class="nav-item ml-2">
+          <a class="btn btn-light text-dark rounded" href="login.php" role="button" aria-label="Entrar">Login</a>
+        </li>
+
+        <li class="nav-item ml-2">
+          <a class="btn btn-outline-dark text-white rounded" href="loginTecnico.php" role="button" aria-label="Acesso técnico">Técnico</a>
+        </li>
+
+        <!-- Quick contact for small screens -->
+        <li class="nav-item d-lg-none mt-2">
+          <a class="nav-link pl-0" href="tel:+5521XXXXXXXX" title="Ligar para suporte"><i class="fas fa-phone mr-2"></i>(21) XXXXX-XXXX</a>
+        </li>
       </ul>
     </div>
-    </nav>
+  </nav>
+
+  <!-- Seção - História da NetoNerd -->
+  <div class="container mt-5 mb-5">
+    <div class="row">
+      <div class="col-md-12">
+        <div class="card border-primary">
+          <div class="card-header bg-primary text-white">
+            <h4>Nossa História</h4>
+          </div>
+          <div class="card-body">
+            <div class="row align-items-center">
+              <div class="col-md-4 text-center mb-3 mb-md-0">
+          <figure class="figure">
+            <img src="imagens/logoNetoNerd.jpg" class="figure-img img-fluid rounded" alt="Logo NetoNerd" style="max-height:140px; object-fit:contain;">
+            <figcaption class="figure-caption mt-2"><strong>Produto: NetoNerd</strong></figcaption>
+          </figure>
+              </div>
+              <div class="col-md-4 text-center mb-3 mb-md-0">
+          <figure class="figure">
+            <img src="imagens/foto_CEO.jpeg" class="figure-img img-fluid rounded-circle" alt="Rondineli Oliveira" style="width:140px; height:140px; object-fit:cover;">
+            <figcaption class="figure-caption mt-2"><strong>Rondineli Oliveira</strong><br><small class="text-muted">CEO</small></figcaption>
+          </figure>
+              </div>
+              <div class="col-md-4">
+          <p>A Neto Nerd nasceu do coração do nosso CEO Rondineli Oliveira, apaixonado por tecnologia, formado em Ciência da Computação e Data Science. Rondineli desenvolveu a NetoNerd para ser uma empresa de suporte tecnológico às pessoas idosas. No entanto, ao começar a trabalhar em Teresópolis-RJ, o projeto cresceu e alcançou até mesmo o público jovem.</p>
+          <p>Com isso, ele viu a necessidade de expandir a empresa e atender pessoas e empresas. Ao observar as necessidades de algumas empresas, observou a possibilidade de ir além, assim, criou nossa linha de produtos inovadores.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Seção - Produtos NetoNerd -->
+  <div class="container mt-5 mb-5">
+    <h4 class="text-center mb-5">Nossos Produtos</h4>
+    <div class="row">
+      <div class="col-md-6 col-lg-4 mb-4">
+        <a href="apresenta_myhealth/apresenta_myhealth.php" style="color: black; text-decoration: none;">
+        <div class="card h-100 border-0 shadow-sm" style="border-top: 4px solid #007bff;">
+          <div class="card-body text-center p-3">
+            <div class="mb-3" style="height:140px; overflow:hidden; border-radius:10px; display:flex; align-items:center; justify-content:center;">
+              <img src="imagens/Logo_MyHealth.png" alt="MyHealth" style="width:70%; height:100%; object-fit:cover; object-position:center; display:block;">
+            </div>
+            <!-- <h5 class="card-title">MyHealth</h5> -->
+            <p class="card-text">Plataforma para gerenciamento de prontuários eletrônicos.</p>
+          </div>
+        </div>
+        </a>
+      </div>
+      <div class="col-md-6 col-lg-4 mb-4">
+        <a href="apresenta_myhealth/apresenta_myhealth.php" style="color: black; text-decoration: none;">
+        <div class="card h-100 border-0 shadow-sm" style="border-top: 4px solid #28a745;">
+          <div class="card-body text-center">
+            <div class="mb-3" style="height:140px; overflow:hidden; border-radius:10px; display:flex; align-items:center; justify-content:center;">
+              <img src="imagens/Logo_Escritorius.png" alt="MyHealth" style="width:70%; height:100%; object-fit:cover; object-position:center; display:block;">
+            </div>
+            <!-- <h5 class="card-title">Escritorius</h5> -->
+            <p class="card-text">Sistema de gerenciamento de escritórios de advocacia.</p>
+          </div>
+        </div>
+        </a>
+      </div>
+      <div class="col-md-6 col-lg-4 mb-4">
+        <a href="apresenta_myhealth/apresenta_myhealth.php" style="color: black; text-decoration: none;">
+        <div class="card h-100 border-0 shadow-sm" style="border-top: 4px solid #28a745;">
+          <div class="card-body text-center">
+            <div class="mb-3" style="height:140px; overflow:hidden; border-radius:10px; display:flex; align-items:center; justify-content:center;">
+              <img src="imagens/Logo_StyleManager.png" alt="MyHealth" style="width:70%; height:100%; object-fit:cover; object-position:center; display:block;">
+            </div>
+            <!-- <h5 class="card-title">Escritorius</h5> -->
+            <p class="card-text">Sistema de gerenciamento de escritórios de advocacia.</p>
+          </div>
+        </div>
+        </a>
+      </div>
+      <div class="col-md-6 col-lg-4 mb-4">
+        <a href="apresenta_myhealth/apresenta_myhealth.php" style="color: black; text-decoration: none;">
+        <div class="card h-100 border-0 shadow-sm" style="border-top: 4px solid #ffc107;">
+          <div class="card-body text-center">
+            <div class="mb-3" style="height:140px; overflow:hidden; border-radius:10px; display:flex; align-items:center; justify-content:center;">
+              <img src="imagens/logoNetoNerd.jpg" alt="MyHealth" style="width:40%; height:100%; object-fit:cover; object-position:center; display:block;">
+            </div>
+            <h5 class="card-title">NetoNerd PJ</h5>
+            <p class="card-text">Suporte tecnológico especializado para empresas com planos personalizados.</p>
+          </div>
+        </div>
+        </a>
+      </div>
+    </div>
+  </div>
 
     <div class="container">
-      
-      <div id="planosCarousel" class="carousel slide mt-5" data-ride="carousel">
-        <h4 class="d-block w-100 p-4 bg-primary text-center">Conheça nossos planos para empresas!</h4>
-        <div class="carousel-inner">
-          <div class="carousel-item active">
-            <div class="d-block w-100 p-4 bg-light text-center">
-              <h3>Plano Mensal – R$ 400/mês</h3>
-              <p>✅ 1 visita presencial por mês para manutenção e ajustes.<br>✅ Diagnóstico e recomendações para evitar problemas futuros.</p>
-            </div>
-          </div>
-          <div class="carousel-item">
-            <div class="d-block w-100 p-4 bg-light text-center">
-              <h3>Plano Quinzenal – R$ 500/mês</h3>
-              <p>✅ 2 visitas presenciais por mês.<br>✅ Suporte prioritário para emergências.<br>✅ Treinamento básico para equipe sobre segurança digital e boas práticas.</p>
-            </div>
-          </div>
-          <div class="carousel-item">
-            <div class="d-block w-100 p-4 bg-light text-center">
-              <h3>Plano Semanal – R$ 600/mês</h3>
-              <p>✅ 1 visita presencial por semana.<br>✅ Atendimento emergencial garantido.<br>✅ Treinamento aprimorado para equipe sobre organização de arquivos, backups e segurança.</p>
-            </div>
-          </div>
-        </div>
-        <a class="carousel-control-prev" href="#planosCarousel" role="button" data-slide="prev">
-          <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-        </a>
-        <a class="carousel-control-next" href="#planosCarousel" role="button" data-slide="next">
-          <span class="carousel-control-next-icon" aria-hidden="true">></span>
-        </a>
-      </div>
+      <!-- Preços dos Produtos -->
+      <div class="mt-5 mb-4">
+      <h4 class="text-center mb-4">💰 Confira nossos preços</h4>
       <div class="row">
-        <div class="card-login">
-          <div class="card">
-            <div class="card-header bg-primary">Login</div>
-            <div class="card-body bg-white">
-              <form action="valida_login.php" method="post">
-                <div class="form-group">
-                  <input name="email" type="email" class="form-control bg-light" placeholder="E-mail" required>
-                </div>
-                <div class="form-group">
-                  <input name="senha" type="password" class="form-control bg-light" placeholder="Senha" required>
-                </div>
-                <?php if(isset($_GET['login']) && $_GET['login'] == 'erro'){?>
-                <div class="text-danger">Usuário ou senha inválido(s)</div>
-                <?php } ?>
-                <?php if(isset($_GET['login']) && $_GET['login'] == 'erro2'){?>
-                <div class="text-danger">Por favor, faça login antes de acessar as páginas protegidas</div>
-                <?php } ?>
-                <button class="btn btn-lg btn-info btn-block" type="submit">Entrar</button>
-                <button class="btn btn-lg btn-info btn-block" type="submit"><a href="cadastro.php">Castre-se</a></button>
-              </form>
-            </div>
+        <!-- MyHealth (pronto para atualização caso tenha valores específicos) -->
+        <div class="col-md-6 col-lg-3 mb-4">
+        <div class="card h-100 border-0 shadow-sm text-center" style="border-top: 4px solid #007bff;">
+          <div class="card-body">
+          <h5 class="card-title">🏥 MyHealth</h5>
+          <p class="card-text">Prontuários eletrônicos e gerenciamento de clínicas e hospitais.</p>
+          <p class="text-info font-weight-bold">📞 Fale conosco para conhecer valores especiais</p>
+          <a href="contato.php" class="btn btn-sm btn-info">Solicitar Orçamento</a>
           </div>
+        </div>
+        </div>
+
+        <!-- Escritorius (advogados) -->
+        <div class="col-md-6 col-lg-3 mb-4">
+        <div class="card h-100 border-0 shadow-sm text-center" style="border-top: 4px solid #28a745;">
+          <div class="card-body">
+          <h5 class="card-title">⚖️ Escritorius</h5>
+          <p class="card-text">Sistema para escritórios de advocacia.</p>
+          <ul class="list-unstyled mt-3">
+        <li class="mb-2"><strong>R$ 300,00</strong> <span class="badge badge-light">/mês</span></li>
+        <li class="mb-2"><span class="badge badge-success">-10%</span> <strong>R$ 3.240,00</strong> <span class="badge badge-light">/ano</span></li>
+        <li><span class="badge badge-success">-5%</span> <strong>R$ 1.710,00</strong> <span class="badge badge-light">/semestre</span></li>
+          </ul>
+          </div>
+        </div>
+        </div>
+
+        <!-- Style Manager -->
+        <div class="col-md-6 col-lg-3 mb-4">
+        <div class="card h-100 border-0 shadow-sm text-center" style="border-top: 4px solid #ffc107;">
+          <div class="card-body">
+          <h5 class="card-title">💇 Style Manager</h5>
+          <p class="card-text">Gestão para salões, barbearias e similares.</p>
+          <ul class="list-unstyled mt-3">
+        <li class="mb-2"><strong>R$ 119,90</strong> <span class="badge badge-light">/mês</span></li>
+        <li class="mb-2"><strong>R$ 1.300,00</strong> <span class="badge badge-light">/ano</span></li>
+        <li><strong>R$ 683,00</strong> <span class="badge badge-light">/semestre</span></li>
+          </ul>
+          </div>
+        </div>
+        </div>
+
+        <!-- NetoNerd PJ -->
+        <div class="col-md-6 col-lg-3 mb-4">
+        <div class="card h-100 border-0 shadow-sm text-center" style="border-top: 4px solid #dc3545;">
+          <div class="card-body">
+          <h5 class="card-title">🚀 NetoNerd PJ</h5>
+          <p class="card-text">Suporte tecnológico especializado para empresas.</p>
+          <ul class="list-unstyled mt-3">
+        <li class="mb-2"><strong>R$ 699,00</strong> <span class="badge badge-light">/mês</span></li>
+        <li class="mb-2"><span class="badge badge-success">-10%</span> <strong>R$ 7.549,20</strong> <span class="badge badge-light">/ano</span></li>
+        <li><span class="badge badge-success">-5%</span> <strong>R$ 3.984,30</strong> <span class="badge badge-light">/semestre</span></li>
+          </ul>
+          <a href="contato.php" class="btn btn-sm btn-danger mt-2">Plano Personalizado</a>
+          </div>
+        </div>
         </div>
       </div>
-      <div class="row atendimento-section text-center">
-        <div class="col-md-6">
-          <div class="card atendimento-card">
-            <img src="imagens/suporte pf.jpg" alt="Atendimento Pessoa Física">
-            <div class="card-body">
-              <h5 class="card-title">Atendimento para Pessoas Físicas</h5>
-              <p class="card-text">Soluções tecnológicas para seu dia a dia! Oferecemos manutenção de computadores, suporte remoto e aulas personalizadas.</p>
-            </div>
-          </div>
-        </div>
-        <div class="col-md-6">
-          <div class="card atendimento-card">
-            <img src="imagens/suporte pj temporário.jpg" alt="Atendimento Pessoa Jurídica">
-            <div class="card-body">
-              <h5 class="card-title">Atendimento para Empresas</h5>
-              <p class="card-text">Serviços especializados para negócios! Suporte para infraestrutura de TI, redes corporativas e soluções empresariais personalizadas.</p>
-            </div>
-          </div>
-        </div>
-      </div>
-      
-      
-    </div>
+      </div></div>
     <gmpx-api-loader key="AIzaSyAn8jvObnrRaBeaYBdSG3-yBtv-pKI_Czc" solution-channel="GMP_GE_placepicker_v2">
     </gmpx-api-loader>
     <div id="place-picker-box">
       <div id="place-picker-container">
-        <gmpx-place-picker placeholder="Enter an address"></gmpx-place-picker>
+      <gmpx-place-picker placeholder="Enter an address"></gmpx-place-picker>
       </div>
     </div>
     <!-- Scripts necessários para o funcionamento do Bootstrap -->
