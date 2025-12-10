@@ -24,24 +24,9 @@
 <body>
 
   <!-- Navbar -->
-  <nav class="navbar navbar-expand-lg navbar-custom bg-primary">
-      <a class="navbar-brand" href="index.php">
-        <img class="logo" src="imagens/logoNetoNerd.jpg" alt="Logo NetoNerd" >
-      </a>
-      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-        <span class="navbar-toggler-icon"></span>
-      </button>
-      <div class="collapse navbar-collapse LinksNav" id="navbarNav">
-      <ul class="navbar-nav ml-auto">
-        <li class="nav-item"><a class="nav-link" href="index.php">Inicio</a></li>
-        <li class="nav-item"><a class="nav-link" href="atendimento.php">Atendimento</a></li>
-        <li class="nav-item"><a class="nav-link" href="planos.php">Planos</a></li>
-        <li class="nav-item"><a class="nav-link" href="contato.php">Contato</a></li>
-        <li class="nav-item"><a class="nav-link" href="quemsomo.php">Quem somos</a></li>
-        <li class="nav-item"><a class="nav-link btn btn-light text-white bg-dark ml-2" href="logoff.php">Sair</a></li>
-      </ul>
-    </div>
-    </nav>
+  <?php
+  include_once('../routes/header.php')
+  ?>
 
   <!-- Conteúdo Principal -->
   <div class="container mt-5">
@@ -87,29 +72,9 @@
   </div>
 
   <!-- Footer -->
-  <footer class="bg-primary text-white text-center py-4 mt-5">
-    <div class="container">
-      <p class="mb-3"><strong>© 2025 Neto Nerd</strong> - Suporte Tecnológico Profissional</p>
-      <div class="footer-links mb-4">
-      <a href="atendimento.php" class="text-white mx-3">Atendimento</a>
-      <a href="planos.php" class="text-white mx-3">Planos</a>
-      <a href="contato.php" class="text-white mx-3">Contato</a>
-      <a href="index.php" class="text-white mx-3">Início</a>
-      </div>
-      <div class="social-links mb-3">
-      <a href="https://facebook.com/netonerd" target="_blank" class="text-white mx-2" title="Facebook">
-        <i class="fab fa-facebook-f"></i>
-      </a>
-      <a href="https://twitter.com/netonerd" target="_blank" class="text-white mx-2" title="Twitter">
-        <i class="fab fa-twitter"></i>
-      </a>
-      <a href="https://instagram.com/netonerd" target="_blank" class="text-white mx-2" title="Instagram">
-        <i class="fab fa-instagram"></i>
-      </a>
-      </div>
-      <p class="text-muted small">Todos os direitos reservados.</p>
-    </div>
-  </footer>
+  <?php
+  include_once('../routes/footer.php')
+  ?>
 
   <!-- FontAwesome -->
   <script src="https://kit.fontawesome.com/a076d05399.js"></script>
