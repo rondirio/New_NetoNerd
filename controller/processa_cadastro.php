@@ -1,5 +1,5 @@
 <?php
-require 'bandoDeDados/conexao.php'; // Arquivo de configuração do banco de dados
+require '../config/bandoDeDados/conexao.php'; // Arquivo de configuração do banco de dados
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $nome = trim($_POST['nome']);
@@ -34,7 +34,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $stmt->bind_param("sssssss", $nome, $email, $senha, $telefone, $endereco, $complemento, $cep);
 
         if ($stmt->execute()) {
-            header("Location: index.php?cadastro=sucesso");
+            header("Location: ../publics/index.php?cadastro=sucesso");
             echo json_encode(["status" => "sucesso", "mensagem" => "Cadastro realizado com sucesso!"]);
         } else {
             echo json_encode(["status" => "erro", "mensagem" => "Erro ao cadastrar cliente."]);
