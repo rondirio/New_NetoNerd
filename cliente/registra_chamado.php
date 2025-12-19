@@ -1,6 +1,6 @@
 <?php
 session_start();
-include 'bandoDeDados/conexao.php'; // Certifique-se do nome correto da pasta
+include '../config/bandoDeDados/conexao.php'; // Certifique-se do nome correto da pasta
 
 try {
     // Pegando dados do formulário e sanitizando entrada

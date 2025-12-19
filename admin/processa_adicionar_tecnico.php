@@ -1,6 +1,6 @@
 <?php
 // Inclui o arquivo de conexão com o banco de dados
-require_once 'bandoDeDados/conexao.php';
+require_once '../config/bandoDeDados/conexao.php';
 
 // Verifica se o formulário foi enviado
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -36,7 +36,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if ($stmt->execute()) {
             echo 'Técnico adicionado com sucesso!';
             // Redireciona para a página de sucesso ou outra página desejada
-            header('Location: dashboard.php');
+            header('Location: ../tecnico/dashboard.php');
         } else {
             echo 'Erro ao adicionar técnico: ' . $stmt->error;
         }

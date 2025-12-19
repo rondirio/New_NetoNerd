@@ -46,29 +46,15 @@
 </head>
 <body>
     <!-- Navbar -->
-  <nav class="navbar navbar-expand-lg navbar-custom bg-primary">
-      <a class="navbar-brand" href="index.php">
-        <img class="logo" src="imagens/logoNetoNerd.jpg" alt="Logo NetoNerd" >
-      </a>
-      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-        <span class="navbar-toggler-icon"></span>
-      </button>
-      <div class="collapse navbar-collapse LinksNav" id="navbarNav">
-      <ul class="navbar-nav ml-auto">
-        <li class="nav-item"><a class="nav-link" href="atendimento.php">Atendimento</a></li>
-        <li class="nav-item"><a class="nav-link" href="planos.php">Planos</a></li>
-        <li class="nav-item"><a class="nav-link" href="contato.php">Contato</a></li>
-        <li class="nav-item"><a class="nav-link" href="quemsomo.php">Quem somos</a></li>
-        <li class="nav-item"><a class="nav-link btn btn-light text-white bg-dark ml-2" href="logoff.php">Sair</a></li>
-      </ul>
-    </div>
-    </nav>
+  <?php
+    include_once('../routes/headerTecnico.php')
+  ?>
     <div class="container">
-        <!-- Cabeçalho do Dashboard -->
+        <!-- Cabeçalho do Dashboard
         <div class="dashboard-header">
             <h4>Bem-vindo, Cliente</h4>
             
-        </div>
+        </div> -->
 
         <!-- Tabela de Chamados -->
         <h4 class="mb-4">Chamados Pendentes</h4>
