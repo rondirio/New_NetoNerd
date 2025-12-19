@@ -51,7 +51,7 @@
     <div class="container">
         <div class="dashboard-header">
             <?php
-                include 'bandoDeDados/conexao.php';
+                include '../config/bandoDeDados/conexao.php';
 
                 $tecnicoId = 1; // Substitua pelo ID do técnico logado
                 $query = "SELECT nome FROM tecnicos WHERE id = ?";

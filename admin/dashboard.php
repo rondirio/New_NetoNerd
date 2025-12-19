@@ -70,11 +70,11 @@
             <h2 class="text-center">NetoNerd</h2>
             <ul class="nav flex-column">
                 <li class="nav-item"><a href="#" class="nav-link">Dashboard</a></li>
-                <li class="nav-item"><a href="#" class="nav-link">Técnicos</a></li>
-                <li class="nav-item"><a href="#" class="nav-link">Chamados</a></li>
-                <li class="nav-item"><a href="#" class="nav-link">Relatórios</a></li>
-                <li class="nav-item"><a href="#" class="nav-link">Configurações</a></li>
-                <li class="nav-item"><a class="nav-link btn btn-light text-white bg-dark ml-2" href="logoff.php">Sair</a></li>
+                <li class="nav-item"><a href="apresenta_tecnicos.php" class="nav-link">Técnicos</a></li>
+                <li class="nav-item"><a href="chamados_ativos.php" class="nav-link">Chamados</a></li>
+                <li class="nav-item"><a href="relatorios.php" class="nav-link">Relatórios</a></li>
+                <li class="nav-item"><a href="configura.php" class="nav-link">Configurações</a></li>
+                <li class="nav-item"><a class="nav-link btn btn-light text-white bg-dark ml-2" href="../tecnico/logoff.php">Sair</a></li>
             </ul>
         </div>
         <div class="main-content flex-grow-1 p-4">
@@ -85,7 +85,7 @@
                 <div class="col-md-3">
                     <div class="card p-3 text-center">
                         <?php
-                            include 'bandoDeDados/conexao.php';
+                            include '../config/bandoDeDados/conexao.php';
 
                             $sql = "SELECT COUNT(*) AS total_chamados FROM chamados WHERE status = 'Aberto'";
                             $result = $conn->query($sql);
@@ -104,7 +104,7 @@
                 <div class="col-md-3">
                     <div class="card p-3 text-center">
                         <?php
-                            include 'bandoDeDados/conexao.php';
+                            include '../config/bandoDeDados/conexao.php';
 
                             $today = date('Y-m-d');
                             $sql = "SELECT COUNT(*) AS atendimentos_hoje FROM chamados WHERE DATE(data_fechamento) = ?";
@@ -128,7 +128,7 @@
                 <div class="col-md-3">
                     <div class="card p-3 text-center">
                     <?php
-include 'bandoDeDados/conexao.php';
+include '../config/bandoDeDados/conexao.php';
 
 // Inicializa as contagens
 $contagens = [
@@ -239,39 +239,54 @@ $boleto = $contagens['Boleto'];
                     <tbody>
                         <tr>
                             <?php
-                                // Inclui o arquivo de conexão
-                                include 'bandoDeDados/conexao.php';
+include '../config/bandoDeDados/conexao.php';
 
-                                // Consulta corrigida
-                                $sql = "SELECT id, nome, carro_do_dia, email, created_at, matricula, status_tecnico FROM tecnicos";
-                                $result = $conn->query($sql);
+$sql = "SELECT id, nome, carro_do_dia, email, created_at, matricula, status_tecnico FROM tecnicos";
+$result = $conn->query($sql);
 
-                                if ($result === false) {
-                                    echo "<tr><td colspan='8' class='text-center'>Erro na consulta: " . $conn->error . "</td></tr>";
-                                } elseif ($result->num_rows > 0) {
-                                    while ($row = $result->fetch_assoc()) {
-                                        echo "<tr>";
-                                        echo "<td>" . htmlspecialchars($row['id']) . "</td>";
-                                        echo "<td>" . htmlspecialchars($row['nome']) . "</td>";
-                                        echo "<td>" . htmlspecialchars($row['email']) . "</td>";
-                                        echo "<td>" . htmlspecialchars($row['status_tecnico']) . "</td>";
-                                        echo "<td>" . htmlspecialchars($row['created_at']) . "</td>";
-                                        echo "<td>" . htmlspecialchars($row['matricula']) . "</td>";
-                                        echo "<td>" . htmlspecialchars($row['carro_do_dia']) . "</td>";
-                                        echo "<td>";
-                                        echo "<button class='btn btn-sm btn-edit'>Editar</button>";
-                                        echo "<button class='btn btn-sm btn-success'><i class='fas fa-file'></i> Relatório</button>";
-                                        echo "<button class='btn btn-sm btn-delete'>Excluir</button>";
-                                        echo "</td>";
-                                        echo "</tr>";
-                                    }
-                                } else {
-                                    echo "<tr><td colspan='7' class='text-center'>Nenhum técnico encontrado</td></tr>";
-                                }
+if ($result === false) {
+    echo "<tr><td colspan='8' class='text-center'>Erro na consulta: " . $conn->error . "</td></tr>";
+} elseif ($result->num_rows > 0) {
+    while ($row = $result->fetch_assoc()) {
 
-                                // Fecha a conexão
-                                $conn->close();
-                            ?>
+        $id = (int)$row['id'];
+
+        echo "<tr>";
+        echo "<td>" . htmlspecialchars($id) . "</td>";
+        echo "<td>" . htmlspecialchars($row['nome']) . "</td>";
+        echo "<td>" . htmlspecialchars($row['email']) . "</td>";
+        echo "<td>" . htmlspecialchars($row['status_tecnico']) . "</td>";
+        echo "<td>" . htmlspecialchars($row['created_at']) . "</td>";
+        echo "<td>" . htmlspecialchars($row['matricula']) . "</td>";
+        echo "<td>" . htmlspecialchars($row['carro_do_dia']) . "</td>";
+
+        echo "<td>";
+
+        // Editar
+        echo "<a href='editar_tecnico.php?id=$id' class='btn btn-sm btn-edit'>Editar</a> ";
+
+        // Relatório
+        echo "<a href='relatorio_tecnico.php?id=$id' class='btn btn-sm btn-success'>
+                <i class='fas fa-file'></i> Relatório
+              </a> ";
+
+        // Excluir
+        echo "<a href='excluir_tecnico.php?id=$id' 
+                class='btn btn-sm btn-delete'
+                onclick=\"return confirm('Deseja realmente excluir este técnico?');\">
+                Excluir
+              </a>";
+
+        echo "</td>";
+        echo "</tr>";
+    }
+} else {
+    echo "<tr><td colspan='7' class='text-center'>Nenhum técnico encontrado</td></tr>";
+}
+
+$conn->close();
+?>
+
                             </td>
                         </tr>
                     </tbody>
@@ -289,7 +304,7 @@ $boleto = $contagens['Boleto'];
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                <form action="processa_adicionar_tecnico.php" method="POST">
+                <form action="../admin/processa_adicionar_tecnico.php" method="POST">
                     <div class="mb-3">
                         <label for="nome" class="form-label">Nome</label>
                         <input type="text" class="form-control" id="nome" name="nome" required>
@@ -312,7 +327,7 @@ $boleto = $contagens['Boleto'];
                             // 2025: ano em que entrou para a empresa
                             // F1: Filial 1
                             // 000: dígito verificador
-                            include 'bandoDeDados/conexao.php';
+                           include '../config/bandoDeDados/conexao.php';
 
                             $sql = "SELECT matricula FROM tecnicos WHERE matricula LIKE '2025F1%' ORDER BY matricula DESC LIMIT 1";
                             $result = $conn->query($sql);
