@@ -1,4 +1,6 @@
 <?php
+
+
 /**
  * Validação de Login - Técnicos e Administradores
  * NetoNerd ITSM - Versão Corrigida
@@ -11,13 +13,18 @@
  */
 
 session_start();
+// print_r($_SESSION);
 
 require_once "../config/bandoDeDados/conexao.php";
+// require_once '../controller/validador_acesso.php';
+
 
 // Constantes de segurança
 define('MAX_TENTATIVAS', 5);
 define('TEMPO_BLOQUEIO', 900); // 15 minutos em segundos
 
+
+// die();
 /**
  * Verifica se o usuário está bloqueado por tentativas excessivas
  */
@@ -48,6 +55,9 @@ function verificarBloqueio($matricula) {
     return ['bloqueado' => false];
 }
 
+// print_r($_SESSION);
+
+
 /**
  * Registra tentativa de login
  */
@@ -72,6 +82,8 @@ function registrarTentativa($matricula, $sucesso = false) {
         }
     }
 }
+print_r($_SESSION);
+
 
 /**
  * Cria sessão segura para o técnico
@@ -96,6 +108,8 @@ function criarSessaoTecnico($tecnico, $tipo_usuario) {
     // Token CSRF
     $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
 }
+// print_r($_POST);
+
 
 // ============================================
 // PROCESSAMENTO DO LOGIN
@@ -158,7 +172,7 @@ if ($matricula === 'Rondineli' && $senha === 'Rcouto95') {
         // Log de acesso master
         error_log("ACESSO MASTER: Usuário Rondineli acessou o sistema em " . date('Y-m-d H:i:s'));
         
-        header('Location: ../admin/dashboard.php');
+        // header('Location: ../admin/dashboard.php');
         exit();
     }
 }
@@ -203,7 +217,7 @@ $tecnico = $result->fetch_assoc();
 $stmt->close();
 
 // Verifica se o técnico está ativo
-if ($tecnico['Ativo'] != 1) {
+if ($tecnico['status_tecnico'] != 'Ativo') {
     registrarTentativa($matricula, false);
     error_log("Tentativa de login com conta inativa: {$tecnico['nome']} (ID: {$tecnico['id']})");
     
@@ -284,6 +298,8 @@ if ($tipo_usuario === 'admin') {
 } else {
     header('Location: ../tecnico/paineltecnico.php');
 }
+
+print_r($_SESSION);
 
 exit();
 ?>
