@@ -2,6 +2,9 @@
 require_once "../controller/validador_acesso.php";
 include '../config/bandoDeDados/conexao.php';
 
+$dados_cliente = obterDadosCliente();
+// print_r($dados_cliente['genero']);
+
 $conn = getConnection();
 $usuario_id = $_SESSION['id'];
 
@@ -33,7 +36,8 @@ $conn->close();
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Abrir Novo Chamado - NetoNerd</title>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
-    <link rel="stylesheet" type="text/css" href="css/main.css">
+    <link rel="stylesheet" type="text/css" href="../src/css/main.css">
+    <link rel="stylesheet" type="text/css" href="../src/css/estilo_navegar_cliente.css">
     <style>
         .form-wizard {
             background: white;
@@ -486,26 +490,38 @@ $conn->close();
                 margin-bottom: 20px;
             }
         }
+        .logo{
+            width: 90px;
+            height: 90px;
+            /* object-fit: contain; */
+            margin-bottom: 30px;
+        }
     </style>
 </head>
 <body>
-    <!-- Navbar -->
-    <nav class="navbar navbar-expand-lg navbar-custom bg-primary">
-        <a class="navbar-brand" href="home.php">
-            <img class="logo" src="imagens/logoNetoNerd.jpg" alt="Logo NetoNerd">
-        </a>
-        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse LinksNav" id="navbarNav">
-            <ul class="navbar-nav ml-auto">
-                <li class="nav-item"><a class="nav-link" href="home.php">Meus Chamados</a></li>
-                <li class="nav-item"><a class="nav-link" href="minha_conta.php">Minha Conta</a></li>
-                <li class="nav-item"><a class="nav-link" href="suporte.php">Suporte</a></li>
-                <li class="nav-item"><a class="nav-link btn btn-light text-white bg-dark ml-2" href="logoff.php">Sair</a></li>
-            </ul>
+    <div class="top-navbar">
+        <div class="container">
+            <div class="user-info">
+                <div class="user-avatar">
+                    <?php echo strtoupper(substr($cliente['nome'], 0, 0)); ?>
+                </div>
+                <div class="user-details">
+                    <h6>
+                        <?php 
+                        echo ($dados_cliente['genero'] === 'Feminino' ? 'Bem-vinda, ' : 'Bem-vindo, ') . 
+                             htmlspecialchars(explode(' ', $cliente['nome'])[0]); 
+                        ?>
+                    </h6>
+                    <small><?php echo htmlspecialchars($cliente['email']); ?></small>
+                </div>
+            </div>
+            <div>
+                <a href="logoff.php" class="btn btn-light btn-sm">
+                    <i class="fas fa-sign-out-alt"></i> Sair
+                </a>
+            </div>
         </div>
-    </nav>
+    </div>
 
     <div class="container">
         <div class="form-wizard">
@@ -539,7 +555,6 @@ $conn->close();
             <!-- Form -->
             <form id="chamadoForm" method="POST" action="registra_chamado.php" enctype="multipart/form-data">
                 <input type="hidden" name="usuario" value="<?php echo htmlspecialchars($cliente['nome']); ?>">
-                
                 <!-- Step 1: Categoria -->
                 <div class="form-section active" data-section="1">
                     <h4 style="margin-bottom: 25px; font-weight: 600;">Selecione a categoria do problema</h4>

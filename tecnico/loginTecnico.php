@@ -1,3 +1,7 @@
+<?php
+print_r($_POST);
+?>
+
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -315,6 +319,8 @@
     </style>
 </head>
 <body>
+
+
     <!-- Botão Voltar -->
     <div class="back-home">
         <a href="../publics/index.php" class="btn-back">
@@ -381,8 +387,8 @@
                             </span>
                             <input type="text" 
                                    class="form-control" 
-                                   id="email" 
-                                   name="email" 
+                                   id="matricula" 
+                                   name="matricula" 
                                    placeholder="NNF12345"
                                    required 
                                    
@@ -471,11 +477,11 @@
             const email = document.getElementById('email').value.trim();
             const senha = document.getElementById('senha').value;
 
-            if (!email || !senha) {
-                e.preventDefault();
-                alert('Por favor, preencha todos os campos.');
-                return false;
-            }
+            // if (!email || !senha) {
+            //     e.preventDefault();
+            //     alert('Por favor, preencha todos os campos.');
+            //     return false;
+            // }
 
             // Validação de email
             const matriculaRegex = /^(\d{4}[A-Z]\d{4}|[A-Z]{3}\d{6})$/;
