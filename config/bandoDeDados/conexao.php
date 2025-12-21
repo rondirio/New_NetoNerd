@@ -17,5 +17,30 @@ if (!function_exists('getConnection')) {
         return $conn;
     }
 }
-// Agora você pode usar a variável $conn diretamente para interagir com o banco de dados.
+// Função para obter dados do cliente
+function obterDadosCliente() {
+    $conn = getConnection();
+    
+    // Verificar se usuário está logado
+    if (!isset($_SESSION['id'])) {
+        return null;
+    }
+    
+    $usuario_id = $_SESSION['id'];
+
+    // Busca dados do cliente
+    $stmt = $conn->prepare("SELECT * FROM clientes WHERE id = ?");
+    if (!$stmt) {
+        die("Erro na preparação da query: " . $conn->error);
+    }
+    
+    $stmt->bind_param("i", $usuario_id);
+    $stmt->execute();
+    $resultado = $stmt->get_result();
+    $cliente = $resultado->fetch_assoc();
+    $stmt->close();
+    
+    return $cliente;
+}
+
 ?>

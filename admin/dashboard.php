@@ -1,4 +1,9 @@
-<?php session_start()?>
+<?php 
+
+session_start();
+
+include_once '../config/bandoDeDados/conexao.php';
+?>
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
@@ -85,7 +90,7 @@
                 <div class="col-md-3">
                     <div class="card p-3 text-center">
                         <?php
-                            include '../config/bandoDeDados/conexao.php';
+                            // include '../config/bandoDeDados/conexao.php';
 
                             $sql = "SELECT COUNT(*) AS total_chamados FROM chamados WHERE status = 'Aberto'";
                             $result = $conn->query($sql);
@@ -96,7 +101,7 @@
                                 $totalChamados = 0;
                             }
 
-                            $conn->close();
+                            // $conn->close();
                         ?>
                         <div>Chamados Abertos: <span><?php echo htmlspecialchars($totalChamados); ?></span></div>
                     </div>
@@ -104,7 +109,7 @@
                 <div class="col-md-3">
                     <div class="card p-3 text-center">
                         <?php
-                            include '../config/bandoDeDados/conexao.php';
+                            // include '../config/bandoDeDados/conexao.php';
 
                             $today = date('Y-m-d');
                             $sql = "SELECT COUNT(*) AS atendimentos_hoje FROM chamados WHERE DATE(data_fechamento) = ?";
@@ -120,7 +125,7 @@
                             }
 
                             $stmt->close();
-                            $conn->close();
+                            // $conn->close();
                         ?>
                         <div>Atendimentos Hoje: <span><?php echo htmlspecialchars($atendimentosHoje); ?></span></div>
                     </div>
@@ -128,7 +133,7 @@
                 <div class="col-md-3">
                     <div class="card p-3 text-center">
                     <?php
-include '../config/bandoDeDados/conexao.php';
+// include '../config/bandoDeDados/conexao.php';
 
 // Inicializa as contagens
 $contagens = [
@@ -170,7 +175,7 @@ if ($result) {
     }
 }
 
-$conn->close();
+// $conn->close();
 
 // Exibe os valores corretamente
 $pix = $contagens['PIX'];
@@ -239,7 +244,7 @@ $boleto = $contagens['Boleto'];
                     <tbody>
                         <tr>
                             <?php
-include '../config/bandoDeDados/conexao.php';
+// include '../config/bandoDeDados/conexao.php';
 
 $sql = "SELECT id, nome, carro_do_dia, email, created_at, matricula, status_tecnico FROM tecnicos";
 $result = $conn->query($sql);
@@ -284,7 +289,7 @@ if ($result === false) {
     echo "<tr><td colspan='7' class='text-center'>Nenhum técnico encontrado</td></tr>";
 }
 
-$conn->close();
+// $conn->close();
 ?>
 
                             </td>
@@ -327,7 +332,7 @@ $conn->close();
                             // 2025: ano em que entrou para a empresa
                             // F1: Filial 1
                             // 000: dígito verificador
-                           include '../config/bandoDeDados/conexao.php';
+                        //    include '../config/bandoDeDados/conexao.php';
 
                             $sql = "SELECT matricula FROM tecnicos WHERE matricula LIKE '2025F1%' ORDER BY matricula DESC LIMIT 1";
                             $result = $conn->query($sql);

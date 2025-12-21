@@ -1,5 +1,9 @@
 <?php 
 require_once "../controller/validador_acesso.php";
+require_once "../config/bandoDeDados/conexao.php";
+
+$dados_cliente = obterDadosCliente()
+
 ?>
 <!DOCTYPE html>
 <html lang="pt-br">
@@ -227,26 +231,38 @@ require_once "../controller/validador_acesso.php";
             background: #dfe6e9;
             color: #636e72;
         }
+        .logo{
+            width: 90px;
+            height: 90px;
+            /* object-fit: contain; */
+            margin-bottom: 30px;
+        }
     </style>
 </head>
 <body>
-    <!-- Navbar -->
-    <nav class="navbar navbar-expand-lg navbar-custom bg-primary">
-        <a class="navbar-brand" href="home.php">
-            <img class="logo" src="imagens/logoNetoNerd.jpg" alt="Logo NetoNerd">
-        </a>
-        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse LinksNav" id="navbarNav">
-            <ul class="navbar-nav ml-auto">
-                <li class="nav-item"><a class="nav-link" href="home.php">Meus Chamados</a></li>
-                <li class="nav-item"><a class="nav-link" href="minha_conta.php">Minha Conta</a></li>
-                <li class="nav-item active"><a class="nav-link" href="suporte.php">Suporte</a></li>
-                <li class="nav-item"><a class="nav-link btn btn-light text-white bg-dark ml-2" href="logoff.php">Sair</a></li>
-            </ul>
+   <div class="top-navbar">
+        <div class="container">
+            <div class="user-info">
+                <div class="user-avatar">
+                    <?php echo strtoupper(substr($dados_cliente['nome'], 0, 0)); ?>
+                </div>
+                <div class="user-details">
+                    <h6>
+                        <?php 
+                        echo ($dados_cliente['genero'] === 'Feminino' ? 'Bem-vinda, ' : 'Bem-vindo, ') . 
+                             htmlspecialchars(explode(' ', $dados_cliente['nome'])[0]); 
+                        ?>
+                    </h6>
+                    <small><?php echo htmlspecialchars($dados_cliente['email']); ?></small>
+                </div>
+            </div>
+            <div>
+                <a href="logoff.php" class="btn btn-light btn-sm">
+                    <i class="fas fa-sign-out-alt"></i> Sair
+                </a>
+            </div>
         </div>
-    </nav>
+    </div>
 
     <div class="container mt-5">
         <h1 style="text-align: center; color: #212529; margin-bottom: 30px;">

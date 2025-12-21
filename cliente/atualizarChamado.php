@@ -1,16 +1,5 @@
 <?php
-// Conexão com o banco de dados
-$servername = "localhost";
-$username = "root";
-$password = "";
-$dbname = "seu_banco_de_dados";
-
-$conn = new mysqli($servername, $username, $password, $dbname);
-
-// Verifica a conexão
-if ($conn->connect_error) {
-    die("Falha na conexão: " . $conn->connect_error);
-}
+include_once '../config/bandoDeDados/conexao.php';
 
 // Verifica se os dados foram enviados via POST
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
