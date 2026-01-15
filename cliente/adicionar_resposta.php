@@ -90,10 +90,45 @@ try {
     $stmt->bind_param("i", $chamado_id);
     $stmt->execute();
     $stmt->close();
-    
-    // TODO: Enviar email para o técnico notificando nova resposta
-    // Implementar na Fase 1.5
-    
+
+    // Enviar email para o técnico notificando nova resposta
+    try {
+        // Buscar dados completos do chamado
+        $stmt = $conn->prepare("
+            SELECT c.*, cl.nome as cliente_nome, cl.email as cliente_email, cl.telefone as cliente_telefone
+            FROM chamados c
+            INNER JOIN clientes cl ON c.cliente_id = cl.id
+            WHERE c.id = ?
+        ");
+        $stmt->bind_param("i", $chamado_id);
+        $stmt->execute();
+        $chamado_completo = $stmt->get_result()->fetch_assoc();
+        $stmt->close();
+
+        // Se houver técnico atribuído, notificar
+        if ($chamado_completo['tecnico_id']) {
+            $stmt = $conn->prepare("SELECT nome, email FROM tecnicos WHERE id = ?");
+            $stmt->bind_param("i", $chamado_completo['tecnico_id']);
+            $stmt->execute();
+            $tecnico = $stmt->get_result()->fetch_assoc();
+            $stmt->close();
+
+            if ($tecnico) {
+                require_once __DIR__ . '/../config/EmailService.php';
+                $emailService = new EmailService();
+                $emailService->notificarNovaResposta(
+                    $tecnico,
+                    $chamado_completo,
+                    ['nome' => $chamado_completo['cliente_nome'], 'email' => $chamado_completo['cliente_email']],
+                    $resposta
+                );
+            }
+        }
+    } catch (Exception $e) {
+        error_log("Erro ao enviar email de notificação: " . $e->getMessage());
+        // Não bloquear o fluxo se falhar o envio do email
+    }
+
     $conn->close();
     
     // Redirecionar com sucesso

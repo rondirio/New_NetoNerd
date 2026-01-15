@@ -1,9 +1,14 @@
-<?php 
+<?php
 
-$host = "localhost";
-$dbname = "netonerd_chamados";
-$username = "root";
-$password = "";
+// Carregar configurações do .env
+require_once __DIR__ . '/../config.php';
+
+// Obter configurações do banco de dados
+$dbConfig = Config::database();
+$host = $dbConfig['host'];
+$dbname = $dbConfig['name'];
+$username = $dbConfig['username'];
+$password = $dbConfig['password'];
 
 $conn = new mysqli($host, $username, $password, $dbname);
 
