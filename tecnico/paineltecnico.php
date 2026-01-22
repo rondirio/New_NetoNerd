@@ -1,338 +1,347 @@
-<!DOCTYPE html>
-<html lang="pt-br">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Painel do Técnico - NetoNerd</title>
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f7f7f7;
-        }
-        .container {
-            margin-top: 50px;
-        }
-        .dashboard-header {
-            background-color: #343a40;
-            color: #fff;
-            padding: 20px;
-            border-radius: 10px;
-            margin-bottom: 30px;
-        }
-        .dashboard-header h4 {
-            margin: 0;
-        }
-        .table th, .table td {
-            vertical-align: middle;
-        }
-        .btn-visualizar {
-            background-color: #007bff;
-            color: #fff;
-        }
-        .btn-visualizar:hover {
-            background-color: #0056b3;
-        }
-        .badge-verde {
-            background-color: #28a745;
-        }
-        .badge-amarelo {
-            background-color: #ffc107;
-        }
-        .badge-vermelho {
-            background-color: #dc3545;
-        }
-        .badge-preto {
-            background-color: #343a40;
-        }
-    </style>
-</head>
-<body>
-    <div class="container">
-        <div class="dashboard-header">
-            <?php
-                include '../config/bandoDeDados/conexao.php';
+<?php
+/**
+ * Painel do Técnico - NetoNerd ITSM v2.0
+ * Dashboard principal para técnicos
+ */
 
-                $tecnicoId = 1; // Substitua pelo ID do técnico logado
-                $query = "SELECT nome FROM tecnicos WHERE id = ?";
-                $stmt = $conn->prepare($query);
-                $stmt->bind_param("i", $tecnicoId);
-                $stmt->execute();
-                $stmt->bind_result($nomeTecnico);
-                $stmt->fetch();
-                $stmt->close();
-            ?>
-            <h4>Bem-vindo, Técnico <?php echo htmlspecialchars($nomeTecnico, ENT_QUOTES, 'UTF-8'); ?></h4>
-            <?php
-                $queryMatricula = "SELECT matricula FROM tecnicos WHERE id = ?";
-                $stmtMatricula = $conn->prepare($queryMatricula);
-                $stmtMatricula->bind_param("i", $tecnicoId);
-                $stmtMatricula->execute();
-                $stmtMatricula->bind_result($matriculaTecnico);
-                $stmtMatricula->fetch();
-                $stmtMatricula->close();
-            ?>
-            <?php
-                $queryCarro = "SELECT carro_do_dia FROM tecnicos WHERE id = ?";
-                $stmtCarro = $conn->prepare($queryCarro);
-                $stmtCarro->bind_param("i", $tecnicoId);
-                $stmtCarro->execute();
-                $stmtCarro->bind_result($carroDoDia);
-                $stmtCarro->fetch();
-                $stmtCarro->close();
-            ?>
-            <p>Matrícula: <?php echo htmlspecialchars($matriculaTecnico, ENT_QUOTES, 'UTF-8'); ?> | Carro: <?php echo htmlspecialchars($carroDoDia, ENT_QUOTES, 'UTF-8'); ?></p>
-        </div>
+session_start();
+require_once '../controller/auth_middleware.php';
+require_once '../config/bandoDeDados/conexao.php';
 
-        <h4 class="mb-4">Chamados Recebidos</h4>
-        <table class="table table-striped">
-            <thead>
-                <tr>
-                    <th>ID</th>
-                    <th>Cliente</th>
-                    <th>Descrição</th>
-                    <th>Prioridade</th>
-                    <th>Status</th>
-                    <th>Classificação</th>
-                    <th>Ações</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <?php
-                    $queryChamados = "SELECT id, nome_usuario, descricao, prioridade, status, categoria FROM chamados";
-                    $resultChamados = $conn->query($queryChamados);
+// PROTEÇÃO: Apenas técnicos
+requireTecnico();
 
-                    if (!$resultChamados) {
-                        echo "<tr><td colspan='7'>Erro ao executar a consulta: " . htmlspecialchars($conn->error, ENT_QUOTES, 'UTF-8') . "</td></tr>";
-                    } elseif ($resultChamados->num_rows > 0) {
-                        while ($row = $resultChamados->fetch_assoc()) {
-                            echo "<tr>";
-                            echo "<td>" . htmlspecialchars($row['id'], ENT_QUOTES, 'UTF-8') . "</td>";
-                            echo "<td>" . htmlspecialchars($row['nome_usuario'], ENT_QUOTES, 'UTF-8') . "</td>";
-                            echo "<td>" . htmlspecialchars($row['descricao'], ENT_QUOTES, 'UTF-8') . "</td>";
-                            echo "<td>" . htmlspecialchars($row['prioridade'], ENT_QUOTES, 'UTF-8') . "</td>";
-                            echo "<td><span class='badge " . ($row['status'] == 'Pendente' ? 'badge-warning' : ($row['status'] == 'Em Andamento' ? 'badge-info' : 'badge-success')) . "'>" . htmlspecialchars($row['status'], ENT_QUOTES, 'UTF-8') . "</span></td>";
-                            echo "<td>
-                                    <select class='form-control form-control-sm'>
-                                        <option value='cancelado'" . ($row['categoria'] == 'cancelado' ? ' selected' : '') . " style='background-color: red; color: white;'>Cancelado</option>
-                                        <option value='resolvido'" . ($row['categoria'] == 'resolvido' ? ' selected' : '') . " style='background-color: green; color: white;'>Resolvido</option>
-                                        <option value='aberto'" . ($row['categoria'] == 'aberto' ? ' selected' : '') . " style='background-color: green; color: white;'>Aberto</option>
-                                        <option value='pendente'" . ($row['categoria'] == 'pendente' ? ' selected' : '') . " style='background-color: yellow;'>Pendente</option>
-                                    </select>
-                                  </td>";
-                            echo "<td>
-                                    <button class='btn btn-success btn-sm' data-toggle='modal' data-target='#modalAlterar' 
-                                            onclick='preencherModalAlterar(this)'>Alterar Chamado</button>
-                                  </td>";
-                            echo "</tr>";
-                        }
-                    } else {
-                        echo "<tr><td colspan='7'>Nenhum chamado encontrado.</td></tr>";
-                    }
-                    ?>
+$conn = getConnection();
+$tecnico_id = $_SESSION['usuario_id'];
 
-                        <!-- Modal de Alterar Chamado -->
-                        <div class="modal fade" id="modalAlterar" tabindex="-1" role="dialog" aria-labelledby="modalAlterarLabel" aria-hidden="true">
-                            <div class="modal-dialog" role="document">
-                                <div class="modal-content">
-                                    <div class="modal-header">
-                                        <h5 class="modal-title" id="modalAlterarLabel">Alterar Chamado</h5>
-                                        <button type="button" class="close" data-dismiss="modal" aria-label="Fechar">
-                                            <span aria-hidden="true">&times;</span>
-                                        </button>
-                                    </div>
-                                    <form method="POST" action="atualizarChamado.php">
-                                        <div class="modal-body">
-                                            <input type="hidden" name="chamado_id" id="alterarChamadoId" value="">
-                                            <div class="form-group">
-                                                <label for="alterarPrioridade">Prioridade:</label>
-                                                <select class="form-control" name="prioridade" id="alterarPrioridade">
-                                                    <option value="Baixa">Baixa</option>
-                                                    <option value="Média">Média</option>
-                                                    <option value="Alta">Alta</option>
-                                                </select>
-                                            </div>
-                                            <div class="form-group">
-                                                <label for="alterarStatus">Status:</label>
-                                                <select class="form-control" name="status" id="alterarStatus">
-                                                    <option value="Pendente">Pendente</option>
-                                                    <option value="Em Andamento">Em Andamento</option>
-                                                    <option value="Concluído">Concluído</option>
-                                                </select>
-                                            </div>
-                                            <div class="form-group">
-                                                <label for="alterarClassificacao">Classificação:</label>
-                                                <select class="form-control" name="classificacao" id="alterarClassificacao">
-                                                    <option value="verde">Fácil</option>
-                                                    <option value="amarelo">Intermediário</option>
-                                                    <option value="vermelho">Difícil</option>
-                                                    <option value="preto">Substituição</option>
-                                                </select>
-                                            </div>
-                                        </div>
-                                        <div class="modal-footer">
-                                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
-                                            <button type="submit" class="btn btn-primary">Salvar Alterações</button>
-                                        </div>
-                                    </form>
-                                </div>
-                            </div>
-                        </div>
-                    </td>
-                </tr>
-            </tbody>
-        </table>
+// Buscar informações do técnico
+$sql_tecnico = "SELECT nome, matricula, carro_do_dia, email FROM tecnicos WHERE id = ?";
+$stmt_tecnico = $conn->prepare($sql_tecnico);
+$stmt_tecnico->bind_param("i", $tecnico_id);
+$stmt_tecnico->execute();
+$tecnico = $stmt_tecnico->get_result()->fetch_assoc();
 
-        <!-- Modal de Visualizar Chamado -->
-        <div class="modal fade" id="modalVisualizar" tabindex="-1" role="dialog" aria-labelledby="modalVisualizarLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg" role="document">
-        <div class="modal-content">
-            <div class="modal-header bg-primary text-white">
-                <h5 class="modal-title" id="modalVisualizarLabel">Visualizar Chamado</h5>
-                <button type="button" class="close text-white" data-dismiss="modal" aria-label="Fechar">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <div class="modal-body">
-                <h5 class="mb-3">Detalhes do Chamado</h5>
-                <div class="row">
-                    <div class="col-md-6">
-                        <p><strong>Cliente:</strong> <span id="modalCliente"></span></p>
-                        <p><strong>Descrição:</strong> <span id="modalDescricao"></span></p>
-                        <p><strong>Status:</strong> <span id="modalStatus"></span></p>
-                        <p><strong>Prioridade:</strong> <span id="modalPrioridade"></span></p>
-                    </div>
-                    <div class="col-md-6">
-                        <p><strong>Data de Fechamento:</strong> <span id="modalDataFechamento"></span></p>
-                        <p><strong>Categoria:</strong> <span id="modalCategoria"></span></p>
-                        <p><strong>Pagamento:</strong> <span id="modalPagamentoValor"></span> (<span id="modalPagamentoForma"></span>)</p>
+// Estatísticas do técnico
+$stats_sql = "
+    SELECT
+        COUNT(*) as total,
+        COUNT(CASE WHEN status = 'aberto' THEN 1 END) as abertos,
+        COUNT(CASE WHEN status = 'em andamento' THEN 1 END) as em_andamento,
+        COUNT(CASE WHEN status = 'pendente' THEN 1 END) as pendentes,
+        COUNT(CASE WHEN status = 'resolvido' THEN 1 END) as resolvidos,
+        AVG(CASE WHEN tempo_atendimento_minutos IS NOT NULL THEN tempo_atendimento_minutos END) as tempo_medio,
+        SUM(CASE WHEN DATE(data_abertura) = CURDATE() THEN 1 ELSE 0 END) as hoje
+    FROM chamados
+    WHERE tecnico_id = ? AND status != 'cancelado'
+";
+$stmt_stats = $conn->prepare($stats_sql);
+$stmt_stats->bind_param("i", $tecnico_id);
+$stmt_stats->execute();
+$stats = $stmt_stats->get_result()->fetch_assoc();
+
+// Chamados urgentes (críticos ou altos abertos há mais de 24h)
+$urgentes_sql = "
+    SELECT COUNT(*) as urgentes
+    FROM chamados
+    WHERE tecnico_id = ?
+      AND status IN ('aberto', 'em andamento')
+      AND prioridade IN ('critica', 'alta')
+      AND TIMESTAMPDIFF(HOUR, data_abertura, NOW()) > 24
+";
+$stmt_urgentes = $conn->prepare($urgentes_sql);
+$stmt_urgentes->bind_param("i", $tecnico_id);
+$stmt_urgentes->execute();
+$urgentes = $stmt_urgentes->get_result()->fetch_assoc()['urgentes'];
+
+// Buscar chamados recentes (últimos 5)
+$recentes_sql = "
+    SELECT
+        c.id,
+        c.protocolo,
+        c.titulo,
+        c.status,
+        c.prioridade,
+        c.data_abertura,
+        cl.nome as cliente_nome,
+        TIMESTAMPDIFF(HOUR, c.data_abertura, NOW()) as horas_abertas
+    FROM chamados c
+    INNER JOIN clientes cl ON c.cliente_id = cl.id
+    WHERE c.tecnico_id = ?
+      AND c.status != 'resolvido'
+      AND c.status != 'cancelado'
+    ORDER BY
+        CASE c.prioridade
+            WHEN 'critica' THEN 1
+            WHEN 'alta' THEN 2
+            WHEN 'media' THEN 3
+            WHEN 'baixa' THEN 4
+        END,
+        c.data_abertura ASC
+    LIMIT 5
+";
+$stmt_recentes = $conn->prepare($recentes_sql);
+$stmt_recentes->bind_param("i", $tecnico_id);
+$stmt_recentes->execute();
+$recentes = $stmt_recentes->get_result();
+
+// Configuração da página
+$page_title = "Painel do Técnico - NetoNerd ITSM";
+
+// Incluir header
+require_once '../includes/header.php';
+?>
+
+<!-- Conteúdo Principal -->
+<div class="nn-main-wrapper">
+    <div class="nn-content nn-content-full">
+
+        <!-- Cabeçalho de Boas-Vindas -->
+        <div class="nn-card nn-animate-fade">
+            <div class="nn-card-header">
+                <div>
+                    <h1 class="nn-card-title mb-2">
+                        <i class="fas fa-user-cog"></i>
+                        Bem-vindo, <?php echo htmlspecialchars($tecnico['nome']); ?>!
+                    </h1>
+                    <div>
+                        <span class="nn-badge nn-badge-info">
+                            <i class="fas fa-id-card"></i>
+                            Matrícula: <?php echo htmlspecialchars($tecnico['matricula']); ?>
+                        </span>
+                        <?php if ($tecnico['carro_do_dia']): ?>
+                            <span class="nn-badge nn-badge-success">
+                                <i class="fas fa-car"></i>
+                                Veículo: <?php echo htmlspecialchars($tecnico['carro_do_dia']); ?>
+                            </span>
+                        <?php endif; ?>
                     </div>
                 </div>
-                <hr>
-                <h5 class="mb-3">Atualizar Informações</h5>
-                <form>
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label for="inputDataFechamento">Alterar Data de Fechamento:</label>
-                                <input type="date" class="form-control" id="inputDataFechamento" name="data_fechamento">
-                            </div>
-                            <div class="form-group">
-                                <label for="inputCategoria">Alterar Categoria:</label>
-                                <label>Categoria</label>
-                        <select class="form-control" name="categoria">
-                        <option value="selected">Selecione uma opção</option>
-                        <option>Antivírus</option>
-                        <option>Armazenamento</option>
-                        <option>Atualizações</option>
-                        <option>Auditoria</option>
-                        <option>Automação</option>
-                        <option>Backup</option>
-                        <option>Banco de Dados</option>
-                        <option>Big Data</option>
-                        <option>Blockchain</option>
-                        <option>Cloud Computing</option>
-                        <option>Comércio Eletrônico</option>
-                        <option>Compliance</option>
-                        <option>Configuração</option>
-                        <option>Consultoria</option>
-                        <option>Conexão à Internet</option>
-                        <option>Criptografia</option>
-                        <option>Design de Interface</option>
-                        <option>DevOps</option>
-                        <option>Documentação</option>
-                        <option>Equipamentos</option>
-                        <option>Erros de Sistema</option>
-                        <option>Experiência do Usuário</option>
-                        <option>Firewall</option>
-                        <option>Gerenciamento de Projetos</option>
-                        <option>Gestão de TI</option>
-                        <option>Governança</option>
-                        <option>Hardware</option>
-                        <option>Impressão</option>
-                        <option>Integração</option>
-                        <option>Inteligência Artificial</option>
-                        <option>IoT (Internet das Coisas)</option>
-                        <option>Licenciamento</option>
-                        <option>Machine Learning</option>
-                        <option>Manutenção</option>
-                        <option>Marketing Digital</option>
-                        <option>Monitoramento</option>
-                        <option>Outros</option>
-                        <option>Outsourcing</option>
-                        <option>Planejamento Estratégico</option>
-                        <option>Problemas com Conta</option>
-                        <option>Programas</option>
-                        <option>Realidade Aumentada</option>
-                        <option>Realidade Virtual</option>
-                        <option>Recuperação de Dados</option>
-                        <option>Rede Local</option>
-                        <option>Segurança</option>
-                        <option>SEO</option>
-                        <option>Servidores</option>
-                        <option>Software</option>
-                        <option>Suporte Técnico</option>
-                        <option>Testes de Software</option>
-                        <option>Treinamento</option>
-                        <option>VPN</option>
-                        <option>Wi-Fi</option>
-                        </select>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label for="inputPagamentoValor">Alterar Pagamento - Valor:</label>
-                                <input type="number" class="form-control" id="inputPagamentoValor" name="pagamento_valor" step="0.01">
-                            </div>
-                            <div class="form-group">
-                                <label for="inputPagamentoForma">Alterar Pagamento - Forma:</label>
-                                <select class="form-control" id="inputPagamentoForma" name="pagamento_forma">
-                                    <option value="PIX">PIX</option>
-                                    <option value="Dinheiro">Dinheiro</option>
-                                    <option value="Cartão Crédito">Cartão de Crédito</option>
-                                    <option value="Cartão Débito">Cartão de Débito</option>
-                                    <option value="Boleto">Boleto</option>
-                                </select>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <label for="mensagemCliente">Mensagem para o cliente:</label>
-                        <textarea class="form-control" id="mensagemCliente" rows="3" placeholder="Digite uma mensagem..."></textarea>
-                    </div>
-                    <div class="form-group">
-                        <label for="fotoChamado">Adicionar Foto:</label>
-                        <input type="file" class="form-control-file" id="fotoChamado">
-                    </div>
-                </form>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-dismiss="modal">Fechar</button>
-                <button type="button" class="btn btn-primary">Enviar Atualização</button>
+                <div>
+                    <button class="nn-btn nn-btn-primary" onclick="location.href='meus_chamados.php'">
+                        <i class="fas fa-list"></i>
+                        Ver Todos os Chamados
+                    </button>
+                </div>
             </div>
         </div>
+
+        <!-- Alerta de Chamados Urgentes -->
+        <?php if ($urgentes > 0): ?>
+            <div class="nn-alert nn-alert-danger nn-animate-fade">
+                <i class="fas fa-exclamation-triangle"></i>
+                <strong>Atenção!</strong> Você tem <?php echo $urgentes; ?> chamado(s) urgente(s) com mais de 24 horas em aberto!
+                <a href="meus_chamados.php?prioridade=critica" class="nn-btn nn-btn-danger nn-btn-sm" style="float: right;">
+                    Ver Urgentes
+                </a>
+            </div>
+        <?php endif; ?>
+
+        <!-- Dashboard Stats -->
+        <div class="nn-stats-grid nn-animate-slide">
+            <!-- Abertos -->
+            <div class="nn-stat-card primary">
+                <div class="nn-stat-icon primary">
+                    <i class="fas fa-folder-open"></i>
+                </div>
+                <div class="nn-stat-value"><?php echo $stats['abertos']; ?></div>
+                <div class="nn-stat-label">Abertos</div>
+            </div>
+
+            <!-- Em Andamento -->
+            <div class="nn-stat-card info">
+                <div class="nn-stat-icon info">
+                    <i class="fas fa-spinner"></i>
+                </div>
+                <div class="nn-stat-value"><?php echo $stats['em_andamento']; ?></div>
+                <div class="nn-stat-label">Em Andamento</div>
+            </div>
+
+            <!-- Pendentes -->
+            <div class="nn-stat-card warning">
+                <div class="nn-stat-icon warning">
+                    <i class="fas fa-clock"></i>
+                </div>
+                <div class="nn-stat-value"><?php echo $stats['pendentes']; ?></div>
+                <div class="nn-stat-label">Pendentes</div>
+            </div>
+
+            <!-- Resolvidos -->
+            <div class="nn-stat-card success">
+                <div class="nn-stat-icon success">
+                    <i class="fas fa-check-circle"></i>
+                </div>
+                <div class="nn-stat-value"><?php echo $stats['resolvidos']; ?></div>
+                <div class="nn-stat-label">Resolvidos</div>
+            </div>
+        </div>
+
+        <!-- Estatísticas Adicionais -->
+        <div class="row g-3 mb-4">
+            <div class="col-md-4">
+                <div class="nn-card">
+                    <div class="nn-card-body text-center">
+                        <i class="fas fa-ticket-alt text-primary mb-2" style="font-size: 2rem;"></i>
+                        <div class="nn-stat-value"><?php echo $stats['total']; ?></div>
+                        <div class="nn-stat-label">Total de Chamados Ativos</div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="nn-card">
+                    <div class="nn-card-body text-center">
+                        <i class="fas fa-calendar-day text-success mb-2" style="font-size: 2rem;"></i>
+                        <div class="nn-stat-value"><?php echo $stats['hoje']; ?></div>
+                        <div class="nn-stat-label">Recebidos Hoje</div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="nn-card">
+                    <div class="nn-card-body text-center">
+                        <i class="fas fa-clock text-info mb-2" style="font-size: 2rem;"></i>
+                        <div class="nn-stat-value">
+                            <?php
+                            if ($stats['tempo_medio']) {
+                                $horas = floor($stats['tempo_medio'] / 60);
+                                $minutos = $stats['tempo_medio'] % 60;
+                                echo $horas . "h " . $minutos . "m";
+                            } else {
+                                echo "N/A";
+                            }
+                            ?>
+                        </div>
+                        <div class="nn-stat-label">Tempo Médio de Resolução</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Chamados Recentes / Prioritários -->
+        <div class="nn-card nn-animate-fade">
+            <div class="nn-card-header">
+                <h2 class="nn-card-title">
+                    <i class="fas fa-fire"></i>
+                    Chamados Prioritários
+                </h2>
+                <div>
+                    <button class="nn-btn nn-btn-primary nn-btn-sm" onclick="location.reload()">
+                        <i class="fas fa-sync"></i>
+                        Atualizar
+                    </button>
+                </div>
+            </div>
+            <div class="nn-card-body">
+                <?php if ($recentes->num_rows > 0): ?>
+                    <div class="nn-table">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Protocolo</th>
+                                    <th>Título</th>
+                                    <th>Cliente</th>
+                                    <th>Prioridade</th>
+                                    <th>Status</th>
+                                    <th>Tempo Aberto</th>
+                                    <th>Ações</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <?php while ($chamado = $recentes->fetch_assoc()):
+                                    // Classes de prioridade
+                                    $prioridadeClass = match(strtolower($chamado['prioridade'])) {
+                                        'critica' => 'nn-badge-critical',
+                                        'alta' => 'nn-badge-high',
+                                        'media' => 'nn-badge-medium',
+                                        'baixa' => 'nn-badge-low',
+                                        default => 'nn-badge-secondary'
+                                    };
+
+                                    // Classes de status
+                                    $statusClass = match(strtolower($chamado['status'])) {
+                                        'aberto' => 'nn-badge-primary',
+                                        'em andamento' => 'nn-badge-info',
+                                        'pendente' => 'nn-badge-warning',
+                                        default => 'nn-badge-secondary'
+                                    };
+                                ?>
+                                    <tr>
+                                        <td><strong>#<?php echo htmlspecialchars($chamado['protocolo']); ?></strong></td>
+                                        <td><?php echo htmlspecialchars($chamado['titulo']); ?></td>
+                                        <td><?php echo htmlspecialchars($chamado['cliente_nome']); ?></td>
+                                        <td>
+                                            <span class="nn-badge <?php echo $prioridadeClass; ?>">
+                                                <?php echo ucfirst($chamado['prioridade']); ?>
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <span class="nn-badge <?php echo $statusClass; ?>">
+                                                <?php echo ucfirst($chamado['status']); ?>
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <?php
+                                            $horas = $chamado['horas_abertas'];
+                                            if ($horas >= 24) {
+                                                echo floor($horas / 24) . " dia(s)";
+                                            } else {
+                                                echo $horas . "h";
+                                            }
+                                            ?>
+                                        </td>
+                                        <td>
+                                            <?php if ($chamado['status'] === 'aberto'): ?>
+                                                <a href="processar_chamado.php?acao=iniciar&id=<?php echo $chamado['id']; ?>"
+                                                   class="nn-btn nn-btn-success nn-btn-sm"
+                                                   onclick="return confirm('Iniciar atendimento deste chamado?')">
+                                                    <i class="fas fa-play"></i>
+                                                    Iniciar
+                                                </a>
+                                            <?php elseif ($chamado['status'] === 'em andamento'): ?>
+                                                <a href="resolver_chamado.php?id=<?php echo $chamado['id']; ?>"
+                                                   class="nn-btn nn-btn-primary nn-btn-sm">
+                                                    <i class="fas fa-check"></i>
+                                                    Resolver
+                                                </a>
+                                            <?php else: ?>
+                                                <a href="meus_chamados.php?id=<?php echo $chamado['id']; ?>"
+                                                   class="nn-btn nn-btn-secondary nn-btn-sm">
+                                                    <i class="fas fa-eye"></i>
+                                                    Ver
+                                                </a>
+                                            <?php endif; ?>
+                                        </td>
+                                    </tr>
+                                <?php endwhile; ?>
+                            </tbody>
+                        </table>
+                    </div>
+                <?php else: ?>
+                    <div class="nn-alert nn-alert-success">
+                        <i class="fas fa-check-circle"></i>
+                        Parabéns! Você não tem chamados pendentes no momento.
+                    </div>
+                <?php endif; ?>
+
+                <?php if ($recentes->num_rows > 0): ?>
+                    <div class="text-center mt-3">
+                        <a href="meus_chamados.php" class="nn-btn nn-btn-primary">
+                            <i class="fas fa-list"></i>
+                            Ver Todos os Chamados (<?php echo $stats['total']; ?>)
+                        </a>
+                    </div>
+                <?php endif; ?>
+            </div>
+        </div>
+
     </div>
 </div>
 
-    </div>
-
-    <script>
-        function preencherModal(button) {
-            const row = button.closest('tr');
-            const cliente = row.cells[1].innerText;
-            const descricao = row.cells[2].innerText;
-            const prioridade = row.cells[3].querySelector('select').value;
-            const status = row.cells[4].innerText;
-
-            document.getElementById('modalCliente').innerText = cliente;
-            document.getElementById('modalDescricao').innerText = descricao;
-            document.getElementById('modalPrioridade').innerText = prioridade;
-            document.getElementById('modalStatus').innerText = status;
-        }
-    </script>
-
-    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-</body>
-</html>
+<?php
+// Incluir footer
+$stmt_tecnico->close();
+$stmt_stats->close();
+$stmt_urgentes->close();
+$stmt_recentes->close();
+$conn->close();
+require_once '../includes/footer.php';
+?>
