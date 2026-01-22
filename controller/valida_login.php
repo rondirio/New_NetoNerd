@@ -69,8 +69,27 @@ try {
     $cliente = $result->fetch_assoc();
     $stmt->close();
 
-    // Verificar senha
-    if (!password_verify($senha, $cliente['senha_hash'])) {
+    // Verificar senha (suporta hash bcrypt e texto plano com migração automática)
+    $senha_valida = false;
+
+    // Verifica se é um hash bcrypt válido
+    if (!empty($cliente['senha_hash']) && password_get_info($cliente['senha_hash'])['algo'] !== null) {
+        // Senha já está hasheada com bcrypt
+        $senha_valida = password_verify($senha, $cliente['senha_hash']);
+    } else if ($senha === $cliente['senha_hash']) {
+        // Senha está em texto plano - migração automática
+        $senha_valida = true;
+        $novo_hash = password_hash($senha, PASSWORD_DEFAULT);
+
+        $stmt_update = $conn->prepare("UPDATE clientes SET senha_hash = ? WHERE id = ?");
+        $stmt_update->bind_param("si", $novo_hash, $cliente['id']);
+        $stmt_update->execute();
+        $stmt_update->close();
+
+        error_log("Senha migrada para bcrypt: $email");
+    }
+
+    if (!$senha_valida) {
         // Senha incorreta
         error_log("Tentativa de login com senha incorreta: $email | IP: " . $_SERVER['REMOTE_ADDR']);
         $conn->close();

@@ -60,13 +60,27 @@ function registrarTentativa($matricula, $sucesso = false) {
 function criarSessaoTecnico($tecnico, $tipo_usuario) {
     session_regenerate_id(true);
     $_SESSION['autenticado'] = 'SIM';
-    $_SESSION['usuario_id'] = $tecnico['id'];
-    $_SESSION['tipo_usuario'] = $tipo_usuario;
-    $_SESSION['usuario_nome'] = $tecnico['nome'];
-    $_SESSION['usuario_email'] = $tecnico['email'];
+
+    // IDs do usuário (compatibilidade com sistemas antigos e novos)
+    $_SESSION['id'] = $tecnico['id'];                    // Para admin pages
+    $_SESSION['usuario_id'] = $tecnico['id'];            // Para compatibilidade
+
+    // Tipo de usuário (compatibilidade com sistemas antigos e novos)
+    $_SESSION['tipo'] = $tipo_usuario;                   // Para admin pages
+    $_SESSION['tipo_usuario'] = $tipo_usuario;           // Para compatibilidade
+
+    // Dados do usuário
+    $_SESSION['nome'] = $tecnico['nome'];                // Para admin pages
+    $_SESSION['usuario_nome'] = $tecnico['nome'];        // Para compatibilidade
+    $_SESSION['email'] = $tecnico['email'];              // Para admin pages
+    $_SESSION['usuario_email'] = $tecnico['email'];      // Para compatibilidade
     $_SESSION['matricula'] = $tecnico['matricula'];
+
+    // Segurança
     $_SESSION['login_time'] = time();
+    $_SESSION['last_activity'] = time();
     $_SESSION['ip_address'] = $_SERVER['REMOTE_ADDR'];
+    $_SESSION['user_agent'] = $_SERVER['HTTP_USER_AGENT'];
     $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
 }
 

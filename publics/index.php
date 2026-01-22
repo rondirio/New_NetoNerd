@@ -429,7 +429,7 @@
                 <img class="logo" src="../src/imagens/logoNetoNerd.jpg" alt="Logo NetoNerd">
             </a>
             <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav">
-                <span class="navbar-toggler-icon" style="color: white;">☰</span>
+                <span class="navbar-toggler-icon" style="color: dark;">☰</span>
             </button>
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav ml-auto">

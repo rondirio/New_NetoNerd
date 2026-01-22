@@ -28,8 +28,6 @@ $categorias = [
 ];
 
 $conn->close();
-
-include('../includes/header.php');
 ?>
 <!DOCTYPE html>
 <html lang="pt-br">
@@ -501,27 +499,32 @@ include('../includes/header.php');
     </style>
 </head>
 <body>
-    <!--<div class="top-navbar">-->
-    <!--    <div class="container">-->
-    <!--        <div class="user-info">-->
-    <!--            <div class="user-avatar">-->
-                    
-    <!--            </div>-->
-    <!--            <div class="user-details">-->
-    <!--                <h6>-->
-    <!--                    <
-    <!--                </h6>-->
-    <!--                <small></small>-->
-    <!--            </div>-->
-    <!--        </div>-->
-    <!--        <div>-->
-    <!--            <a href="logoff.php" class="btn btn-light btn-sm">-->
-    <!--                <i class="fas fa-sign-out-alt"></i> Sair-->
-    <!--            </a>-->
-    <!--        </div>-->
-    <!--    </div>-->
-    <!--</div>-->
-<br><br><br><br>
+   <?php include('../routes/headr.php');?>
+    <div class="top-navbar">
+        <div class="container">
+            <div class="user-info">
+                <div class="user-avatar">
+                    <?php echo strtoupper(substr($cliente['nome'], 0, 0)); ?>
+                </div>
+                <div class="user-details">
+                    <h6>
+                        <?php 
+                        echo ($dados_cliente['genero'] === 'Feminino' ? 'Bem-vinda, ' : 'Bem-vindo, ') . 
+                             htmlspecialchars(explode(' ', $cliente['nome'])[0]); 
+                        ?>
+                    </h6>
+                    <small><?php echo htmlspecialchars($cliente['email']); ?></small>
+                </div>
+            </div>
+            <div>
+                <a href="logoff.php" class="btn btn-light btn-sm">
+                    <i class="fas fa-sign-out-alt"></i> Sair
+                </a>
+            </div>
+        </div>
+    </div>
+     <?php include('../routes/header.php');?>
+
     <div class="container">
         <div class="form-wizard">
             <!-- Header -->
