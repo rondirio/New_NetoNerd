@@ -76,6 +76,10 @@ $pagina_atual = basename($_SERVER['PHP_SELF']);
                     <i class="fas fa-dashboard"></i>
                     <span class="nn-hidden-mobile">Dashboard</span>
                 </a>
+                <a href="/admin/gerar_ordem_servico.php" class="<?= $pagina_atual === 'gerar_ordem_de_servico.php' ? 'active' : '' ?>">
+                    <i class="fas fa-dashboard"></i>
+                    <span class="nn-hidden-mobile">OS</span>
+                </a>
                 <a href="/admin/atribuir_chamados.php" class="<?= $pagina_atual === 'atribuir_chamados.php' ? 'active' : '' ?>">
                     <i class="fas fa-user-plus"></i>
                     <span>Atribuir Chamados</span>

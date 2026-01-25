@@ -317,7 +317,7 @@
 <body>
     <!-- Botão Voltar -->
     <div class="back-home">
-        <a href="index.php" class="btn-back">
+        <a href="../index.php" class="btn-back">
             <i class="fas fa-arrow-left"></i> Voltar ao Início
         </a>
     </div>
