@@ -1,3 +1,3 @@
 <?php 
-require_once('publics/index.php')
+include_once('publics/index.php')
 ?>
