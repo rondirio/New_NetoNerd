@@ -1,0 +1,61 @@
+# ============================================================
+# NetoNerd ITSM - .gitignore
+# ============================================================
+
+# Arquivo de configuração com credenciais sensíveis
+.env
+
+# Arquivos de log
+logs/
+*.log
+
+# Arquivos de upload
+uploads/*
+!uploads/.gitkeep
+
+# Cache e temporários
+cache/
+temp/
+tmp/
+
+# Dependências do Composer
+/vendor/
+composer.lock
+
+# Arquivos do sistema operacional
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# IDEs e editores
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+*.swp
+*.swo
+*~
+
+# Backups de banco de dados
+*.sql.backup
+*.sql.bak
+backup/
+
+# Arquivos do phpMyAdmin
+phpmyadmin/
+
+# Arquivos de sessão PHP
+sessions/
+
+# Certificados e chaves privadas
+*.pem
+*.key
+*.crt
+*.cer
+
+# Node modules (se houver)
+node_modules/
+
+# Configurações locais específicas
+config/local.php
+config/database.local.php

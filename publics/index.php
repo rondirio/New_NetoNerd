@@ -4,7 +4,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>NetoNerd - Soluções Tecnológicas Profissionais</title>
-    <meta name="description" content="NetoNerd - Suporte técnico especializado, desenvolvimento de software e soluções digitais em Teresópolis-RJ">
+    <meta name="description" content="NetoNerd - Suporte técnico especializado, desenvolvimento de software e soluções digitais em Teresópolis-RJ, Araruama-RJ, Saquarema-RJ">
     
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -429,7 +429,7 @@
                 <img class="logo" src="../src/imagens/logoNetoNerd.jpg" alt="Logo NetoNerd">
             </a>
             <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav">
-                <span class="navbar-toggler-icon" style="color: white;">☰</span>
+                <span class="navbar-toggler-icon" style="color: dark;">☰</span>
             </button>
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav ml-auto">
@@ -437,19 +437,19 @@
                         <a class="nav-link" href="#produtos">Produtos</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="atendimento.php">Atendimento</a>
+                        <a class="nav-link" href="#atendimento">Atendimento</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="planos.php">Planos</a>
+                        <a class="nav-link" href="publics/planos.php">Planos</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="contato.php">Contato</a>
+                        <a class="nav-link" href="publics/contato.php">Contato</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="quemsomo.php">Sobre</a>
+                        <a class="nav-link" href="publics/quemsomo.php">Sobre</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link btn btn-light text-primary ml-2" href="login.php">
+                        <a class="nav-link btn btn-light text-primary ml-2" href="publics/login.php">
                             <i class="fas fa-user"></i> Entrar
                         </a>
                     </li>
@@ -465,10 +465,10 @@
                 <div class="col-lg-6 hero-content">
                     <h1 class="hero-title">Tecnologia que Transforma seu Negócio</h1>
                     <p class="hero-subtitle">
-                        Soluções completas em TI: suporte técnico especializado, desenvolvimento de software e consultoria tecnológica em Teresópolis-RJ
+                        Soluções completas em TI: suporte técnico especializado, desenvolvimento de software e consultoria tecnológica em Teresópolis, Araruama e Saquarema
                     </p>
                     <div class="hero-buttons">
-                        <a href="contato.php" class="btn btn-hero btn-hero-primary">
+                        <a href="publics/contato.php" class="btn btn-hero btn-hero-primary">
                             <i class="fas fa-rocket"></i> Solicitar Orçamento
                         </a>
                         <a href="#produtos" class="btn btn-hero btn-hero-outline">
@@ -585,42 +585,42 @@
                 </div>
 
                 <!-- Escritorius -->
-                <div class="col-lg-6 mb-4">
-                    <div class="produto-card">
-                        <div class="produto-header">
-                            <div class="produto-icon">
-                                <img src="../src/imagens/Logo_Escritorius.png" alt="Escritorius">
-                            </div>
-                            <div class="produto-tagline">Gestão para Escritórios de Advocacia</div>
-                        </div>
-                        <div class="produto-body">
-                            <p class="produto-descricao">
-                                <strong>Plataforma completa para advogados</strong> que gerencia processos, prazos, clientes, documentos e financeiro. Tudo integrado em uma interface intuitiva.
-                            </p>
-                            <ul class="list-unstyled mb-3">
-                                <li><i class="fas fa-check text-success"></i> Gestão de processos e prazos</li>
-                                <li><i class="fas fa-check text-success"></i> Geração automática de documentos</li>
-                                <li><i class="fas fa-check text-success"></i> Controle financeiro integrado</li>
-                                <li><i class="fas fa-check text-success"></i> App mobile incluso</li>
-                            </ul>
-                            <div class="produto-preco">
-                                <div class="preco-destaque">
-                                    R$ 300<span class="preco-periodo">/mês</span>
-                                </div>
-                                <small>
-                                    <strong>Anual:</strong> R$ 3.240 <span class="desconto-badge">-10%</span><br>
-                                    <strong>Semestral:</strong> R$ 1.710 <span class="desconto-badge">-5%</span>
-                                </small>
-                            </div>
-                            <a href="produtos.php?id=escritorius" class="btn btn-primary btn-block">
-                                <i class="fas fa-shopping-cart"></i> Contratar Agora
-                            </a>
-                            <a href="produtos.php?id=escritorius#demo" class="btn btn-outline-primary btn-block">
-                                <i class="fas fa-play"></i> Testar Grátis (7 dias)
-                            </a>
-                        </div>
-                    </div>
-                </div>
+                <!--<div class="col-lg-6 mb-4">-->
+                <!--    <div class="produto-card">-->
+                <!--        <div class="produto-header">-->
+                <!--            <div class="produto-icon">-->
+                <!--                <img src="../src/imagens/Logo_Escritorius.png" alt="Escritorius">-->
+                <!--            </div>-->
+                <!--            <div class="produto-tagline">Gestão para Escritórios de Advocacia</div>-->
+                <!--        </div>-->
+                <!--        <div class="produto-body">-->
+                <!--            <p class="produto-descricao">-->
+                <!--                <strong>Plataforma completa para advogados</strong> que gerencia processos, prazos, clientes, documentos e financeiro. Tudo integrado em uma interface intuitiva.-->
+                <!--            </p>-->
+                <!--            <ul class="list-unstyled mb-3">-->
+                <!--                <li><i class="fas fa-check text-success"></i> Gestão de processos e prazos</li>-->
+                <!--                <li><i class="fas fa-check text-success"></i> Geração automática de documentos</li>-->
+                <!--                <li><i class="fas fa-check text-success"></i> Controle financeiro integrado</li>-->
+                <!--                <li><i class="fas fa-check text-success"></i> App mobile incluso</li>-->
+                <!--            </ul>-->
+                <!--            <div class="produto-preco">-->
+                <!--                <div class="preco-destaque">-->
+                <!--                    R$ 300<span class="preco-periodo">/mês</span>-->
+                <!--                </div>-->
+                <!--                <small>-->
+                <!--                    <strong>Anual:</strong> R$ 3.240 <span class="desconto-badge">-10%</span><br>-->
+                <!--                    <strong>Semestral:</strong> R$ 1.710 <span class="desconto-badge">-5%</span>-->
+                <!--                </small>-->
+                <!--            </div>-->
+                <!--            <a href="produtos.php?id=escritorius" class="btn btn-primary btn-block">-->
+                <!--                <i class="fas fa-shopping-cart"></i> Contratar Agora-->
+                <!--            </a>-->
+                <!--            <a href="produtos.php?id=escritorius#demo" class="btn btn-outline-primary btn-block">-->
+                <!--                <i class="fas fa-play"></i> Testar Grátis (7 dias)-->
+                <!--            </a>-->
+                <!--        </div>-->
+                <!--    </div>-->
+                <!--</div>-->
 
                 <!-- Style Manager -->
                 <div class="col-lg-6 mb-4">
@@ -643,18 +643,18 @@
                             </ul>
                             <div class="produto-preco">
                                 <div class="preco-destaque">
-                                    R$ 119,90<span class="preco-periodo">/mês</span>
+                                    R$ 139,90<span class="preco-periodo">/mês</span>
                                 </div>
                                 <small>
-                                    <strong>Anual:</strong> R$ 1.300<br>
-                                    <strong>Semestral:</strong> R$ 683
+                                    <strong>Anual:</strong> R$ 1.594,86<br>
+                                    <strong>Semestral:</strong> R$ 822,62
                                 </small>
                             </div>
                             <a href="produtos.php?id=stylemanager" class="btn btn-primary btn-block">
                                 <i class="fas fa-shopping-cart"></i> Contratar Agora
                             </a>
-                            <a href="produtos.php?id=stylemanager#demo" class="btn btn-outline-primary btn-block">
-                                <i class="fas fa-play"></i> Testar Grátis (14 dias)
+                            <a href="publics/produtos.php?id=stylemanager#demo" class="btn btn-outline-primary btn-block">
+                                <i class="fas fa-play"></i> Testar Grátis (7 dias)
                             </a>
                         </div>
                     </div>
@@ -674,24 +674,24 @@
                                 <strong>Suporte técnico completo para empresas</strong> com infraestrutura, segurança, backup e atendimento prioritário. Seu time de TI terceirizado.
                             </p>
                             <ul class="list-unstyled mb-3">
-                                <li><i class="fas fa-check text-success"></i> Suporte técnico 24/7</li>
+                                <li><i class="fas fa-check text-success"></i> Suporte técnico presencial</li>
                                 <li><i class="fas fa-check text-success"></i> Gestão de infraestrutura</li>
                                 <li><i class="fas fa-check text-success"></i> Backup em nuvem</li>
                                 <li><i class="fas fa-check text-success"></i> Gerente de conta dedicado</li>
                             </ul>
                             <div class="produto-preco">
                                 <div class="preco-destaque">
-                                    R$ 699<span class="preco-periodo">/mês</span>
+                                    À partir de 400<span class="preco-periodo">/mês</span>
                                 </div>
-                                <small>
-                                    <strong>Anual:</strong> R$ 7.549 <span class="desconto-badge">-10%</span><br>
-                                    <strong>Semestral:</strong> R$ 3.984 <span class="desconto-badge">-5%</span>
-                                </small>
+                                <!--<small>-->
+                                <!--    <strong>Anual:</strong> R$ 7.549 <span class="desconto-badge">-10%</span><br>-->
+                                <!--    <strong>Semestral:</strong> R$ 3.984 <span class="desconto-badge">-5%</span>-->
+                                <!--</small>-->
                             </div>
                             <a href="contato.php?produto=pj" class="btn btn-primary btn-block">
                                 <i class="fas fa-phone"></i> Falar com Consultor
                             </a>
-                            <a href="produtos.php?id=pj" class="btn btn-outline-primary btn-block">
+                            <a href="publics/produtos.php?id=pj" class="btn btn-outline-primary btn-block">
                                 <i class="fas fa-file-alt"></i> Plano Personalizado
                             </a>
                         </div>
@@ -754,7 +754,7 @@
             <a href="contato.php" class="btn btn-hero btn-hero-primary btn-lg">
                 <i class="fas fa-comments"></i> Falar com Especialista
             </a>
-            <a href="ordem_servico.php" class="btn btn-hero btn-hero-outline btn-lg">
+            <a href="publics/login.php" class="btn btn-hero btn-hero-outline btn-lg">
                 <i class="fas fa-tools"></i> Solicitar Atendimento
             </a>
         </div>
@@ -810,11 +810,16 @@
                     <div class="footer-section">
                         <h5 class="footer-title">Contato</h5>
                         <ul class="footer-links">
-                            <li><i class="fas fa-map-marker-alt"></i> Teresópolis - RJ</li>
+                            <ul style="list-style: none; padding: 0;">
+                              <li><i class="fas fa-map-marker-alt"></i> Teresópolis</li>
+                              <li><i class="fas fa-map-marker-alt"></i> Araruama</li>
+                              <li><i class="fas fa-map-marker-alt"></i> Saquarema</li>
+                            </ul>
                             <li><i class="fas fa-phone"></i> (21) 97739-5867</li>
                             <li><i class="fas fa-envelope"></i> netonerdinterno@gmail.com</li>
-                            <li><i class="fas fa-clock"></i> Seg-Sex: 9h-18h | Sáb: 9h-13h</li>
+                            <li><i class="fas fa-clock"></i> Seg-Sex: 9h-18h</li>
                         </ul>
+                       
                     </div>
                 </div>
             </div>
