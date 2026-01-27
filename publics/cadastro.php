@@ -280,6 +280,33 @@
             padding: 15px;
             margin-bottom: 20px;
         }
+        .back-home {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            z-index: 1000;
+        }
+        
+        .btn-back {
+            background: rgba(255,255,255,0.2);
+            backdrop-filter: blur(10px);
+            border: 2px solid rgba(255,255,255,0.3);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 10px;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-back:hover {
+            background: rgba(255,255,255,0.3);
+            color: white;
+            text-decoration: none;
+        }
         
         .back-login {
             text-align: center;
@@ -296,6 +323,34 @@
         
         .back-login a:hover {
             text-decoration: underline;
+        }
+        
+        .back-loginTop {
+            position: fixed;
+            top: 90px;
+            left: 20px;
+            /*z-index: 1000;*/
+        }
+        
+        .btn-back {
+            background: rgba(255,255,255,0.2);
+            backdrop-filter: blur(10px);
+            border: 2px solid rgba(255,255,255,0.3);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 10px;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-back:hover {
+            background: rgba(255,255,255,0.3);
+            color: white;
+            text-decoration: none;
         }
         
         .terms-box {
@@ -322,6 +377,17 @@
     </style>
 </head>
 <body>
+    <div class="back-home">
+        <a href="../index.php" class="btn-back">
+            <i class="fas fa-arrow-left"></i> Voltar ao Início
+        </a>
+    </div>
+    <br><br><br><br><br><br><br><br>
+    <div class="back-loginTop">
+        <a href="login.php" class="btn-back">
+            <i class="fas fa-arrow-left"></i> Voltar ao login
+        </a>
+    </div>
     <div class="cadastro-container">
         <div class="cadastro-card">
             <!-- Header -->

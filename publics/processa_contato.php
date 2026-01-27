@@ -5,8 +5,7 @@
  */
 
 require_once "../config/bandoDeDados/conexao.php";
-const MAILNN = 'netonerdinterno@gmail.com';
-const APPPASS = 'svew nkjt eanw hhqk';
+require_once "../config/EmailService.php";
 
 // Inclui os arquivos do PHPMailer (coloque a pasta PHPMailer/src no mesmo nível ou ajuste o caminho)
 require_once __DIR__ . '/../libs/PHPMailer-php-8.4/src/Exception.php';
@@ -91,47 +90,56 @@ try {
     $contato_id = $conn->insert_id;
     $stmt->close();
     
-    // ======================
-// ENVIO DO E-MAIL PARA A EQUIPE (você)
-// ======================
-$mail = new PHPMailer(true);
-
-$mail->isSMTP();
-$mail->Host       = 'smtp.gmail.com';
-$mail->SMTPAuth   = true;
-$mail->Username   = MAILNN;          // ← corrigido
-$mail->Password   = APPPASS;        // ← usando a constante
-$mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
-$mail->Port       = 587;
-$mail->CharSet    = 'UTF-8';
-
-$mail->setFrom('no-reply@netonerd.com.br', 'Contato Site NetoNerd');
-// ou use: $mail->setFrom(MAILNN, 'Contato Site');
-
-$mail->addReplyTo($email, $nome);   // ← cliente aparece ao responder
-$mail->addAddress(MAILNN);          // você recebe
-
-$mail->isHTML(true);
-$mail->Subject = "Novo Contato - {$assunto} (#{$contato_id})";
-$mail->Body    = $mensagem_email;
-
-$mail->send();
-
-    // ======================
-    // E-MAIL DE CONFIRMAÇÃO PARA O CLIENTE
-    // ======================
+    // Enviar email para a equipe usando EmailService
+    $emailConfig = Config::email();
     $mail = new PHPMailer(true);
 
     $mail->isSMTP();
-    $mail->Host       = 'smtp.gmail.com';
+    $mail->Host       = $emailConfig['host'];
     $mail->SMTPAuth   = true;
-    $mail->Username   = MAILNN;
-    $mail->Password   = APPPASS;
-    $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
-    $mail->Port       = 587;
+    $mail->Username   = $emailConfig['username'];
+    $mail->Password   = $emailConfig['password'];
+    $mail->SMTPSecure = $emailConfig['encryption'];
+    $mail->Port       = $emailConfig['port'];
     $mail->CharSet    = 'UTF-8';
 
-    $mail->setFrom(MAILNN, 'NetoNerd');
+    $mail->setFrom($emailConfig['from_email'], 'Contato Site NetoNerd');
+    $mail->addReplyTo($email, $nome);
+    $mail->addAddress($emailConfig['username']);
+
+    $mensagem_email = "
+    <html>
+    <body style='font-family: Arial, sans-serif;'>
+        <h2>Novo Contato do Site</h2>
+        <p><strong>Nome:</strong> {$nome}</p>
+        <p><strong>Email:</strong> {$email}</p>
+        <p><strong>Telefone:</strong> " . formatarTelefone($telefone) . "</p>
+        <p><strong>Assunto:</strong> {$assunto}</p>
+        <p><strong>Mensagem:</strong></p>
+        <p style='background: #f8f9fa; padding: 15px; border-radius: 5px;'>{$mensagem}</p>
+        <p><strong>Protocolo:</strong> #{$contato_id}</p>
+        <p><strong>Data:</strong> " . date('d/m/Y H:i') . "</p>
+    </body>
+    </html>";
+
+    $mail->isHTML(true);
+    $mail->Subject = "Novo Contato - {$assunto} (#{$contato_id})";
+    $mail->Body    = $mensagem_email;
+    $mail->send();
+
+    // Email de confirmação para o cliente
+    $mail = new PHPMailer(true);
+
+    $mail->isSMTP();
+    $mail->Host       = $emailConfig['host'];
+    $mail->SMTPAuth   = true;
+    $mail->Username   = $emailConfig['username'];
+    $mail->Password   = $emailConfig['password'];
+    $mail->SMTPSecure = $emailConfig['encryption'];
+    $mail->Port       = $emailConfig['port'];
+    $mail->CharSet    = 'UTF-8';
+
+    $mail->setFrom($emailConfig['from_email'], $emailConfig['from_name']);
     $mail->addAddress($email, $nome);
 
     $mail->isHTML(true);

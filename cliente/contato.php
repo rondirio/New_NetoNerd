@@ -2,7 +2,9 @@
 require_once "../controller/validador_acesso.php";
 require_once "../config/bandoDeDados/conexao.php";
 
-$dados_cliente = obterDadosCliente()
+$dados_cliente = obterDadosCliente();
+
+include('../includes/header.php');
 
 ?>
 <!DOCTYPE html>
@@ -242,28 +244,10 @@ $dados_cliente = obterDadosCliente()
 <body>
    <div class="top-navbar">
         <div class="container">
-            <div class="user-info">
-                <div class="user-avatar">
-                    <?php echo strtoupper(substr($dados_cliente['nome'], 0, 0)); ?>
-                </div>
-                <div class="user-details">
-                    <h6>
-                        <?php 
-                        echo ($dados_cliente['genero'] === 'Feminino' ? 'Bem-vinda, ' : 'Bem-vindo, ') . 
-                             htmlspecialchars(explode(' ', $dados_cliente['nome'])[0]); 
-                        ?>
-                    </h6>
-                    <small><?php echo htmlspecialchars($dados_cliente['email']); ?></small>
-                </div>
-            </div>
-            <div>
-                <a href="logoff.php" class="btn btn-light btn-sm">
-                    <i class="fas fa-sign-out-alt"></i> Sair
-                </a>
-            </div>
+            
         </div>
     </div>
-
+<br><br><br><br>
     <div class="container mt-5">
         <h1 style="text-align: center; color: #212529; margin-bottom: 30px;">
             Central de Suporte
