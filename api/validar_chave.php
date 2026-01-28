@@ -2,30 +2,27 @@
 /**
  * Endpoint de Validação de Chave API - NetoNerd ITSM
  *
- * Este endpoint valida se uma chave API é válida para uso no aplicativo.
+ * Valida a chave API e retorna os dados de conexão do banco de dados do cliente.
  *
  * Uso:
  * POST /api/validar_chave.php
  * Body JSON: { "api_key": "SUA_CHAVE_AQUI" }
  *
- * OU
- *
- * GET /api/validar_chave.php?api_key=SUA_CHAVE_AQUI
+ * OU via Header:
+ * Authorization: Bearer SUA_CHAVE_AQUI
+ * X-API-Key: SUA_CHAVE_AQUI
  *
  * Respostas:
- * - 200: Chave válida
+ * - 200: Chave válida + dados de conexão do BD
  * - 401: Chave inválida, expirada ou revogada
  * - 400: Chave não fornecida
- * - 403: IP não autorizado
  */
 
-// Headers para API REST
 header('Content-Type: application/json; charset=utf-8');
 header('Access-Control-Allow-Origin: *');
 header('Access-Control-Allow-Methods: GET, POST, OPTIONS');
 header('Access-Control-Allow-Headers: Content-Type, Authorization, X-API-Key');
 
-// Preflight request
 if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
     http_response_code(200);
     exit;
@@ -38,7 +35,7 @@ $conn = getConnection();
 // Obter a chave API
 $api_key = null;
 
-// Verificar no header Authorization
+// Header Authorization
 if (isset($_SERVER['HTTP_AUTHORIZATION'])) {
     $auth_header = $_SERVER['HTTP_AUTHORIZATION'];
     if (preg_match('/Bearer\s+(.*)$/i', $auth_header, $matches)) {
@@ -46,12 +43,12 @@ if (isset($_SERVER['HTTP_AUTHORIZATION'])) {
     }
 }
 
-// Verificar no header X-API-Key
+// Header X-API-Key
 if (!$api_key && isset($_SERVER['HTTP_X_API_KEY'])) {
     $api_key = $_SERVER['HTTP_X_API_KEY'];
 }
 
-// Verificar no body JSON (POST)
+// Body JSON (POST)
 if (!$api_key && $_SERVER['REQUEST_METHOD'] === 'POST') {
     $json = file_get_contents('php://input');
     $data = json_decode($json, true);
@@ -60,7 +57,7 @@ if (!$api_key && $_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 
-// Verificar no query string (GET)
+// Query string (GET)
 if (!$api_key && isset($_GET['api_key'])) {
     $api_key = $_GET['api_key'];
 }
@@ -76,17 +73,15 @@ if (!$api_key) {
     exit;
 }
 
-// Sanitizar a chave
 $api_key = trim($api_key);
 
 // Buscar a chave no banco
-$stmt = $conn->prepare("SELECT id, chave, cliente_nome, status, data_expiracao, ip_permitido FROM api_keys WHERE chave = ?");
+$stmt = $conn->prepare("SELECT id, chave, cliente_nome, db_host, db_nome, db_usuario, db_senha, db_porta, status, data_expiracao, ip_permitido FROM api_keys WHERE chave = ?");
 $stmt->bind_param("s", $api_key);
 $stmt->execute();
 $result = $stmt->get_result();
 
 if ($result->num_rows === 0) {
-    // Chave não encontrada
     http_response_code(401);
     echo json_encode([
         'success' => false,
@@ -115,7 +110,6 @@ if ($key_data['status'] !== 'ativa') {
 
 // Verificar expiração
 if ($key_data['data_expiracao'] && strtotime($key_data['data_expiracao']) < time()) {
-    // Atualizar status para expirada
     $stmt = $conn->prepare("UPDATE api_keys SET status = 'revogada' WHERE id = ?");
     $stmt->bind_param("i", $key_data['id']);
     $stmt->execute();
@@ -153,28 +147,24 @@ $stmt->bind_param("i", $key_data['id']);
 $stmt->execute();
 $stmt->close();
 
-// Registrar log de acesso (se tabela existir)
-$result = $conn->query("SHOW TABLES LIKE 'api_keys_log'");
-if ($result->num_rows > 0) {
-    $endpoint = $_SERVER['REQUEST_URI'] ?? '';
-    $user_agent = $_SERVER['HTTP_USER_AGENT'] ?? '';
+// Descriptografar senha do banco
+$db_senha = base64_decode($key_data['db_senha']);
 
-    $stmt = $conn->prepare("INSERT INTO api_keys_log (api_key_id, ip_address, endpoint, user_agent, resposta_status) VALUES (?, ?, ?, ?, 200)");
-    $stmt->bind_param("isss", $key_data['id'], $client_ip, $endpoint, $user_agent);
-    $stmt->execute();
-    $stmt->close();
-}
-
-// Chave válida!
+// Chave válida - retornar dados de conexão do BD
 http_response_code(200);
 echo json_encode([
     'success' => true,
     'message' => 'API key válida',
     'code' => 'API_KEY_VALID',
-    'data' => [
-        'cliente' => $key_data['cliente_nome'] ?? null,
-        'expira_em' => $key_data['data_expiracao'] ?? null
-    ]
+    'cliente' => $key_data['cliente_nome'],
+    'database' => [
+        'host' => $key_data['db_host'],
+        'name' => $key_data['db_nome'],
+        'user' => $key_data['db_usuario'],
+        'password' => $db_senha,
+        'port' => intval($key_data['db_porta'])
+    ],
+    'expira_em' => $key_data['data_expiracao']
 ]);
 
 $conn->close();
