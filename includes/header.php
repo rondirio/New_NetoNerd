@@ -113,6 +113,10 @@ $pagina_atual = basename($_SERVER['PHP_SELF']);
                     <i class="fas fa-key"></i>
                     <span class="nn-hidden-mobile">Licenças</span>
                 </a>
+                <a href="/admin/api_keys.php" class="<?= $pagina_atual === 'api_keys.php' ? 'active' : '' ?>">
+                    <i class="fas fa-code"></i>
+                    <span class="nn-hidden-mobile">API Keys</span>
+                </a>
 
             <?php elseif ($tipo_usuario === 'tecnico'): ?>
                 <!-- Menu Técnico -->
