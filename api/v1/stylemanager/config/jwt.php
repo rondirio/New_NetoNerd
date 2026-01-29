@@ -3,17 +3,27 @@
  * StyleManager API - JWT Handler
  *
  * Gerencia tokens JWT para autenticação do app mobile.
+ * Configurações vêm do arquivo clientes.php
  */
 
 class StyleManagerJWT {
     private $secretKey;
     private $algorithm = 'HS256';
-    private $tokenExpiration = 86400 * 30; // 30 dias
-    private $refreshExpiration = 86400 * 90; // 90 dias
+    private $tokenExpiration;
+    private $refreshExpiration;
 
     public function __construct() {
-        // Chave secreta do ambiente ou fallback
-        $this->secretKey = getenv('JWT_SECRET') ?: 'stylemanager_jwt_secret_key_2026_change_in_production';
+        // Carrega configurações do arquivo clientes.php
+        $config = StyleManagerDatabase::getGlobalConfig();
+
+        // Chave secreta do config ou fallback do ambiente
+        $this->secretKey = $config['jwt_secret']
+            ?? getenv('JWT_SECRET')
+            ?: 'stylemanager_jwt_secret_key_2026_change_in_production';
+
+        // Tempos de expiração
+        $this->tokenExpiration = $config['token_expiration'] ?? 86400 * 30; // 30 dias
+        $this->refreshExpiration = $config['refresh_expiration'] ?? 86400 * 90; // 90 dias
     }
 
     /**
