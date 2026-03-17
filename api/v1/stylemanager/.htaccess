@@ -1,0 +1,57 @@
+# StyleManager API - Apache Rewrite Rules
+
+# CORS Headers - Allow requests from any origin
+<IfModule mod_headers.c>
+    Header always set Access-Control-Allow-Origin "*"
+    Header always set Access-Control-Allow-Methods "GET, POST, PUT, DELETE, OPTIONS"
+    Header always set Access-Control-Allow-Headers "Content-Type, Authorization, X-API-Key, X-Requested-With"
+    Header always set Access-Control-Max-Age "86400"
+</IfModule>
+
+RewriteEngine On
+RewriteBase /api/v1/stylemanager/
+
+# Handle OPTIONS requests (CORS preflight) - return 200 with headers
+RewriteCond %{REQUEST_METHOD} OPTIONS
+RewriteRule ^(.*)$ - [R=200,L]
+
+# Auth routes
+RewriteRule ^auth/login$ auth/login.php [L,QSA]
+RewriteRule ^auth/logout$ auth/logout.php [L,QSA]
+RewriteRule ^auth/refresh$ auth/refresh.php [L,QSA]
+
+# Validate license
+RewriteRule ^validate-license$ validate-license.php [L,QSA]
+
+# Dashboard
+RewriteRule ^dashboard$ dashboard.php [L,QSA]
+
+# Configurações
+RewriteRule ^configuracoes$ configuracoes.php [L,QSA]
+
+# Agendamentos
+RewriteRule ^agendamentos/horarios$ agendamentos/horarios.php [L,QSA]
+RewriteRule ^agendamentos/?$ agendamentos/index.php [L,QSA]
+RewriteRule ^agendamentos/([0-9]+)$ agendamentos/index.php/$1 [L,QSA]
+
+# Clientes
+RewriteRule ^clientes/rapido$ clientes/rapido.php [L,QSA]
+RewriteRule ^clientes/aniversariantes$ clientes/aniversariantes.php [L,QSA]
+RewriteRule ^clientes/?$ clientes/index.php [L,QSA]
+RewriteRule ^clientes/([0-9]+)$ clientes/index.php/$1 [L,QSA]
+
+# Serviços
+RewriteRule ^servicos/?$ servicos/index.php [L,QSA]
+RewriteRule ^servicos/([0-9]+)$ servicos/index.php/$1 [L,QSA]
+
+# Profissionais
+RewriteRule ^profissionais/?$ profissionais/index.php [L,QSA]
+RewriteRule ^profissionais/([0-9]+)$ profissionais/index.php/$1 [L,QSA]
+
+# Comissões
+RewriteRule ^comissoes/resumo$ comissoes/resumo.php [L,QSA]
+RewriteRule ^comissoes/?$ comissoes/index.php [L,QSA]
+
+# Perfil
+RewriteRule ^perfil/senha$ perfil/senha.php [L,QSA]
+RewriteRule ^perfil/?$ perfil/index.php [L,QSA]

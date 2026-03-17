@@ -1,0 +1,561 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gerador de JWT Tokens - SuperAdmin NetoNerd</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .header {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            color: #667eea;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            color: #666;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+
+        .card {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+
+        .card h2 {
+            color: #333;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #667eea;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #333;
+            font-weight: 600;
+        }
+
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: border-color 0.3s;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px 30px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            width: 100%;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        .token-display {
+            background: #f5f5f5;
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 20px;
+            display: none;
+        }
+
+        .token-display.active {
+            display: block;
+        }
+
+        .token-text {
+            word-break: break-all;
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            margin: 10px 0;
+            border: 2px solid #667eea;
+        }
+
+        .token-info {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .info-item {
+            background: white;
+            padding: 10px;
+            border-radius: 5px;
+        }
+
+        .info-item strong {
+            color: #667eea;
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        .copy-btn {
+            background: #28a745;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 10px;
+            width: 100%;
+            font-weight: 600;
+        }
+
+        .copy-btn:hover {
+            background: #218838;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .stat-number {
+            font-size: 32px;
+            font-weight: bold;
+            color: #667eea;
+            margin-bottom: 5px;
+        }
+
+        .stat-label {
+            color: #666;
+            font-size: 14px;
+        }
+
+        .tokens-list {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .token-item {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            border-left: 4px solid #667eea;
+        }
+
+        .token-item.revoked {
+            border-left-color: #dc3545;
+            opacity: 0.7;
+        }
+
+        .token-item.expired {
+            border-left-color: #ffc107;
+            opacity: 0.8;
+        }
+
+        .token-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .badge {
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .badge.active {
+            background: #28a745;
+            color: white;
+        }
+
+        .badge.revoked {
+            background: #dc3545;
+            color: white;
+        }
+
+        .badge.expired {
+            background: #ffc107;
+            color: #333;
+        }
+
+        .alert {
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        .alert.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .alert.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        @media (max-width: 768px) {
+            .grid {
+                grid-template-columns: 1fr;
+            }
+
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .token-info {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <h1>🔐 Gerador de JWT Tokens</h1>
+            <p>Sistema de autenticação centralizado para projetos NetoNerd</p>
+        </div>
+
+        <!-- Estatísticas -->
+        <div class="stats-grid" id="statsGrid">
+            <div class="stat-card">
+                <div class="stat-number" id="totalTokens">0</div>
+                <div class="stat-label">Total de Tokens</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="activeTokens">0</div>
+                <div class="stat-label">Tokens Ativos</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="revokedTokens">0</div>
+                <div class="stat-label">Tokens Revogados</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="expiredTokens">0</div>
+                <div class="stat-label">Tokens Expirados</div>
+            </div>
+        </div>
+
+        <!-- Grid Principal -->
+        <div class="grid">
+            <!-- Formulário de Geração -->
+            <div class="card">
+                <h2>Gerar Novo Token</h2>
+                
+                <div id="alertContainer"></div>
+
+                <form id="tokenForm">
+                    <div class="form-group">
+                        <label>Nome da Empresa *</label>
+                        <input type="text" id="nomeEmpresa" required placeholder="Ex: Hospital São Lucas">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Tipo de Projeto *</label>
+                        <select id="tipoProjeto" required>
+                            <option value="">Selecione...</option>
+                            <option value="myhealth">🏥 MyHealth (Hospitais/Clínicas)</option>
+                            <option value="barbershop">💈 BarberShop Manager (Barbearias/Salões)</option>
+                            <option value="suporte_ti">🖥️ Suporte TI (Empresas)</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Email do Proprietário *</label>
+                        <input type="email" id="emailOwner" required placeholder="admin@empresa.com">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Telefone</label>
+                        <input type="tel" id="telefone" placeholder="(11) 98765-4321">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Plano *</label>
+                        <select id="plano" required>
+                            <option value="basico">Básico</option>
+                            <option value="profissional">Profissional</option>
+                            <option value="premium">Premium</option>
+                            <option value="enterprise">Enterprise</option>
+                        </select>
+                    </div>
+
+                    <button type="submit" class="btn">🔑 Gerar Token JWT</button>
+                </form>
+
+                <!-- Display do Token Gerado -->
+                <div class="token-display" id="tokenDisplay">
+                    <h3 style="color: #28a745; margin-bottom: 15px;">✅ Token Gerado com Sucesso!</h3>
+                    
+                    <strong>JWT Token:</strong>
+                    <div class="token-text" id="jwtToken"></div>
+                    
+                    <button class="copy-btn" onclick="copyToken()">📋 Copiar Token</button>
+
+                    <div class="token-info">
+                        <div class="info-item">
+                            <strong>Tenant ID:</strong>
+                            <span id="tenantId"></span>
+                        </div>
+                        <div class="info-item">
+                            <strong>Projeto:</strong>
+                            <span id="projectType"></span>
+                        </div>
+                        <div class="info-item">
+                            <strong>Emitido em:</strong>
+                            <span id="issuedAt"></span>
+                        </div>
+                        <div class="info-item">
+                            <strong>Expira em:</strong>
+                            <span id="expiresAt"></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Lista de Tokens Ativos -->
+            <div class="card">
+                <h2>Tokens Recentes</h2>
+                <div class="tokens-list" id="tokensList">
+                    <p style="text-align: center; color: #999; padding: 40px 0;">
+                        Nenhum token gerado ainda
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Dados mockados (em produção, viriam do backend via AJAX)
+        let tokensData = [];
+
+        // Carregar estatísticas
+        function loadStats() {
+            // Simular dados (substituir por chamada AJAX real)
+            document.getElementById('totalTokens').textContent = tokensData.length;
+            document.getElementById('activeTokens').textContent = tokensData.filter(t => t.status === 'active').length;
+            document.getElementById('revokedTokens').textContent = tokensData.filter(t => t.status === 'revoked').length;
+            document.getElementById('expiredTokens').textContent = tokensData.filter(t => t.status === 'expired').length;
+        }
+
+        // Mostrar alerta
+        function showAlert(message, type) {
+            const alertContainer = document.getElementById('alertContainer');
+            alertContainer.innerHTML = `
+                <div class="alert ${type}">
+                    ${message}
+                </div>
+            `;
+            setTimeout(() => {
+                alertContainer.innerHTML = '';
+            }, 5000);
+        }
+
+        // Submeter formulário
+        document.getElementById('tokenForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+
+            const formData = {
+                nome_empresa: document.getElementById('nomeEmpresa').value,
+                tipo_projeto: document.getElementById('tipoProjeto').value,
+                email_owner: document.getElementById('emailOwner').value,
+                telefone: document.getElementById('telefone').value,
+                plano: document.getElementById('plano').value
+            };
+
+            // Simular geração de token (SUBSTITUIR por chamada AJAX real)
+            const mockToken = generateMockToken(formData);
+            
+            // Exibir token
+            displayToken(mockToken);
+            
+            // Adicionar à lista
+            tokensData.unshift(mockToken);
+            renderTokensList();
+            loadStats();
+
+            // Mostrar mensagem de sucesso
+            showAlert('Token JWT gerado com sucesso!', 'success');
+
+            // Limpar formulário
+            this.reset();
+        });
+
+        // Gerar token mockado (REMOVER em produção)
+        function generateMockToken(data) {
+            const now = new Date();
+            const expiration = new Date(now.getTime() + 365 * 24 * 60 * 60 * 1000); // 1 ano
+            
+            // Gerar tenant_id
+            const projectPrefix = data.tipo_projeto.substring(0, 3).toUpperCase();
+            const randomNum = Math.floor(Math.random() * 999999).toString().padStart(6, '0');
+            const tenantId = `TENANT-${projectPrefix}-${randomNum}`;
+
+            // Gerar token JWT mockado
+            const header = btoa(JSON.stringify({typ: 'JWT', alg: 'HS256'}));
+            const payload = btoa(JSON.stringify({
+                iss: 'NetoNerd Super Admin',
+                iat: Math.floor(now.getTime() / 1000),
+                exp: Math.floor(expiration.getTime() / 1000),
+                tenant_id: tenantId,
+                empresa: data.nome_empresa,
+                projeto: data.tipo_projeto,
+                plano: data.plano,
+                email_owner: data.email_owner
+            }));
+            const signature = btoa(Math.random().toString(36).substring(2, 15));
+            const token = `${header}.${payload}.${signature}`;
+
+            return {
+                token: token,
+                tenant_id: tenantId,
+                empresa: data.nome_empresa,
+                projeto: data.tipo_projeto,
+                plano: data.plano,
+                issued_at: now.toLocaleString('pt-BR'),
+                expires_at: expiration.toLocaleString('pt-BR'),
+                status: 'active'
+            };
+        }
+
+        // Exibir token gerado
+        function displayToken(tokenData) {
+            document.getElementById('jwtToken').textContent = tokenData.token;
+            document.getElementById('tenantId').textContent = tokenData.tenant_id;
+            document.getElementById('projectType').textContent = getProjectName(tokenData.projeto);
+            document.getElementById('issuedAt').textContent = tokenData.issued_at;
+            document.getElementById('expiresAt').textContent = tokenData.expires_at;
+            
+            document.getElementById('tokenDisplay').classList.add('active');
+        }
+
+        // Copiar token para clipboard
+        function copyToken() {
+            const tokenText = document.getElementById('jwtToken').textContent;
+            navigator.clipboard.writeText(tokenText).then(() => {
+                showAlert('Token copiado para a área de transferência!', 'success');
+            });
+        }
+
+        // Renderizar lista de tokens
+        function renderTokensList() {
+            const container = document.getElementById('tokensList');
+            
+            if (tokensData.length === 0) {
+                container.innerHTML = '<p style="text-align: center; color: #999; padding: 40px 0;">Nenhum token gerado ainda</p>';
+                return;
+            }
+
+            container.innerHTML = tokensData.map(token => `
+                <div class="token-item ${token.status}">
+                    <div class="token-header">
+                        <strong>${token.empresa}</strong>
+                        <span class="badge ${token.status}">${getStatusLabel(token.status)}</span>
+                    </div>
+                    <div style="font-size: 12px; color: #666;">
+                        <div><strong>Tenant:</strong> ${token.tenant_id}</div>
+                        <div><strong>Projeto:</strong> ${getProjectName(token.projeto)}</div>
+                        <div><strong>Plano:</strong> ${token.plano}</div>
+                        <div><strong>Expira:</strong> ${token.expires_at}</div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Helper functions
+        function getProjectName(tipo) {
+            const names = {
+                'myhealth': '🏥 MyHealth',
+                'barbershop': '💈 BarberShop',
+                'suporte_ti': '🖥️ Suporte TI'
+            };
+            return names[tipo] || tipo;
+        }
+
+        function getStatusLabel(status) {
+            const labels = {
+                'active': 'Ativo',
+                'revoked': 'Revogado',
+                'expired': 'Expirado'
+            };
+            return labels[status] || status;
+        }
+
+        // Carregar dados iniciais
+        loadStats();
+    </script>
+</body>
+</html>
+

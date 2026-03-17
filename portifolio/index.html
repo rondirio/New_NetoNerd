@@ -1,0 +1,504 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Rondineli Projects</title>
+
+  <!-- Bootstrap CSS -->
+  <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+
+  <!-- FontAwesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="main.css">
+  <link rel="stylesheet" href="projetos.css">
+  <link rel="stylesheet" href="footer.css">
+  <script src="script.js"></script>
+</head>
+
+<body>
+  <header>
+
+
+    <div class="menu-bg" id="menu-bg"></div>
+    <div class="links">
+      <a href="index.html">
+        <button>
+          <span>Inicio</span>
+        </button>
+      </a>
+      <a href="projetos.html">
+        <button>
+          <span>
+            Projetos</span>
+        </button>
+      </a>
+      <a href="habilidades.html">
+        <button>
+          <span>Habilidades</span>
+        </button>
+      </a>
+
+      <a href="formacao.html">
+        <button>
+          <span>Formação</span>
+        </button>
+      </a>
+      <a href="experiencia.html">
+        <button>
+          <span>Experiencia</span>
+        </button>
+    </div>
+    </a>
+
+    <script>
+      const syncPointer = ({ x: pointerX, y: pointerY }) => {
+        const x = pointerX.toFixed(2);
+        const y = pointerY.toFixed(2);
+
+        const xp = (pointerX / window.innerWidth).toFixed(2);
+        const yp = (pointerY / window.innerHeight).toFixed(2);
+
+        document.documentElement.style.setProperty('--x', x);
+        document.documentElement.style.setProperty('--xp', xp);
+        document.documentElement.style.setProperty('--y', y);
+        document.documentElement.style.setProperty('--yp', yp);
+      };
+
+      document.body.addEventListener('pointermove', syncPointer);
+
+      function menuOnClick() {
+  document.getElementById("menu-bar").classList.toggle("change");
+  document.getElementById("nav").classList.toggle("change");
+  document.getElementById("menu-bg").classList.toggle("change-bg");
+}
+    </script>
+    </div>
+    <div id="menu">
+      <div id="menu-bar" onclick="menuOnClick()">
+        <div id="bar1" class="bar"></div>
+        <div id="bar2" class="bar"></div>
+        <div id="bar3" class="bar"></div>
+      </div>
+      <nav class="nav" id="nav">
+        <ul>
+          <li><a href="index.html">Inicio</a></li>
+          <li><a href="projetos.html">Projetos</a></li>
+          <li><a href="habilidades.html">Habilidades</a></li>
+          <li><a href="formacao.html">Formação</a></li>
+          <li><a href="experiencia.html">Experiencia</a></li>
+        </ul>
+      </nav> 
+      <div class="menu-bg" id="menu-bg"></div>
+    </div>
+    
+    </nav>
+  </header>
+  <br><br><br><br>
+  <section class="apresentacao">
+    <div class="foto">
+      <img src="imagens/minhafoto.jpg" alt="Minha foto">
+    </div>
+    <div class="SobreMim">
+      <h3>Olá, mundo!</h3>
+      <hr>
+      <p class="ApresentaNome">Meu nome é <b>Rondineli Oliveira</b>
+        <code>também conhecido como Rondi.</code><br><br>
+        Sou um entusiasta da programação. Esse projeto é uma apresentação de outros projetos que já desenvolvi.
+      </p><br>
+      <div class="BreveHistory">
+        <h3>O começo.</h3>
+        <p>Tudo começou apenas com o <code>"h1 ola mundo h1"</code> Aqui apresentado sem a tag correta por que
+          se não dá erro... <br>
+          Eu começei aos 15 anos de idade com o html puro.
+          Esse foi meu primeiro contato com o desenvolvimento web. <br>
+          Posteriormente eu aprendi conceitos de estilização com CSS e Bootstrap e depois conceitos mais da
+          area da <br> programação mesmo como o js e o PHP <br><br>
+        <h4>Hoje eu sou um desenvolvedor fullStak.</h4> <br> Nesse projeto de portifolio, vou apresentar os meus
+        projetos em ordem de produção, ou seja, do hello world <br>até uma rede social.</p>
+      </div>
+    </div>
+
+    <!-- Exemplo projetos inicio -->
+    <section id="projetos">
+      <div class="body-wrapper">
+        <div class="wrapper">
+          <div class="content">
+            <div class="arrows">
+              <div class="left-arrow">
+                <h1>
+                  < </div>
+                    <div class="right-arrow">
+                      <h1>
+                        < </div>
+                    </div>
+                    <div class="card left l3">
+                      <div class="avatar" style="background-image: url('imagens/Playstation.png')"></div>
+                      <div class="info">
+                        <div class="name">PlayStation</div>
+                        <div class="status">Em produção</div>
+                      </div>
+                      <div class="missed-msg">
+                        <div class="num">
+                          <div class="value">Paralax</div>
+                        </div>
+                        <div class="desc">
+                          Nesse projeto temos conceitos de CSS intermediário e avançados. Ainda não conclui ele por
+                          motivos de
+                          tempo, visto que é um projeto para hobie
+                          <div class="clear-fix"></div>
+                        </div>
+                      </div>
+
+                    </div>
+
+                    <div class="card left l2">
+                      <div class="avatar" style="background-image: url('imagens/TechBlog.png')"></div>
+                      <div class="info">
+                        <div class="name">TechBlog</div>
+                        <div class="status">Feito</div>
+                      </div>
+                      <div class="missed-msg">
+                        <div class="num">
+                          <div class="value">CSS</div>
+                        </div>
+                        <div class="desc">
+                          Esse projeto usa conceitos Básicos de HTML e CSS.
+                          <div class="clear-fix"></div>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="card left l1">
+                      <div class="avatar" style="background-image: url('imagens/UnesUniversidade.png')"></div>
+                      <div class="info">
+                        <div class="name">Unes Universidade</div>
+                        <div class="status">Feito</div>
+                      </div>
+                      <div class="missed-msg">
+                        <div class="num">
+                          <div class="value">HTM</div>
+                        </div>
+                        <div class="desc">
+                          Projeto simples com HTML Básico
+                          <div class="clear-fix"></div>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="card active">
+                      <div class="avatar" style="background-image: url('imagens/olamundo.png')">
+                      </div>
+                      <div class="info">
+                        <div class="name">Olá Mundo</div>
+                        <div class="status">Feito</div>
+                      </div>
+                      <div class="missed-msg">
+                        <div class="num">
+                          <div class="value">OInicio</div>
+                        </div>
+                        <div class="desc">
+                          Tela olamundo.html que fiz no inicio do meu estudo
+                          <div class="clear-fix"></div>
+                        </div>
+                      </div>
+
+                    </div>
+                    <div class="card right l1">
+                      <div class="avatar" style="background-image: url('imagens/RegistroDespesas.png')"></div>
+                      <div class="info">
+                        <div class="name">Registra despesas</div>
+                        <div class="status">Feito</div>
+                      </div>
+                      <div class="missed-msg">
+                        <div class="num">
+                          <div class="value">PHP</div>
+                        </div>
+                        <div class="desc">
+                          Esse projeto usa PHP, CSS, HTML, JS e BootStrap.
+                          <div class="clear-fix"></div>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="card right l2">
+                      <div class="avatar" style="background-image: url('imagens/MataMosquito.png')"></div>
+                      <div class="info">
+                        <div class="name">Mata Mosquito</div>
+                        <div class="status">Feito</div>
+                      </div>
+                      <div class="missed-msg">
+                        <div class="num">
+                          <div class="value">JS</div>
+                        </div>
+                        <div class="desc">
+                          Jogo web feito com CSS, BootStrap, HTML e JS
+                          <div class="clear-fix"></div>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="card right l3">
+                      <div class="avatar" style="background-image: url('imagens/SendMail.png')"></div>
+                      <div class="info">
+                        <div class="name">SendMAil - PHPMailer</div>
+                        <div class="status">Feito</div>
+                      </div>
+                      <div class="missed-msg">
+                        <div class="num">
+                          <div class="value">PHP</div>
+                        </div>
+                        <div class="desc">
+                          Essa aplicação usa a biblioteca do PHP a PHPMailer para enviar email via SMTP.
+                          <div class="clear-fix"></div>
+                        </div>
+                      </div>
+                    </div>
+              </div>
+            </div>
+    </section>
+    <div class="BreveHistory">
+      <h3>Esclarecimento!</h3>
+      <p>Eu coloquei apenas alguns dos meus projetos aqui. Você poderá vê-los com mais detalhes na aba 'projetos'. Lá
+        estão mais alguns projetos que já fiz. <br> <br> <br> Mas lembre-se, há projetos que não vou colocar aqui por
+        questão de poluição e outros por sigilo.</p>
+    </div>
+    <!-- Exemplo projetos fim -->
+  </section>
+  <section class="skills">
+    <div class="skillsApresentacao">
+      <h4>Aqui, vou apresentar algumas das minhas habilidades</h4>
+    </div>
+    <div class="Habilidades">
+      <h5>Habilidades ou Skills!</h5>
+      <ul>
+        <li class="SkillCss">CSS</li>
+        <li class="Skilljs">JS</li>
+        <li class="Skillhtml">HTML</li>
+        <li class="Skillphp">PHP</li>
+        <li class="Skillreact">React-Native</li>
+        <li class="Skillsql">Banco de Dados SQl</li>
+        <li class="Skillajax">Ajax</li>
+        <li class="Skillmvc">Arquitetura MVC - WEB</li>
+        <li class="Skillgit">Git & GitHub</li>
+        <li class="Skillpython">Python</li>
+      </ul>
+    </div>
+  </section>
+  <section class="atividadeProfissional">
+    <div class="skillsApresentacao">
+      <h4>Aqui, vou apresentar alguns projetos feitos profissionalmente</h4>
+    </div>
+    <div class="freelance">
+      <div class="netonerd">
+        <h5>Neto Nerd</h5>
+        <p>
+          É um dos projetos da Four_BA. Empresa essa que eu criei para dar suporte tecnológico às PJ's.
+          Nesse projeto usei HTML, CSS, JS, PHP, banco de dados relacional Mysql, Git e GuitHub. Além de ser o
+          primeiro projeto que fiz deploy em um server web (no caso a hostinger).
+        </p>
+        <img src="imagens/netonerd.png" alt="None">
+      </div>
+      <div class="Four_BA">
+        <h5>Four_BA</h5>
+        <p>
+          A Four_BA foi criada em 2023 para dar suporte tecnologico às PJ's e desenvolver projetos para a
+          sociedade geral.
+          Esse projeto é o mais simples profissionalmente. É um projeto de apresentação da Empresa então ele
+          conta com poucas funcionalidades que dependem de PHP. <br>Mas ainda trouxe um charme com a
+          biblioteca PHPMailer que envia um email com os dados inseridos no formulario.
+        </p>
+        <img src="imagens/Fourba.jpg" alt="None">
+      </div>
+      <div class="Feirinha">
+        <h5>Feirinha Digital</h5>
+        <p>
+          É um projeto legado, no qual desenvolvi correções e alterações no BackEnd e no FrontEnd. Para fazer
+          essas mudanças usei Ajax, CSS, PHP, HTML e JS.
+        </p>
+        <img src="imagens/feirinha.jpg" alt="None">
+      </div>
+      <div class="ReciclaTere">
+        <h5>ReciclaTere</h5>
+        <p>
+          Esse é um aplicativo mobile que fiz junto a UNIFESO, nesse projeto trabalhei com uma equipe de 6
+          pessoas e fui gerenciado por um dos professores orientador. Usei nesse projeto HTML, CSS, JS, React,
+          React-Native, Pacote NPM e NPX, Git e GuitHub
+        </p>
+        <img src="imagens/Reciclatere.jpg" alt="None">
+      </div>
+    </div>
+  </section>
+
+  <footer>
+
+    <div class="navFooter">
+      <div class="Convite">
+        <h4>Contatos</h4>
+        <h6>Minhas redes sociais estão disponíveis para se caso você quiser entrar em contato</h6>
+      </div>
+      <div class="menu-bg" id="menu-bg"></div>
+      <div class="links">
+        <a href="https://www.linkedin.com/in/rondineli-oliveira-16536775/">
+          <button>
+            <span> <i class="fab fa-linkedin"></i>Linkedin</span>
+          </button>
+        </a>
+        <a href="https://www.facebook.com/RCoutoOliveira?locale=pt_BR">
+          <button>
+            <span><i class="fab fa-facebook"></i> Facebook</span>
+          </button>
+        </a>
+        <a href="https://www.instagram.com/rondi_o_concurseiro/">
+          <button>
+            <span><i class="fab fa-instagram"></i> Instagram</span>
+          </button>
+        </a>
+
+        <a href="https://github.com/RondiRio">
+          <button>
+            <span><i class="fab fa-github"></i> GitHub</span>
+          </button>
+        </a>
+      </div>
+    </div>
+  </footer>
+  <!-- jQuery (necessário para os plugins JavaScript do Bootstrap) -->
+  <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+
+  <!-- Popper.js, necessário para os tooltips do Bootstrap -->
+  <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
+
+  <!-- Bootstrap JS -->
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+  <script>
+    $(document).ready(function () {
+
+      var rightCardsNotInPlace = 0;
+      var leftCardsNotInPlace = 0;
+      var classes = ["l1", "l2", "l3", "l4"];
+      var cards = $('.card').toArray();
+      var activeIndx = Math.floor($(cards).length / 2);
+
+      $('.left-arrow').on('click', function () {
+        if (activeIndx < $(cards).length - 1) {
+          active = $(cards[activeIndx]);
+          if (activeIndx < Math.floor($(cards).length / 2)) {
+            var leftCards = $('.left').toArray();
+            leftCards.reverse();
+            for (var i = 0; i < leftCards.length; i++) {
+              $(leftCards[i]).removeClass("l" + (i + 1)).addClass("l" + (i + 2));
+            }
+          }
+          active.addClass('slideLeft').addClass('left').addClass('l1');
+          active.removeClass('slideLeft');
+          next = $(cards[activeIndx + 1]);
+          next.removeClass('right').removeClass('l1');
+          if (activeIndx >= Math.floor($(cards).length / 2)) {
+            var rightCards = $('.right').toArray();
+            for (var i = 0; i < rightCards.length; i++) {
+              $(rightCards[i]).removeClass("l" + (i + 2)).addClass("l" + (i + 1));
+            }
+          }
+          active.removeClass('active');
+          next.addClass('active');
+          activeIndx++;
+        }
+      });
+
+      $('.right-arrow').on('click', function () {
+        if (activeIndx > 0) {
+          active = $(cards[activeIndx]);
+          if (activeIndx > Math.floor($(cards).length / 2)) {
+            var rightCards = $('.right').toArray();
+            for (var i = 0; i < rightCards.length; i++) {
+              $(rightCards[i]).removeClass("l" + (i + 1)).addClass("l" + (i + 2));
+            }
+          }
+          active.addClass('slideRight').addClass('right').addClass('l1');
+          active.removeClass('slideRight');
+          next = $(cards[activeIndx - 1]);
+          next.removeClass('left').removeClass('l1');
+          if (activeIndx <= Math.floor($(cards).length / 2)) {
+            var leftCards = $('.left').toArray();
+            leftCards.reverse();
+            for (var i = 0; i < leftCards.length; i++) {
+              $(leftCards[i]).removeClass("l" + (i + 2)).addClass("l" + (i + 1));
+            }
+          }
+          active.removeClass('active');
+          next.addClass('active');
+          activeIndx--;
+        }
+      });
+
+
+      // handling chat contacts
+
+      var chatContacts = $('.contact').toArray();
+      var chatActiveIndx = Math.floor($(chatContacts).length / 2);
+
+      $('.chat-top-arrow').on('click', function () {
+        if (chatActiveIndx < $(chatContacts).length - 1) {
+          active = $(chatContacts[chatActiveIndx]);
+          if (chatActiveIndx < Math.floor($(chatContacts).length / 2)) {
+            var topCards = $('.top').toArray();
+            topCards.reverse();
+            for (var i = 0; i < topCards.length; i++) {
+              $(topCards[i]).removeClass("l" + (i + 1)).addClass("l" + (i + 2));
+            }
+
+            var sss = $('.contact.bottom.l1.base' + (3 - chatActiveIndx)).removeClass('faded');
+          }
+          if (chatActiveIndx >= Math.floor($(chatContacts).length / 2)) {
+            $('.contact.top.l1').addClass('faded');
+          }
+          active.addClass('slideTop').addClass('top').addClass('l1').addClass('base' + (chatActiveIndx - 1));
+          active.removeClass('slideTop');
+
+          next = $(chatContacts[chatActiveIndx + 1]);
+          next.removeClass('bottom').removeClass('l1');
+          if (chatActiveIndx >= Math.floor($(chatContacts).length / 2)) {
+            var bottomCards = $('.bottom').toArray();
+            for (var i = 0; i < bottomCards.length; i++) {
+              $(bottomCards[i]).removeClass("l" + (i + 2)).addClass("l" + (i + 1));
+            }
+          }
+          active.removeClass('active');
+          next.addClass('active');
+          chatActiveIndx++;
+        }
+      });
+
+      $('.chat-bottom-arrow').on('click', function () {
+        if (chatActiveIndx > 0) {
+          active = $(chatContacts[chatActiveIndx]);
+          if (chatActiveIndx > Math.floor($(chatContacts).length / 2)) {
+            var bottomCards = $('.bottom').toArray();
+            for (var i = 0; i < bottomCards.length; i++) {
+              $(bottomCards[i]).removeClass("l" + (i + 1)).addClass("l" + (i + 2));
+            }
+            var sss = $('.contact.top.l1.base' + (chatActiveIndx - 3)).removeClass('faded');
+          }
+
+          if (chatActiveIndx <= Math.floor($(chatContacts).length / 2)) {
+            $('.contact.bottom.l1').addClass('faded');
+          }
+          active.addClass('slideBottom').addClass('bottom').addClass('l1').addClass('base' + (5 - chatActiveIndx));
+          active.removeClass('slideBottom');
+          next = $(chatContacts[chatActiveIndx - 1]);
+          next.removeClass('top').removeClass('l1');
+          if (chatActiveIndx <= Math.floor($(chatContacts).length / 2)) {
+            var topCards = $('.top').toArray();
+            topCards.reverse();
+            for (var i = 0; i < topCards.length; i++) {
+              $(topCards[i]).removeClass("l" + (i + 2)).addClass("l" + (i + 1));
+            }
+          }
+          active.removeClass('active');
+          next.addClass('active');
+          chatActiveIndx--;
+        }
+      });
+    });
+  </script>
+</body>
+
+</html>

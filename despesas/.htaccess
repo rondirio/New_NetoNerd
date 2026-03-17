@@ -1,0 +1,87 @@
+# Sistema de Gerenciamento de Despesas
+# Arquivo .htaccess
+
+# Definir página inicial - Landing page para visitantes
+DirectoryIndex landing.php
+
+# Ativar RewriteEngine
+RewriteEngine On
+
+# Redirecionar HTTP para HTTPS (descomente se tiver SSL)
+# RewriteCond %{HTTPS} off
+# RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+
+# Proteção contra listagem de diretórios
+Options -Indexes
+
+# Bloquear acesso a arquivos sensíveis
+<FilesMatch "^\.">
+    Order allow,deny
+    Deny from all
+</FilesMatch>
+
+# Proteger arquivos de configuração
+<FilesMatch "(^#.*#|\.(bak|conf|dist|fla|in[ci]|log|psd|sh|sql|sw[op])|~)$">
+    Order allow,deny
+    Deny from all
+</FilesMatch>
+
+# Bloquear acesso direto aos arquivos de classe
+<FilesMatch "^(Database|Despesa|EmailService)\.php$">
+    Order allow,deny
+    Deny from all
+</FilesMatch>
+
+# Proteção XSS
+<IfModule mod_headers.c>
+    Header set X-XSS-Protection "1; mode=block"
+    Header set X-Content-Type-Options "nosniff"
+    Header set X-Frame-Options "SAMEORIGIN"
+    Header set Referrer-Policy "strict-origin-when-cross-origin"
+</IfModule>
+
+# Compressão GZIP
+<IfModule mod_deflate.c>
+    AddOutputFilterByType DEFLATE text/html text/plain text/xml text/css text/javascript application/javascript application/json
+</IfModule>
+
+# Cache de arquivos estáticos
+<IfModule mod_expires.c>
+    ExpiresActive On
+    ExpiresByType image/jpg "access plus 1 year"
+    ExpiresByType image/jpeg "access plus 1 year"
+    ExpiresByType image/gif "access plus 1 year"
+    ExpiresByType image/png "access plus 1 year"
+    ExpiresByType text/css "access plus 1 month"
+    ExpiresByType application/javascript "access plus 1 month"
+    ExpiresByType application/x-javascript "access plus 1 month"
+    ExpiresByType image/x-icon "access plus 1 year"
+</IfModule>
+
+# Limitar tamanho de upload (ajuste conforme necessário)
+php_value upload_max_filesize 10M
+php_value post_max_size 10M
+
+# Desabilitar exibição de erros em produção (descomente em produção)
+# php_flag display_errors off
+# php_flag display_startup_errors off
+
+# Aumentar tempo de execução para relatórios grandes
+php_value max_execution_time 300
+
+# Melhorar segurança de sessões
+php_value session.cookie_httponly 1
+php_value session.cookie_secure 0
+php_value session.use_strict_mode 1
+
+# Bloquear bots maliciosos
+<IfModule mod_rewrite.c>
+    RewriteCond %{HTTP_USER_AGENT} ^$ [OR]
+    RewriteCond %{HTTP_USER_AGENT} ^(-|automated|MJ12bot|AhrefsBot|SemrushBot) [NC]
+    RewriteRule ^(.*)$ - [F,L]
+</IfModule>
+
+# Página de erro personalizada (opcional)
+# ErrorDocument 404 /despesas/404.php
+# ErrorDocument 403 /despesas/403.php
+# ErrorDocument 500 /despesas/500.php
