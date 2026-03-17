@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rondineli Projects</title>
+
+    <!-- Bootstrap CSS -->
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- FontAwesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="main.css">
+    <link rel="stylesheet" href="script.js">
+</head>
+
+<body>
+    <header>
+
+
+        <div class="menu-bg" id="menu-bg"></div>
+        <div class="links">
+          <a href="index.html">
+            <button>
+              <span>Inicio</span>
+            </button>
+          </a>
+          <a href="projetos.html">
+            <button>
+              <span>
+                Projetos</span>
+            </button>
+          </a>
+          <a href="habilidades.html">
+            <button>
+              <span>Habilidades</span>
+            </button>
+          </a>
+    
+          <a href="formacao.html">
+            <button>
+              <span>Formação</span>
+            </button>
+          </a>
+          <a href="experiencia.html">
+            <button>
+              <span>Experiencia</span>
+            </button>
+        </div>
+        </a>
+    
+        <script>
+          const syncPointer = ({ x: pointerX, y: pointerY }) => {
+            const x = pointerX.toFixed(2);
+            const y = pointerY.toFixed(2);
+    
+            const xp = (pointerX / window.innerWidth).toFixed(2);
+            const yp = (pointerY / window.innerHeight).toFixed(2);
+    
+            document.documentElement.style.setProperty('--x', x);
+            document.documentElement.style.setProperty('--xp', xp);
+            document.documentElement.style.setProperty('--y', y);
+            document.documentElement.style.setProperty('--yp', yp);
+          };
+    
+          document.body.addEventListener('pointermove', syncPointer);
+    
+          function menuOnClick() {
+      document.getElementById("menu-bar").classList.toggle("change");
+      document.getElementById("nav").classList.toggle("change");
+      document.getElementById("menu-bg").classList.toggle("change-bg");
+    }
+        </script>
+        </div>
+        <div id="menu">
+          <div id="menu-bar" onclick="menuOnClick()">
+            <div id="bar1" class="bar"></div>
+            <div id="bar2" class="bar"></div>
+            <div id="bar3" class="bar"></div>
+          </div>
+          <nav class="nav" id="nav">
+            <ul>
+              <li><a href="index.html">Inicio</a></li>
+              <li><a href="projetos.html">Projetos</a></li>
+              <li><a href="habilidades.html">Habilidades</a></li>
+              <li><a href="formacao.html">Formação</a></li>
+              <li><a href="experiencia.html">Experiencia</a></li>
+            </ul>
+          </nav> 
+          <div class="menu-bg" id="menu-bg"></div>
+        </div>
+        
+        </nav>
+      </header>
+    <br><br><br><br>
+    <section class="apresentacao">
+        <div class="foto">
+            <img src="imagens/minhafoto.jpg" alt="Minha foto">
+        </div>
+        <div class="SobreMim">
+            <h3>Os projetos</h3>
+            <hr>
+            <p class="ApresentaNome">
+                Alguns desses projetos foram desenvolvidos junto a um curso da Udemy.
+                Mas outros foram desenvolvidos por conta própria, como esse portifólio.
+            </p><br>
+            <div class="BreveHistory">
+                <h3>Nível dos projetos.</h3>
+                <p>Hoje sou fullStak web. Desenvolvo em PHP, JS, HTML, etc. Minha formação já me permite fazer projetos básicos e complexos. 
+                    <br>Aqui, você irá encontrar os projetos mais simples que fiz até algums dos mais complexos. Eles estão listados por ordem, os primeiros são os mais simples. Os últimos são os mais complexos.
+                </p>
+            </div>
+        </div>
+        <div class="projetosIndex">
+            <h2>Esses são alguns dos meus projetos</h2>
+            <div class="projetosFeitosAll">
+                <button class="projetosFeitosAll_mataMosquito">
+                   <span>Unes Universidade
+                    <a href="projetos_feitos/Unes-main/unes/"><img src="imagens/UnesUniversidade.png" alt=""></a>
+                    
+                   </span>
+                </button>
+                <button class="projetosFeitosAll_mataMosquito">
+                    <span>Tech Blog
+                     <a href="projetos_feitos/Tech-Blog-main/"><img src="imagens/TechBlog.png" alt=""></a>
+                    </span>
+                 </button>
+                 <button class="projetosFeitosAll_mataMosquito">
+                    <span>Noticias Cidade
+                     <a href="projetos_feitos/Not-cias-cidade-main/"><img src="imagens/NoticiasCidade.png" alt=""></a>
+                    </span>
+                 </button>
+                 <button class="projetosFeitosAll_mataMosquito">
+                    <span>Playstation
+                     <a href="projetos_feitos/Playstation_breve_historia_paralax-main/"><img src="imagens/Playstation.png" alt=""></a>
+                    </span>
+                 </button>
+                 <button class="projetosFeitosAll_mataMosquito">
+                    <span>Mata Mosquito
+                     <a href="projetos_feitos/JogoMataMosquito-main/"><img src="imagens/MataMosquito.png" alt=""></a>
+                    </span>
+                 </button>
+                 <button class="projetosFeitosAll_mataMosquito">
+                    <span>Registros
+                     <a href="projetos_feitos/RegistroDeDespesas-main/"><img src="imagens/RegistroDespesas.png" alt=""></a>
+                    </span>
+                 </button>
+                 <button class="projetosFeitosAll_mataMosquito">
+                    <span>Tarefas
+                     <a href="projetos_feitos/ListaDeTarefas-main/app_lista_tarefas_public/"><img src="imagens/Captura de Tela (9).png" alt=""></a>
+                    </span>
+                 </button>
+                 <button class="projetosFeitosAll_mataMosquito">
+                    <span>SendMail
+                     <a href="projetos_feitos/SendMail-main/"><img src="imagens/SendMail.png" alt=""></a>
+                    </span>
+                 </button>
+                 <button class="projetosFeitosAll_mataMosquito">
+                    <span>HelpDesk
+                     <a href="projetos_feitos/HespDesk-main/"><img src="imagens/Captura de Tela (7).png" alt=""></a>
+                    </span>
+                 </button>
+                 <button class="projetosFeitosAll_mataMosquito">
+                    <span>Agenda
+                     <a href="projetos_feitos/Agenda-main/"><img src="imagens/Captura de Tela (6).png" alt=""></a>
+                    </span>
+                 </button>
+                 <button class="projetosFeitosAll_mataMosquito">
+                  <span>George
+                   <a href="projetos_feitos/George/main.py"><img src="imagens/ImgGeorge.png" alt=""></a>
+                  </span>
+               </button>
+            </div>
+        </div>
+    </section>
+    <footer>
+        
+        <div class="navFooter">
+            <div class="Convite">
+                <h4>Contatos</h4>
+                <h6>Minhas redes sociais estão disponíveis para se caso você quiser entrar em contato</h6>
+            </div>
+            <div class="menu-bg" id="menu-bg"></div>
+        <div class="links">
+            <a href="https://www.linkedin.com/in/rondineli-oliveira-16536775/">
+                <button>
+                    <span> <i class="fab fa-linkedin"></i>Linkedin</span>
+                </button>
+            </a>
+            <a href="https://www.facebook.com/RCoutoOliveira?locale=pt_BR">
+                <button>
+                    <span><i class="fab fa-facebook"></i> Facebook</span>
+                </button>
+            </a>
+            <a href="https://www.instagram.com/rondi_o_concurseiro/">
+                <button>
+                    <span><i class="fab fa-instagram"></i> Instagram</span>
+                </button>
+            </a>
+
+            <a href="https://github.com/RondiRio">
+                <button>
+                    <span><i class="fab fa-github"></i> GitHub</span>
+                </button>
+            </a>
+        </div>
+        </div>
+    </footer>
+    <!-- jQuery (necessário para os plugins JavaScript do Bootstrap) -->
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+
+    <!-- Popper.js, necessário para os tooltips do Bootstrap -->
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
+
+    <!-- Bootstrap JS -->
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+    <script>
+        
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,517 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema de Gerenciamento Financeiro | NetoNerd</title>
+    <meta name="description" content="Sistema profissional e gratuito para gestão de despesas pessoais e empresariais. Desenvolvido pela NetoNerd.">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        :root {
+            --primary: #2563eb;
+            --primary-dark: #1e40af;
+            --secondary: #1e293b;
+            --accent: #06b6d4;
+            --light: #f8fafc;
+            --dark: #0f172a;
+        }
+        
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            line-height: 1.6;
+            color: var(--secondary);
+            overflow-x: hidden;
+        }
+        
+        /* Header */
+        header {
+            background: white;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 1000;
+        }
+        
+        nav {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 1.5rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary);
+        }
+        
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            list-style: none;
+        }
+        
+        .nav-links a {
+            color: var(--secondary);
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s;
+        }
+        
+        .nav-links a:hover {
+            color: var(--primary);
+        }
+        
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s;
+            border: none;
+            cursor: pointer;
+        }
+        
+        .btn-primary:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+        }
+        
+        .btn-secondary {
+            background: transparent;
+            color: var(--primary);
+            border: 2px solid var(--primary);
+        }
+        
+        .btn-secondary:hover {
+            background: var(--primary);
+            color: white;
+        }
+        
+        /* Hero Section */
+        .hero {
+            background: linear-gradient(135deg, var(--dark) 0%, var(--secondary) 100%);
+            color: white;
+            padding: 10rem 2rem 6rem;
+            text-align: center;
+            margin-top: 72px;
+        }
+        
+        .hero h1 {
+            font-size: 3.5rem;
+            font-weight: 800;
+            margin-bottom: 1.5rem;
+            line-height: 1.2;
+        }
+        
+        .hero p {
+            font-size: 1.25rem;
+            max-width: 700px;
+            margin: 0 auto 2.5rem;
+            opacity: 0.9;
+        }
+        
+        .hero-buttons {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        
+        /* Features Section */
+        .features {
+            padding: 6rem 2rem;
+            background: white;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .section-title {
+            text-align: center;
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            color: var(--dark);
+        }
+        
+        .section-subtitle {
+            text-align: center;
+            font-size: 1.125rem;
+            color: #64748b;
+            max-width: 600px;
+            margin: 0 auto 4rem;
+        }
+        
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2.5rem;
+        }
+        
+        .feature-card {
+            padding: 2rem;
+            background: var(--light);
+            border-radius: 1rem;
+            transition: all 0.3s;
+        }
+        
+        .feature-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+        
+        .feature-icon {
+            width: 60px;
+            height: 60px;
+            background: var(--primary);
+            color: white;
+            border-radius: 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .feature-card h3 {
+            font-size: 1.375rem;
+            margin-bottom: 1rem;
+            color: var(--dark);
+        }
+        
+        .feature-card p {
+            color: #64748b;
+            line-height: 1.7;
+        }
+        
+        /* Stats Section */
+        .stats {
+            padding: 6rem 2rem;
+            background: var(--primary);
+            color: white;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 3rem;
+            text-align: center;
+        }
+        
+        .stat-number {
+            font-size: 3rem;
+            font-weight: 800;
+            margin-bottom: 0.5rem;
+        }
+        
+        .stat-label {
+            font-size: 1.125rem;
+            opacity: 0.9;
+        }
+        
+        /* Tech Stack */
+        .tech-stack {
+            padding: 6rem 2rem;
+            background: var(--light);
+        }
+        
+        .tech-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 2rem;
+            text-align: center;
+        }
+        
+        .tech-item {
+            padding: 1.5rem;
+            background: white;
+            border-radius: 0.75rem;
+            font-weight: 600;
+            color: var(--secondary);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+        
+        /* CTA Section */
+        .cta {
+            padding: 6rem 2rem;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
+            color: white;
+            text-align: center;
+        }
+        
+        .cta h2 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+        }
+        
+        .cta p {
+            font-size: 1.25rem;
+            margin-bottom: 2rem;
+            opacity: 0.95;
+        }
+        
+        .btn-white {
+            background: white;
+            color: var(--primary);
+            padding: 1rem 2.5rem;
+            font-size: 1.125rem;
+        }
+        
+        .btn-white:hover {
+            background: var(--light);
+            transform: translateY(-2px);
+        }
+        
+        /* Footer */
+        footer {
+            background: var(--dark);
+            color: white;
+            padding: 3rem 2rem 2rem;
+        }
+        
+        .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 3rem;
+            margin-bottom: 3rem;
+        }
+        
+        .footer-section h4 {
+            font-size: 1.125rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .footer-section p,
+        .footer-section a {
+            color: #94a3b8;
+            text-decoration: none;
+            display: block;
+            margin-bottom: 0.75rem;
+        }
+        
+        .footer-section a:hover {
+            color: white;
+        }
+        
+        .footer-bottom {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding-top: 2rem;
+            border-top: 1px solid #334155;
+            text-align: center;
+            color: #94a3b8;
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .nav-links {
+                display: none;
+            }
+            
+            .hero h1 {
+                font-size: 2.5rem;
+            }
+            
+            .hero p {
+                font-size: 1.125rem;
+            }
+            
+            .section-title {
+                font-size: 2rem;
+            }
+            
+            .features-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .hero-buttons {
+                flex-direction: column;
+            }
+            
+            .hero-buttons .btn-primary {
+                width: 100%;
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <nav>
+            <div class="logo">NetoNerd</div>
+            <ul class="nav-links">
+                <li><a href="#features">Recursos</a></li>
+                <li><a href="#tecnologias">Tecnologias</a></li>
+                <li><a href="#acesso">Acesso</a></li>
+            </ul>
+            <a href="index.php" class="btn-primary">Acessar Sistema</a>
+        </nav>
+    </header>
+
+    <section class="hero">
+        <h1>Sistema de Gerenciamento Financeiro</h1>
+        <p>Solução profissional e gratuita para controle completo de despesas pessoais e empresariais. Desenvolvido com tecnologia de ponta pela NetoNerd.</p>
+        <div class="hero-buttons">
+            <a href="index.php" class="btn-primary">Começar Gratuitamente</a>
+            <a href="#features" class="btn-primary btn-secondary">Conhecer Recursos</a>
+        </div>
+    </section>
+
+    <section id="features" class="features">
+        <div class="container">
+            <h2 class="section-title">Recursos Principais</h2>
+            <p class="section-subtitle">Ferramentas profissionais para gestão financeira completa e eficiente</p>
+            
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+                    </div>
+                    <h3>Gestão de Despesas</h3>
+                    <p>Controle total sobre suas finanças com categorização inteligente, filtros avançados e visualização detalhada de todas as movimentações.</p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                    </div>
+                    <h3>Despesas Recorrentes</h3>
+                    <p>Automatize contas fixas mensais como aluguel, energia e internet. O sistema gera as despesas automaticamente todo mês.</p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
+                    </div>
+                    <h3>Parcelamento Inteligente</h3>
+                    <p>Gerencie compras parceladas com facilidade. Crie automaticamente todas as parcelas e acompanhe o progresso de pagamento.</p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>
+                    </div>
+                    <h3>Multi-usuário</h3>
+                    <p>Sistema com autenticação segura. Cada usuário possui seus próprios dados isolados e protegidos com criptografia.</p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="M18.7 8l-5.1 5.2-2.8-2.7L7 14.3"/></svg>
+                    </div>
+                    <h3>Relatórios Detalhados</h3>
+                    <p>Visualize estatísticas completas com gráficos e resumos mensais. Exporte ou envie relatórios por email automaticamente.</p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+                    </div>
+                    <h3>API REST</h3>
+                    <p>Integre com outros sistemas através da API REST completa. Consulte boletos pendentes e automatize processos.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="stats">
+        <div class="container">
+            <div class="stats-grid">
+                <div class="stat-item">
+                    <div class="stat-number">100%</div>
+                    <div class="stat-label">Gratuito</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number">Open</div>
+                    <div class="stat-label">Source</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number">PHP</div>
+                    <div class="stat-label">Moderno</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number">Seguro</div>
+                    <div class="stat-label">Criptografado</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="tecnologias" class="tech-stack">
+        <div class="container">
+            <h2 class="section-title">Tecnologias Utilizadas</h2>
+            <p class="section-subtitle">Desenvolvido com as melhores práticas e ferramentas do mercado</p>
+            
+            <div class="tech-grid">
+                <div class="tech-item">PHP 7.4+</div>
+                <div class="tech-item">MySQL</div>
+                <div class="tech-item">PDO</div>
+                <div class="tech-item">JavaScript ES6</div>
+                <div class="tech-item">HTML5</div>
+                <div class="tech-item">CSS3</div>
+                <div class="tech-item">PHPMailer</div>
+                <div class="tech-item">REST API</div>
+            </div>
+        </div>
+    </section>
+
+    <section id="acesso" class="cta">
+        <div class="container">
+            <h2>Pronto para começar?</h2>
+            <p>Sistema totalmente gratuito e de código aberto disponibilizado pela NetoNerd</p>
+            <a href="index.php" class="btn-primary btn-white">Acessar Sistema Agora</a>
+        </div>
+    </section>
+
+    <footer>
+        <div class="footer-content">
+            <div class="footer-section">
+                <h4>NetoNerd</h4>
+                <p>Soluções tecnológicas profissionais e gratuitas para gestão empresarial.</p>
+            </div>
+            
+            <div class="footer-section">
+                <h4>Sistema</h4>
+                <a href="index.php">Fazer Login</a>
+                <a href="registro.php">Criar Conta</a>
+                <a href="README.md">Documentação</a>
+            </div>
+            
+            <div class="footer-section">
+                <h4>Recursos</h4>
+                <a href="#features">Funcionalidades</a>
+                <a href="#tecnologias">Tecnologias</a>
+                <a href="CHANGELOG.md">Changelog</a>
+            </div>
+            
+            <div class="footer-section">
+                <h4>Suporte</h4>
+                <a href="README.md">Guia de Instalação</a>
+                <a href="MIGRACAO.md">Migração</a>
+                <a href="mailto:suporte@netonerd.com">Contato</a>
+            </div>
+        </div>
+        
+        <div class="footer-bottom">
+            <p>&copy; 2026 NetoNerd. Todos os direitos reservados. Sistema de código aberto disponível gratuitamente.</p>
+        </div>
+    </footer>
+</body>
+</html>

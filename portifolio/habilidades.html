@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rondineli Projects</title>
+
+    <!-- Bootstrap CSS -->
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- FontAwesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="main.css">
+    <link rel="stylesheet" href="script.js">
+</head>
+
+<body>
+    <header>
+
+
+        <div class="menu-bg" id="menu-bg"></div>
+        <div class="links">
+          <a href="index.html">
+            <button>
+              <span>Inicio</span>
+            </button>
+          </a>
+          <a href="projetos.html">
+            <button>
+              <span>
+                Projetos</span>
+            </button>
+          </a>
+          <a href="habilidades.html">
+            <button>
+              <span>Habilidades</span>
+            </button>
+          </a>
+    
+          <a href="formacao.html">
+            <button>
+              <span>Formação</span>
+            </button>
+          </a>
+          <a href="experiencia.html">
+            <button>
+              <span>Experiencia</span>
+            </button>
+        </div>
+        </a>
+    
+        <script>
+          const syncPointer = ({ x: pointerX, y: pointerY }) => {
+            const x = pointerX.toFixed(2);
+            const y = pointerY.toFixed(2);
+    
+            const xp = (pointerX / window.innerWidth).toFixed(2);
+            const yp = (pointerY / window.innerHeight).toFixed(2);
+    
+            document.documentElement.style.setProperty('--x', x);
+            document.documentElement.style.setProperty('--xp', xp);
+            document.documentElement.style.setProperty('--y', y);
+            document.documentElement.style.setProperty('--yp', yp);
+          };
+    
+          document.body.addEventListener('pointermove', syncPointer);
+    
+          function menuOnClick() {
+      document.getElementById("menu-bar").classList.toggle("change");
+      document.getElementById("nav").classList.toggle("change");
+      document.getElementById("menu-bg").classList.toggle("change-bg");
+    }
+        </script>
+        </div>
+        <div id="menu">
+          <div id="menu-bar" onclick="menuOnClick()">
+            <div id="bar1" class="bar"></div>
+            <div id="bar2" class="bar"></div>
+            <div id="bar3" class="bar"></div>
+          </div>
+          <nav class="nav" id="nav">
+            <ul>
+              <li><a href="index.html">Inicio</a></li>
+              <li><a href="projetos.html">Projetos</a></li>
+              <li><a href="habilidades.html">Habilidades</a></li>
+              <li><a href="formacao.html">Formação</a></li>
+              <li><a href="experiencia.html">Experiencia</a></li>
+            </ul>
+          </nav> 
+          <div class="menu-bg" id="menu-bg"></div>
+        </div>
+        
+        </nav>
+      </header>
+    <br><br><br><br>
+    <section class="apresentacao">
+        <div class="foto">
+            <img src="imagens/minhafoto.jpg" alt="Minha foto">
+        </div>
+        <br><br><br><br><br><br>
+        <div class="SobreMim">
+            <h3>Um pouco sobre minhas habilidades / Skills</h3>
+            <hr>
+            <p class="ApresentaNome">A maior parte da minha formação é na Faculdade, porém, possuo algumas habilidades as quais não possuo diploma.<br><br>
+                Como você verá logo mais, possui conhecimentos consolidados em HTML, CSS, JS e PHP.<br>Também possuo bons conhecimentos de MySql e GitHub
+            </p><br>
+        </div>
+    </section>
+    <section class="skills skillsHabilidades">
+        <div class="skillsApresentacaoHabilidades">
+            <h4>Aqui, vou apresentar algumas das minhas habilidades</h4>
+        </div>
+        <div class="Habilidades">
+            <h5>Habilidades ou Skills!</h5>
+            <ul>
+                <li class="SkillCss">CSS</li>
+                <li class="Skilljs">JS</li>
+                <li class="Skillhtml">HTML</li>
+                <li class="Skillphp">PHP</li>
+                <li class="Skillreact">React-Native</li>
+                <li class="Skillsql">Banco de Dados SQl</li>
+                <li class="Skillajax">Ajax</li>
+                <li class="Skillmvc">Arquitetura MVC - WEB</li>
+                <li class="Skillgit">Git & GitHub</li>
+                <li class="Skillpython">Python</li>
+            </ul>
+        </div>
+    </section>
+    <footer>
+        
+        <div class="navFooter">
+            <div class="Convite">
+                <h4>Contatos</h4>
+                <h6>Minhas redes sociais estão disponíveis para se caso você quiser entrar em contato</h6>
+            </div>
+            <div class="menu-bg" id="menu-bg"></div>
+        <div class="links">
+            <a href="https://www.linkedin.com/in/rondineli-oliveira-16536775/">
+                <button>
+                    <span> <i class="fab fa-linkedin"></i>Linkedin</span>
+                </button>
+            </a>
+            <a href="https://www.facebook.com/RCoutoOliveira?locale=pt_BR">
+                <button>
+                    <span><i class="fab fa-facebook"></i> Facebook</span>
+                </button>
+            </a>
+            <a href="https://www.instagram.com/rondi_o_concurseiro/">
+                <button>
+                    <span><i class="fab fa-instagram"></i> Instagram</span>
+                </button>
+            </a>
+
+            <a href="https://github.com/RondiRio">
+                <button>
+                    <span><i class="fab fa-github"></i> GitHub</span>
+                </button>
+            </a>
+        </div>
+        </div>
+    </footer>
+    <!-- jQuery (necessário para os plugins JavaScript do Bootstrap) -->
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+
+    <!-- Popper.js, necessário para os tooltips do Bootstrap -->
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
+
+    <!-- Bootstrap JS -->
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+    <script>
+        
+    </script>
+</body>
+
+</html>

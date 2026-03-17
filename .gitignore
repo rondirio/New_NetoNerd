@@ -1,0 +1,36 @@
+# Credenciais e configuração sensível
+.env
+.env.local
+.env.*.local
+
+# Dump de produção (contém dados reais)
+config/bandoDeDados/u478690921_netonerd.sql
+
+# Dependências
+vendor/
+node_modules/
+
+# Uploads de usuários
+uploads/
+
+# Backups
+backup_*/
+$BACKUP_DIR/
+
+# Logs
+*.log
+logs/
+storage/logs/
+
+# Cache
+storage/cache/
+storage/framework/cache/
+
+# Sistema operacional
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+*.swp

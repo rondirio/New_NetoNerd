@@ -1,0 +1,652 @@
+/* Menu e botões de navegação padrão */
+
+    /* Hamburguer Menu */
+    @media screen and (max-width: 1071px) { 
+        #menu {
+            z-index: 2;
+        }
+        
+        #menu-bar {
+            width: 30px;
+            height: 40px;
+            margin: 20px 0 5px 20px;
+            cursor: pointer;
+        }
+        
+        .bar {
+            height: 3px;
+            width: auto;
+            background-color: #a7818a;
+            display: block;
+            border-radius: 5px;
+            transition: 2s ease;
+        }
+        
+        #bar1 {
+            transform: translateY(-4px);
+            transition: 2s;
+        }
+        
+        #bar3 {
+            transform: translateY(4px);
+            transition: 2s;
+        }
+        .nav {
+            transition: 2s ease;
+            display: none;
+        }
+        
+        .nav ul {
+            padding: 0 10px;
+        }
+        
+        .nav li {
+            list-style: none;
+            padding: 7px 0;
+        }
+        
+        .nav li a {
+            color: white;
+            font-size: 20px;
+            text-decoration: none;
+            /* display: none; */
+        }
+        
+        .nav li a:hover {
+            font-weight: bold;
+        }
+        
+        .menu-bg, #menu {
+            top: 0;
+            left: 0;
+            position: absolute;
+        }
+        
+        .menu-bg {
+            z-index: 1;
+            width: 0;
+            height: 0;
+            margin: 30px 0 20px 20px;
+            background: radial-gradient(circle, #a7818a, #1f1e1e);
+            border-radius: 50%;
+            transition: 0.3s ease;
+        }
+        
+        .change {
+            display: block;
+        }
+        
+        .change .bar {
+            background-color: white;
+        }
+        
+        .change #bar1 {
+            transform: translateY(4px) rotateZ(-45deg);
+        }
+        
+        .change #bar2 {
+            opacity: 0;
+        }
+        
+        .change #bar3 {
+            transform: translateY(-6px) rotateZ(45deg);
+        }
+        
+        .change-bg {
+            width: 520px;
+            height: 460px;
+            transform: translate(-60%,-30%);
+        }
+        
+    }
+    .nav li a {
+        color: white;
+        font-size: 20px;
+        text-decoration: none;
+        @media  screen and (min-width: 1071px){
+            display: none;
+        }
+    }
+.links {
+    display: flex;
+  }
+  
+ @media screen and (max-width: 1072px) { 
+    .links{
+        display: none;
+    }
+ }
+  
+:root {
+    --x: 0;
+    --y: 0;
+    --xp: 0;
+    --yp: 0;
+    --hue: calc(0 + (var(--xp) * 500));
+    --bg: hsl(0, 1%, 40%);
+    --size: 100px;
+    --glow: radial-gradient(
+                50% 50% at center,
+                hsl(var(--hue), 80%, 85%),
+                hsl(var(--hue), 80%, 70%),
+                transparent
+            )
+            calc((var(--x) * 1px) - (var(--size) * 0.5))
+            calc((var(--y) * 1px) - (var(--size) * 0.5)) / var(--size) var(--size) no-repeat fixed;
+}
+.controls{
+    position: fixed;
+    top: 2rem;
+    right: 2rem;
+}
+
+body {
+    background-color: #e6f7f7;
+    font-family: "SF Pro Text";
+    background: var(--bg);
+}
+span{
+    margin-left: 20px;
+    margin-top: 15px;
+    margin-bottom: 15px;
+}
+a{
+    text-decoration: none;
+    color: black;
+    font-style: none;
+    cursor:alias;
+}
+.links{
+    margin-left: 50px;
+    margin-top: 20px;
+}
+button{
+    border-radius: 1rem;
+    text-transform: uppercase;
+    font-weight: bold;
+    letter-spacing: 0.1ch;
+    background: var(--bg);
+    border: 4px solid transparent;
+    box-shadow: 0 1pc hsl(0 0% 100% / 0.15) inset;
+    cursor: pointer;
+    background: linear-gradient(var(--bg), var(--bg)) padding-box, var(--glow), linear-gradient(black, black) border-box;
+    transition: background-size 0.24s;
+    touch-action: none;
+    position: relative;
+    padding: 1rem 2rem;
+    margin: 6px;
+}
+
+button::before{
+    content: "";
+    position: absolute;
+    inset: 0;
+    box-shadow: 0 1px hsl(0 0% 100% /0.15) inset;
+    background: var(--bg);
+    z-index: 2;
+    border-radius: 1rem;
+}
+button span{
+    background: var(--glow), black;
+    background-clip: text;
+    color: transparent;
+    height: 100%;
+    width: 100%;
+    z-index: 2;
+    position: relative;
+    inset: 0;
+}
+
+:root:has(button:active){
+    --size: 300px
+}
+
+button::after{
+    content: "";
+    position: absolute;
+    inset: -4px;
+    filter: blur(20px);
+    border: 4px solid transparent;
+    background: var(--glow);
+    border-radius: 1rem;
+}
+/* inicio projeto */
+.apresentacao {
+    border-radius: 5%;
+    margin-left: 50px;
+    margin-right: 50px;
+}
+.foto {
+    float: left;
+    border-radius: 5vb;
+    /* border: solid red 1px; */
+    margin-right: 25px;
+}
+.foto img{
+    border-radius: 5%;
+    width: 125px;
+    margin-left: 10px;
+    margin-right: 15px;
+    margin-bottom: 15px;
+}
+.SobreMim {
+    margin: auto;
+    padding: auto;
+    text-align: justify;
+    font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+}
+.ApresentaNome {
+    margin-left: 4%;
+    transition: 2s;
+}
+.ApresentaNome:hover {
+    margin-left: 4%;
+    background-color: rgba(245, 248, 248, 0.541);
+}
+.BreveHistory {
+    margin-left: 4%;
+    transition: 2s;
+    text-align: left;
+    text-justify: distribute;
+    font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+}
+.BreveHistory:hover {
+    margin-left: 4%;
+    background-color: rgba(245, 248, 248, 0.541);
+}
+
+/* projetos feitos */
+.card-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.card {
+    margin: 0 10px;
+    height: 100px;
+    display: flex; 
+    justify-content: center;
+    align-items: center;
+    transition: transform 1s ease-out;
+    box-shadow: 0 4px 8px rgba(150, 124, 250, 0.3);
+    cursor: pointer;
+    backface-visibility: hidden;
+}
+.card:hover {
+    transform: scale(1.2) translateZ(50px);
+    z-index: 10;
+}
+.circle-container {
+    margin-top: 10%;
+    margin-left: 20%;
+    position: relative;
+    width: 100px;
+    height: 100px;
+    display: flex;
+    justify-content: right;
+    align-items: left;
+    perspective: 1500000px;
+}
+.card:nth-child(1) { transform: rotateY(0deg) translateZ(200px); }
+.card:nth-child(2) { transform: rotateY(72deg) translateZ(200px); }
+.card:nth-child(3) { transform: rotateY(144deg) translateZ(200px); }
+.card:nth-child(4) { transform: rotateY(216deg) translateZ(200px); }
+.card:nth-child(5) { transform: rotateY(288deg) translateZ(200px); }
+.projetosIndex {
+    margin-top: 5%;
+}
+/* habilidades */
+.skills {
+    /* border: solid red; */
+    background-color: #535353;
+    margin-top: 10%;
+    padding-top: 15px;
+    padding-left: 30px;
+    margin-left: 5%;
+    margin-right: 25%;
+    border-radius: 10vh;
+    color: white;
+    padding-bottom: 15px;
+}
+.skillsApresentacao{
+    /* border: solid red; */
+    border-radius: 10vh;
+    background-color: rgb(180, 177, 177);
+    animation: progress-animation 5s 1;
+    animation-play-state: paused;
+    margin-right: 63%;
+    margin-bottom: 15px;
+    padding-left: 50px;
+    padding-right: 50px;
+    transition: 2s;
+}
+.skillsApresentacao:hover{
+    /* border: solid red; */
+    background-color: rgb(54, 56, 56);
+    animation: progress-animation 5s 1;
+    animation-play-state: paused;
+    margin-right: 63%;
+    margin-bottom: 15px;
+    color: wheat;
+}
+.SkillCss {
+    margin-left: 100px;
+    /* border: solid red 1px; */
+    margin-top: 5%;
+    background-color: #10a7e2;
+    animation: progress-animation-css 4s forwards;
+}
+@keyframes progress-animation-css {
+    0% { width: 0%; }
+    100% { width: 60%; }
+}
+.Skilljs {
+    margin-left: 100px;
+    /* border: solid red 1px; */
+    margin-top: 5%;
+    background-color: #10a7e2;
+    animation: progress-animation-js 4s forwards;
+}
+@keyframes progress-animation-js {
+    0% { width: 0%; }
+    100% { width: 70%; }
+}
+
+.Skillhtml {
+    margin-left: 100px;
+    /* border: solid red 1px; */
+    margin-top: 5%;
+    background-color: #10a7e2;
+    animation: progress-animation-html 4s forwards;
+}
+@keyframes progress-animation-html {
+    0% { width: 0%; }
+    100% { width: 80%; }
+}
+.Skillphp {
+    margin-left: 100px;
+    /* border: solid red 1px; */
+    margin-top: 5%;
+    background-color: #10a7e2;
+    animation: progress-animation-php 4s forwards;
+}
+@keyframes progress-animation-php {
+    0% { width: 0%; }
+    100% { width: 45%; }
+}
+.Skillreact {
+    margin-left: 100px;
+    /* border: solid red 1px; */
+    margin-top: 5%;
+    background-color: #10a7e2;
+    animation: progress-animation-react 4s forwards;
+}
+@keyframes progress-animation-react {
+    0% { width: 0%; }
+    100% { width: 10%; }
+}
+.Skillsql {
+    margin-left: 100px;
+    /* border: solid red 1px; */
+    margin-top: 5%;
+    background-color: #10a7e2;
+    animation: progress-animation-sql 4s forwards;
+}
+@keyframes progress-animation-sql {
+    0% { width: 0%; }
+    100% { width: 60%;}
+}
+.Skillajax {
+    margin-left: 100px;
+    /* border: solid red 1px; */
+    margin-top: 5%;
+    background-color: #10a7e2;
+    animation: progress-animation-ajax 4s forwards;
+}
+@keyframes progress-animation-ajax {
+    0% { width: 0%; }
+    100% { width: 20%;}
+}
+.Skillmvc {
+    margin-left: 100px;
+    /* border: solid red 1px; */
+    margin-top: 5%;
+    background-color: #10a7e2;
+    animation: progress-animation-mvc 4s forwards;
+}
+@keyframes progress-animation-mvc {
+    0% { width: 0%; }
+    100% { width: 40%;}
+}
+.Skillgit {
+    margin-left: 100px;
+    /* border: solid red 1px; */
+    margin-top: 5%;
+    background-color: #10a7e2;
+    animation: progress-animation-git 4s forwards;
+}
+@keyframes progress-animation-git {
+    0% { width: 0%; }
+    100% { width: 55%;}
+}
+.Skillpython {
+    margin-left: 100px;
+    /* border: solid red 1px; */
+    margin-top: 5%;
+    background-color: #10a7e2;
+    animation: progress-animation-python 4s forwards;
+}
+@keyframes progress-animation-python {
+    0% { width: 0%; }
+    100% { width: 40%;}
+}
+li{
+    list-style: none;
+}
+.atividadeProfissional{
+ background-color: #535353;
+ margin-top: 10%;
+ padding-top: 15px;
+ padding-left: 30px;
+ margin-left: 5%;
+ margin-right: 25%;
+ border-radius: 10vh;
+ color: white;
+ padding-bottom: 15px;
+}
+.freelance {
+/* border: solid red 1px; */
+margin: 0 15 0 15px;
+}
+/* Neto Nerd */
+.netonerd{
+    /* border: solid red 1px; */
+    border-radius: 15vw;
+    margin: 0 15 0 15px;
+} 
+.netonerd img{
+    /* border: solid red 1px; */
+    border-radius: 25px;
+    height: 250px;
+    background: transparent;
+    /* margin: 0 15 0 15px; */
+}
+.netonerd p{
+    /* border: solid red 1px; */
+    border-radius: 15vw;
+    /* height: 250px; */
+    margin-left: auto;
+    margin-top: 15px;
+    filter: blur(#158647);
+    text-shadow: #84f8f8;
+}
+/* Fim NetoNerd */
+/* Inicio Four_BA */
+.Four_BA{
+     /* border: solid red 1px; */
+     border-radius: 15vw;
+     margin: 0 15 0 15px;
+}
+.Four_BA img{
+    /* border: solid red 1px; */
+    border-radius: 15vw;
+    height: 250px;
+    /* margin: 0 15 0 15px; */
+}
+.Four_BA p{
+    /* border: solid red 1px; */
+    border-radius: 15vw;
+    /* height: 250px; */
+    margin-left: auto;
+    margin-top: 15px;
+    filter: blur(#158647);
+    text-shadow: #84f8f8;
+}
+/* Fim Four_BA */
+/* Inicio Feirinha */
+.Feirinha{
+    /* border: solid red 1px; */
+    /* border-radius: 15vw; */
+    margin: 0 15 0 15px;
+}
+.Feirinha img{
+   /* border: solid red 1px; */
+   border-radius: 15vw;
+   height: 250px;
+   /* margin: 0 15 0 15px; */
+}
+.Feirinha p{
+   margin-left: auto;
+   margin-top: 15px;
+   filter: blur(#158647);
+   text-shadow: #84f8f8;
+}
+/* Fim Feirinha */
+.ReciclaTere{
+    /* border-radius: 10%; */
+    /* border-radius: 15vw; */
+    margin: 0 15 0 15px;
+}
+.ReciclaTere img {
+    /* border: solid red 1px; */
+   border-radius: 15vw;
+   height: 250px;
+   /* margin: 0 15 0 15px; */
+ }
+.ReciclaTere p{
+   border-radius: 15vw;
+   margin-left: auto;
+   margin-top: 15px;
+   filter: blur(#158647);
+   text-shadow: #84f8f8;
+}
+/* ProjetosFeitosAll */
+.projetosFeitosAll{
+    clear: both;
+    display: flex;
+    flex-wrap: wrap;
+}
+.projetosFeitosAll_mataMosquito{
+    color: white;
+    background-color: black;
+    text-decoration: #584699;
+    flex: 0 0 calc(50% - 15px);
+    box-sizing: border-box;    
+}
+.projetosFeitosAll_mataMosquito img{
+   height: 150px;
+}
+/* Formação */
+.wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
+.container {
+    display: flex;
+    flex-direction: row;
+    color: black;
+}
+.cardFormacao {
+    align-items: flex-end;
+    background-size: cover;
+    border-radius: 2rem;
+    box-shadow: 0px 10px 30px -5px rgba(0, 0, 0, 0.8);
+    cursor: pointer;
+    display: flex;
+    margin: 0 10px;
+    overflow: hidden;
+    transition: 0.6s cubic-bezier(0.28, -0.03, 0, 0, 0.99);
+    width: auto;
+    height: auto;
+    background-color: white;
+    flex-direction: column;
+}
+.cardFormacao > .row {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    flex-wrap: nowrap;
+    height: 100%;
+    width: 100%;
+}
+.cardFormacao > .row > .description {
+    display: flex;
+    flex-direction: column;
+    height: auto;
+    /* justify-content: left; */
+    opacity: 0;
+    overflow: hidden;
+    transform: translateY(30px);
+    transition: all 0.3s ease;
+    transition-delay: 0.3s;
+    width: 80%;
+    text-align: left;
+}
+.cardFormacao h4, p {
+    color: black;
+    margin: 0;
+}
+.faculdade img {
+    height: 150px;
+    margin-top: 10px;
+    color: white;
+    background: black;
+    margin-right: 30px;
+    /* margin-top: 40px; */
+    border-radius: 5px;
+}
+input[type="radio"] {
+    display: none;
+}
+input[type="radio"]:checked + label .description {
+    opacity: 1;
+    transform: translateY(0);
+}
+input[type="radio"] + label .description {
+    opacity: 1;
+    transform: translateY(0);
+}
+.FourbaClass{
+    color: white;
+    background: black;
+    margin-right: 30px;
+    margin-top: 40px;
+    border-radius: 5px;
+}
+footer{
+    /* border: solid red 1px; */
+    margin-left: 60px;
+    margin-right: 320px;
+    margin-top: 35px;
+    padding: auto;
+}
+.linksSobre{
+    /* border: solid red 2px; */
+    padding: auto;
+}
+/* skillsHabilidades */
+.skillsHabilidades{
+    margin-top: 15px !important;
+}
