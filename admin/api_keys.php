@@ -5,7 +5,6 @@
  * Cada chave está vinculada ao banco de dados do cliente na Hostinger
  */
 
-session_start();
 require_once '../controller/auth_middleware.php';
 require_once '../config/bandoDeDados/conexao.php';
 
@@ -37,7 +36,7 @@ $conn->query("CREATE TABLE IF NOT EXISTS api_keys (
 
 // Verificar se colunas de BD existem, se não, adicionar
 $result = $conn->query("SHOW COLUMNS FROM api_keys LIKE 'db_host'");
-if ($result->num_rows === 0) {
+if ($result && $result->num_rows === 0) {
     $conn->query("ALTER TABLE api_keys
         ADD COLUMN db_host VARCHAR(255) NOT NULL DEFAULT '' AFTER cliente_nome,
         ADD COLUMN db_nome VARCHAR(255) NOT NULL DEFAULT '' AFTER db_host,
@@ -81,6 +80,10 @@ if (isset($_GET['msg'])) {
             break;
         case 'conexao_erro':
             $mensagem = 'Erro ao conectar ao banco de dados. Verifique as credenciais.';
+            $tipo_mensagem = 'danger';
+            break;
+        case 'ip_obrigatorio':
+            $mensagem = 'Informe ao menos um IP autorizado para esta chave.';
             $tipo_mensagem = 'danger';
             break;
     }
@@ -195,6 +198,7 @@ require_once '../includes/header.php';
                                                 <!-- Testar Conexão -->
                                                 <?php if (!empty($key['db_host'])): ?>
                                                     <form action="processar_api_key.php" method="POST" style="display:inline;">
+                                                        <?php echo csrfField(); ?>
                                                         <input type="hidden" name="id" value="<?= $key['id'] ?>">
                                                         <input type="hidden" name="acao" value="testar_conexao">
                                                         <button type="submit" class="nn-btn nn-btn-info nn-btn-sm" title="Testar Conexão">
@@ -206,6 +210,7 @@ require_once '../includes/header.php';
                                                 <!-- Ativar/Desativar -->
                                                 <?php if ($key['status'] === 'ativa'): ?>
                                                     <form action="processar_api_key.php" method="POST" style="display:inline;">
+                                                        <?php echo csrfField(); ?>
                                                         <input type="hidden" name="id" value="<?= $key['id'] ?>">
                                                         <input type="hidden" name="acao" value="desativar">
                                                         <button type="submit" class="nn-btn nn-btn-warning nn-btn-sm" title="Desativar">
@@ -214,6 +219,7 @@ require_once '../includes/header.php';
                                                     </form>
                                                 <?php else: ?>
                                                     <form action="processar_api_key.php" method="POST" style="display:inline;">
+                                                        <?php echo csrfField(); ?>
                                                         <input type="hidden" name="id" value="<?= $key['id'] ?>">
                                                         <input type="hidden" name="acao" value="ativar">
                                                         <button type="submit" class="nn-btn nn-btn-success nn-btn-sm" title="Ativar">
@@ -224,6 +230,7 @@ require_once '../includes/header.php';
 
                                                 <!-- Excluir -->
                                                 <form action="processar_api_key.php" method="POST" style="display:inline;" onsubmit="return confirm('Deseja realmente excluir esta chave API?');">
+                                                    <?php echo csrfField(); ?>
                                                     <input type="hidden" name="id" value="<?= $key['id'] ?>">
                                                     <input type="hidden" name="acao" value="excluir">
                                                     <button type="submit" class="nn-btn nn-btn-danger nn-btn-sm" title="Excluir">
@@ -261,6 +268,7 @@ require_once '../includes/header.php';
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
             </div>
             <form action="processar_api_key.php" method="POST">
+                <?php echo csrfField(); ?>
                 <input type="hidden" name="acao" value="criar">
                 <div class="modal-body">
                     <div class="row">
@@ -271,17 +279,17 @@ require_once '../includes/header.php';
                             </h6>
 
                             <div class="nn-form-group">
-                                <label class="nn-form-label">Nome do Cliente *</label>
-                                <input type="text" name="cliente_nome" class="nn-form-control" placeholder="Nome do cliente ou empresa" required>
+                                <label class="nn-form-label" for="ak_cliente_nome">Nome do Cliente *</label>
+                                <input type="text" name="cliente_nome" id="ak_cliente_nome" class="nn-form-control" placeholder="Nome do cliente ou empresa" required>
                             </div>
 
                             <div class="nn-form-group">
-                                <label class="nn-form-label">Descrição</label>
-                                <input type="text" name="descricao" class="nn-form-control" placeholder="Ex: App Android, App iOS...">
+                                <label class="nn-form-label" for="ak_descricao">Descrição</label>
+                                <input type="text" name="descricao" id="ak_descricao" class="nn-form-control" placeholder="Ex: App Android, App iOS...">
                             </div>
 
                             <div class="nn-form-group">
-                                <label class="nn-form-label">Chave API</label>
+                                <label class="nn-form-label" for="chave_api">Chave API</label>
                                 <div class="input-group">
                                     <input type="text" name="chave" id="chave_api" class="nn-form-control" placeholder="Será gerada automaticamente" readonly>
                                     <button type="button" class="nn-btn nn-btn-secondary" onclick="gerarChaveAPI()">
@@ -291,16 +299,16 @@ require_once '../includes/header.php';
                             </div>
 
                             <div class="nn-form-group">
-                                <label class="nn-form-label">Status</label>
-                                <select name="status" class="nn-form-control">
+                                <label class="nn-form-label" for="ak_status">Status</label>
+                                <select name="status" id="ak_status" class="nn-form-control">
                                     <option value="ativa">Ativa</option>
                                     <option value="inativa">Inativa</option>
                                 </select>
                             </div>
 
                             <div class="nn-form-group">
-                                <label class="nn-form-label">Data de Expiração</label>
-                                <input type="date" name="data_expiracao" class="nn-form-control">
+                                <label class="nn-form-label" for="ak_data_expiracao">Data de Expiração</label>
+                                <input type="date" name="data_expiracao" id="ak_data_expiracao" class="nn-form-control">
                                 <small class="text-muted">Deixe em branco para chave sem expiração</small>
                             </div>
                         </div>
@@ -312,23 +320,23 @@ require_once '../includes/header.php';
                             </h6>
 
                             <div class="nn-form-group">
-                                <label class="nn-form-label">Host do Banco *</label>
-                                <input type="text" name="db_host" class="nn-form-control" placeholder="Ex: sql123.main-hosting.eu" required>
+                                <label class="nn-form-label" for="db_host">Host do Banco *</label>
+                                <input type="text" name="db_host" id="db_host" class="nn-form-control" placeholder="Ex: sql123.main-hosting.eu" required>
                                 <small class="text-muted">Encontre no painel da Hostinger</small>
                             </div>
 
                             <div class="nn-form-group">
-                                <label class="nn-form-label">Nome do Banco *</label>
-                                <input type="text" name="db_nome" class="nn-form-control" placeholder="Ex: u123456789_sistema" required>
+                                <label class="nn-form-label" for="db_nome">Nome do Banco *</label>
+                                <input type="text" name="db_nome" id="db_nome" class="nn-form-control" placeholder="Ex: u123456789_sistema" required>
                             </div>
 
                             <div class="nn-form-group">
-                                <label class="nn-form-label">Usuário do Banco *</label>
-                                <input type="text" name="db_usuario" class="nn-form-control" placeholder="Ex: u123456789_admin" required>
+                                <label class="nn-form-label" for="db_usuario">Usuário do Banco *</label>
+                                <input type="text" name="db_usuario" id="db_usuario" class="nn-form-control" placeholder="Ex: u123456789_admin" required>
                             </div>
 
                             <div class="nn-form-group">
-                                <label class="nn-form-label">Senha do Banco *</label>
+                                <label class="nn-form-label" for="db_senha">Senha do Banco *</label>
                                 <div class="input-group">
                                     <input type="password" name="db_senha" id="db_senha" class="nn-form-control" placeholder="Senha do banco de dados" required>
                                     <button type="button" class="nn-btn nn-btn-secondary" onclick="toggleSenha()">
@@ -338,8 +346,14 @@ require_once '../includes/header.php';
                             </div>
 
                             <div class="nn-form-group">
-                                <label class="nn-form-label">Porta</label>
-                                <input type="number" name="db_porta" class="nn-form-control" value="3306" placeholder="3306">
+                                <label class="nn-form-label" for="db_porta">Porta</label>
+                                <input type="number" name="db_porta" id="db_porta" class="nn-form-control" value="3306" placeholder="3306">
+                            </div>
+
+                            <div class="nn-form-group">
+                                <label class="nn-form-label" for="ip_permitido">IP(s) Autorizado(s) *</label>
+                                <input type="text" name="ip_permitido" id="ip_permitido" class="nn-form-control" placeholder="Ex: 203.0.113.10, 203.0.113.11" required>
+                                <small class="text-muted">Obrigatório. Separe múltiplos IPs por vírgula.</small>
                             </div>
                         </div>
                     </div>

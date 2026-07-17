@@ -1,6 +1,6 @@
 <?php
-session_start();
 require_once '../controller/auth_middleware.php';
+require_once '../controller/historico_chamados.php';
 require_once '../config/bandoDeDados/conexao.php';
 
 // PROTEÇÃO: Apenas técnicos e admins
@@ -10,6 +10,8 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     header('Location: meus_chamados.php?erro=metodo_invalido');
     exit();
 }
+
+requireCsrfToken();
 
 $conn = getConnection();
 
@@ -44,6 +46,8 @@ try {
                 throw new Exception("Apenas chamados abertos podem ser iniciados");
             }
 
+            $status_anterior = $chamado['status'];
+
             $stmt = $conn->prepare("
                 UPDATE chamados
                 SET status = 'em andamento',
@@ -63,6 +67,8 @@ try {
             $stmt->execute();
             $stmt->close();
 
+            registrarHistoricoStatus($conn, $chamado_id, $tecnico_id, $status_anterior, 'em andamento', 'Técnico iniciou o atendimento');
+
             $mensagem_sucesso = 'iniciado';
             break;
 
@@ -71,6 +77,8 @@ try {
             if ($chamado['status'] !== 'em andamento') {
                 throw new Exception("Apenas chamados em andamento podem ser pausados");
             }
+
+            $status_anterior = $chamado['status'];
 
             $stmt = $conn->prepare("UPDATE chamados SET status = 'pendente' WHERE id = ?");
             $stmt->bind_param("i", $chamado_id);
@@ -86,6 +94,8 @@ try {
             $stmt->execute();
             $stmt->close();
 
+            registrarHistoricoStatus($conn, $chamado_id, $tecnico_id, $status_anterior, 'pendente', 'Atendimento pausado pelo técnico');
+
             $mensagem_sucesso = 'atualizado';
             break;
 
@@ -94,6 +104,8 @@ try {
             if ($chamado['status'] !== 'pendente') {
                 throw new Exception("Apenas chamados pendentes podem ser retomados");
             }
+
+            $status_anterior = $chamado['status'];
 
             $stmt = $conn->prepare("UPDATE chamados SET status = 'em andamento' WHERE id = ?");
             $stmt->bind_param("i", $chamado_id);
@@ -108,6 +120,8 @@ try {
             $stmt->bind_param("ii", $chamado_id, $tecnico_id);
             $stmt->execute();
             $stmt->close();
+
+            registrarHistoricoStatus($conn, $chamado_id, $tecnico_id, $status_anterior, 'em andamento', 'Atendimento retomado pelo técnico');
 
             $mensagem_sucesso = 'iniciado';
             break;
@@ -130,11 +144,15 @@ try {
             $stmt->close();
 
             // Se for "aguardando_cliente" ou "necessita_peca", mudar status para pendente
-            if (in_array($tipo_atualizacao, ['aguardando_cliente', 'necessita_peca'])) {
+            if (in_array($tipo_atualizacao, ['aguardando_cliente', 'necessita_peca']) && $chamado['status'] !== 'pendente') {
+                $status_anterior = $chamado['status'];
+
                 $stmt = $conn->prepare("UPDATE chamados SET status = 'pendente' WHERE id = ?");
                 $stmt->bind_param("i", $chamado_id);
                 $stmt->execute();
                 $stmt->close();
+
+                registrarHistoricoStatus($conn, $chamado_id, $tecnico_id, $status_anterior, 'pendente', $descricao);
             }
 
             $mensagem_sucesso = 'atualizado';
@@ -146,10 +164,7 @@ try {
 
     // Log do sistema
     $log_acao = "Técnico executou ação '$acao' no chamado #$chamado_id";
-    $stmt = $conn->prepare("INSERT INTO logs_sistema (usuario_id, acao) VALUES (?, ?)");
-    $stmt->bind_param("is", $tecnico_id, $log_acao);
-    $stmt->execute();
-    $stmt->close();
+    registrarLogSistema($conn, $tecnico_id, $log_acao, 'chamado', $chamado_id);
 
     $conn->commit();
 

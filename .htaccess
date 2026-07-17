@@ -1,0 +1,28 @@
+# NetoNerd ITSM - .htaccess raiz
+# Bloqueia acesso direto a arquivos e pastas sensiveis expostos hoje sem protecao.
+# Nao interfere nas rotas normais do site (cliente/, admin/, tecnico/, etc continuam acessiveis).
+
+Options -Indexes
+
+# Bloquear qualquer dotfile (.env, .env.example, .gitignore, etc)
+<FilesMatch "^\.">
+    Order allow,deny
+    Deny from all
+    Require all denied
+</FilesMatch>
+
+# Bloquear extensoes de configuracao/dados que nunca devem ser servidas direto
+<FilesMatch "\.(sql|sh|hd|log|bak|env|ini|conf)$">
+    Order allow,deny
+    Deny from all
+    Require all denied
+</FilesMatch>
+
+# Bloquear pastas inteiras que nao tem por que responder via HTTP
+RewriteEngine On
+RewriteRule ^(\$BACKUP_DIR|backup_20251008_122106|unicle_execution|_REMOVER_DO_SERVIDOR|bandoDeDados|config/bandoDeDados|vendor|storage/logs)(/.*)?$ - [F,L]
+
+# Desabilitar exibicao de erros em producao (o codigo liga isso manualmente em alguns arquivos,
+# isso forca o php.ini a nivel de diretorio como rede de seguranca extra)
+php_flag display_errors off
+php_flag display_startup_errors off

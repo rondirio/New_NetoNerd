@@ -28,6 +28,16 @@
 <!--</footer-->
 
 
+<?php
+// Root do projeto = pasta pai de routes/ (onde este arquivo está)
+// Funciona em qualquer página que inclua o footer, em dev e produção
+$_footerDocRoot = rtrim(str_replace('\\', '/', $_SERVER['DOCUMENT_ROOT']), '/');
+$_footerProjDir = str_replace('\\', '/', dirname(__DIR__)); // c:/xampp/htdocs/NetoNerd/New_NetoNerd-main
+$_footerRoot    = str_replace($_footerDocRoot, '', $_footerProjDir); // /NetoNerd/New_NetoNerd-main
+$_footerProto   = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https' : 'http';
+$_footerBase    = $_footerProto . '://' . $_SERVER['HTTP_HOST'] . $_footerRoot;
+// ex: http://localhost/NetoNerd/New_NetoNerd-main  ou  https://netonerd.com.br.br
+?>
  <!-- Footer -->
     <footer class="footer">
         <div class="container">
@@ -56,10 +66,10 @@
                     <div class="footer-section">
                         <h5 class="footer-title">Produtos</h5>
                         <ul class="footer-links">
-                            <li><a href="produtos.php?id=myhealth">MyHealth</a></li>
-                            <li><a href="produtos.php?id=escritorius">Escritorius</a></li>
-                            <li><a href="produtos.php?id=stylemanager">Style Manager</a></li>
-                            <li><a href="produtos.php?id=pj">NetoNerd PJ</a></li>
+                            <li><a href="<?= $_footerBase ?>/publics/produtos.php?id=myhealth">MyHealth</a></li>
+                            <li><a href="<?= $_footerBase ?>/publics/produtos.php?id=escritorius">Escritorius</a></li>
+                            <li><a href="<?= $_footerBase ?>/publics/produtos.php?id=stylemanager">Style Manager</a></li>
+                            <li><a href="<?= $_footerBase ?>/publics/produtos.php?id=pj">NetoNerd PJ</a></li>
                         </ul>
                     </div>
                 </div>
@@ -67,10 +77,10 @@
                     <div class="footer-section">
                         <h5 class="footer-title">Empresa</h5>
                         <ul class="footer-links">
-                            <li><a href="quemsomo.php">Sobre Nós</a></li>
-                            <li><a href="atendimento.php">Atendimento</a></li>
-                            <li><a href="planos.php">Planos</a></li>
-                            <li><a href="contato.php">Contato</a></li>
+                            <li><a href="<?= $_footerBase ?>/publics/quemsomo.php">Sobre Nós</a></li>
+                            <li><a href="<?= $_footerBase ?>/publics/atendimento.php">Atendimento</a></li>
+                            <li><a href="<?= $_footerBase ?>/publics/planos.php">Planos</a></li>
+                            <li><a href="<?= $_footerBase ?>/publics/contato.php">Contato</a></li>
                         </ul>
                     </div>
                 </div>
@@ -92,8 +102,8 @@
             <div class="footer-bottom">
                 <p>&copy; 2025 Neto Nerd Soluções Digitais LTDA. &mdash; CNPJ: 65.663.425/0001-26. Todos os direitos reservados.</p>
                 <p class="mb-0">
-                    <a href="termos.php" style="color: rgba(255,255,255,0.6); margin: 0 10px;">Termos de Uso</a> |
-                    <a href="privacidade.php" style="color: rgba(255,255,255,0.6); margin: 0 10px;">Política de Privacidade</a>
+                    <a href="<?= $_footerBase ?>/publics/termos.php" style="color: rgba(255,255,255,0.6); margin: 0 10px;">Termos de Uso</a> |
+                    <a href="<?= $_footerBase ?>/publics/privacidade.php" style="color: rgba(255,255,255,0.6); margin: 0 10px;">Política de Privacidade</a>
                 </p>
             </div>
         </div>

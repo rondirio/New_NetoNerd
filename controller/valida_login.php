@@ -6,7 +6,7 @@
  * Login com EMAIL e SENHA
  */
 
-session_start();
+require_once "../controller/auth_middleware.php";
 require_once "../config/bandoDeDados/conexao.php";
 
 // Verificar método POST
@@ -39,6 +39,12 @@ if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
     exit();
 }
 
+$bloqueio = isLoginBloqueado($conn, $email, 'cliente');
+if ($bloqueio['bloqueado']) {
+    header('Location: ../publics/login.php?msg=bloqueado&tempo=' . $bloqueio['minutos']);
+    exit();
+}
+
 try {
     // Buscar cliente no banco
     $stmt = $conn->prepare("
@@ -59,6 +65,7 @@ try {
     if ($result->num_rows === 0) {
         // Cliente não encontrado
         error_log("Tentativa de login com email inexistente | IP: " . $_SERVER['REMOTE_ADDR']);
+        registrarTentativaLogin($conn, $email, 'cliente', false);
         $stmt->close();
         $conn->close();
 
@@ -92,6 +99,7 @@ try {
     if (!$senha_valida) {
         // Senha incorreta
         error_log("Tentativa de login com senha incorreta | IP: " . $_SERVER['REMOTE_ADDR']);
+        registrarTentativaLogin($conn, $email, 'cliente', false);
         $conn->close();
 
         header('Location: ../publics/login.php?erro=credenciais_invalidas');
@@ -101,6 +109,8 @@ try {
     // ============================================
     // LOGIN BEM-SUCEDIDO
     // ============================================
+
+    registrarTentativaLogin($conn, $email, 'cliente', true);
 
     // Regenerar ID da sessão (segurança contra fixação)
     session_regenerate_id(true);
@@ -123,15 +133,7 @@ try {
     $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
 
     // Registrar log de acesso
-    $stmt = $conn->prepare("
-        INSERT INTO logs_sistema (usuario_id, acao)
-        VALUES (?, 'Login de cliente bem-sucedido')
-    ");
-    if ($stmt) {
-        $stmt->bind_param("i", $cliente['id']);
-        $stmt->execute();
-        $stmt->close();
-    }
+    registrarLogSistema($conn, $cliente['id'], 'Login de cliente bem-sucedido', 'cliente', $cliente['id']);
 
     $conn->close();
 

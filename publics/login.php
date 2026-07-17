@@ -423,12 +423,6 @@
                     </button>
                 </form>
 
-                <div class="forgot-password">
-                    <a href="recuperar_senha.php">
-                        <i class="fas fa-key"></i> Esqueceu sua senha?
-                    </a>
-                </div>
-
                 <div class="divider">
                     <span>OU</span>
                 </div>

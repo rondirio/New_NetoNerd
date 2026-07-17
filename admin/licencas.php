@@ -4,7 +4,6 @@
  * Gerenciamento de licenças do sistema
  */
 
-session_start();
 require_once '../controller/auth_middleware.php';
 require_once '../config/bandoDeDados/conexao.php';
 
@@ -85,6 +84,7 @@ require_once '../includes/header.php';
                                         <td><?php echo isset($lic['data_validade']) ? date('d/m/Y', strtotime($lic['data_validade'])) : 'Sem validade'; ?></td>
                                         <td>
                                             <form action="processar_licenca.php" method="POST" style="display:inline;" onsubmit="return confirm('Deseja realmente excluir esta licença?');">
+                                                <?php echo csrfField(); ?>
                                                 <input type="hidden" name="id" value="<?php echo $lic['id']; ?>">
                                                 <input type="hidden" name="acao" value="excluir">
                                                 <button type="submit" class="nn-btn nn-btn-danger nn-btn-sm">
@@ -121,12 +121,13 @@ require_once '../includes/header.php';
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
             </div>
             <form action="processar_licenca.php" method="POST">
+                <?php echo csrfField(); ?>
                 <input type="hidden" name="acao" value="criar">
                 <div class="modal-body">
                     <?php if (count($produtos) > 0): ?>
                         <div class="nn-form-group">
-                            <label class="nn-form-label">Produto *</label>
-                            <select name="produto_id" class="nn-form-control" required>
+                            <label class="nn-form-label" for="produto_id">Produto *</label>
+                            <select id="produto_id" name="produto_id" class="nn-form-control" required>
                                 <option value="">Selecione um produto</option>
                                 <?php foreach ($produtos as $prod): ?>
                                     <option value="<?php echo $prod['id']; ?>">
@@ -143,12 +144,12 @@ require_once '../includes/header.php';
                     <?php endif; ?>
 
                     <div class="nn-form-group">
-                        <label class="nn-form-label">Nome do Cliente *</label>
-                        <input type="text" name="cliente_nome" class="nn-form-control" required>
+                        <label class="nn-form-label" for="licenca_cliente_nome">Nome do Cliente *</label>
+                        <input type="text" id="licenca_cliente_nome" name="cliente_nome" class="nn-form-control" required>
                     </div>
 
                     <div class="nn-form-group">
-                        <label class="nn-form-label">Chave de Licença</label>
+                        <label class="nn-form-label" for="chave_licenca">Chave de Licença</label>
                         <div class="input-group">
                             <input type="text" name="chave_licenca" id="chave_licenca" class="nn-form-control" placeholder="Será gerada automaticamente se deixar em branco">
                             <button type="button" class="nn-btn nn-btn-secondary" onclick="gerarChave()">
@@ -158,8 +159,8 @@ require_once '../includes/header.php';
                     </div>
 
                     <div class="nn-form-group">
-                        <label class="nn-form-label">Status *</label>
-                        <select name="status" class="nn-form-control" required>
+                        <label class="nn-form-label" for="licenca_status">Status *</label>
+                        <select id="licenca_status" name="status" class="nn-form-control" required>
                             <option value="ativa">Ativa</option>
                             <option value="inativa">Inativa</option>
                             <option value="expirada">Expirada</option>
@@ -168,8 +169,8 @@ require_once '../includes/header.php';
                     </div>
 
                     <div class="nn-form-group">
-                        <label class="nn-form-label">Data de Validade</label>
-                        <input type="date" name="data_validade" class="nn-form-control">
+                        <label class="nn-form-label" for="data_validade">Data de Validade</label>
+                        <input type="date" id="data_validade" name="data_validade" class="nn-form-control">
                         <small class="text-muted">Deixe em branco para licença sem validade</small>
                     </div>
                 </div>

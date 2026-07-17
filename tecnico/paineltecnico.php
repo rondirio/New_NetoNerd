@@ -4,7 +4,6 @@
  * Dashboard principal para técnicos
  */
 
-session_start();
 require_once '../controller/auth_middleware.php';
 require_once '../config/bandoDeDados/conexao.php';
 
@@ -345,7 +344,6 @@ require_once '../includes/header.php';
 
 <?php
 // Incluir footer
-$stmt_tecnico->close();
 $stmt_stats->close();
 $stmt_urgentes->close();
 $stmt_recentes->close();

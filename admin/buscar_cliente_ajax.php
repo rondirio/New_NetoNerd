@@ -3,7 +3,6 @@
  * Buscar Cliente via AJAX - NetoNerd ITSM v2.0
  * Busca cliente por nome e telefone
  */
-session_start();
 require_once '../controller/auth_middleware.php';
 require_once '../config/bandoDeDados/conexao.php';
 

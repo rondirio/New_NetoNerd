@@ -1,23 +1,27 @@
 <?php
-session_start();
-require_once 'bandoDeDados/conexao.php';
+require_once '../controller/auth_middleware.php';
+require_once '../controller/historico_chamados.php';
+require_once '../config/bandoDeDados/conexao.php';
 
-// Verificar autenticação
-if (!isset($_SESSION['id'])) {
-    header('Location: index.php?erro=nao_autenticado');
+requireCliente();
+
+if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+    header('Location: home.php?erro=metodo_invalido');
     exit();
 }
+
+requireCsrfToken();
 
 $conn = getConnection();
 $usuario_id = $_SESSION['id'];
 
 // Validar ID do chamado
-if (!isset($_GET['id']) || empty($_GET['id'])) {
+if (!isset($_POST['id']) || empty($_POST['id'])) {
     header('Location: home.php?erro=id_invalido');
     exit();
 }
 
-$chamado_id = intval($_GET['id']);
+$chamado_id = intval($_POST['id']);
 
 // Verificar se o usuário é dono do chamado e se está resolvido
 $stmt = $conn->prepare("
@@ -43,38 +47,33 @@ $stmt->close();
 // Verificar se o chamado está no status "resolvido"
 if ($chamado['status'] !== 'resolvido') {
     $conn->close();
-    header('Location: detalhe_chamado.php?id=' . $chamado_id . '&erro=status_invalido');
+    header('Location: visualizar_chamado.php?id=' . $chamado_id . '&erro=status_invalido');
     exit();
 }
 
 // Fechar o chamado
 try {
+    $conn->begin_transaction();
+
     $stmt = $conn->prepare("
-        UPDATE chamados 
-        SET status = 'fechado', 
-            data_fechamento = CURRENT_TIMESTAMP,
-            data_ultima_atualizacao = CURRENT_TIMESTAMP
+        UPDATE chamados
+        SET status = 'fechado',
+            data_fechamento = CURRENT_TIMESTAMP
         WHERE id = ?
     ");
-    
+
     $stmt->bind_param("i", $chamado_id);
-    
+
     if (!$stmt->execute()) {
         throw new Exception("Erro ao fechar chamado: " . $stmt->error);
     }
-    
+
     $stmt->close();
-    
+
     // Registrar no histórico
-    $stmt = $conn->prepare("
-        INSERT INTO historico_chamados 
-        (chamado_id, usuario_id, status_anterior, status_novo, comentario) 
-        VALUES (?, ?, 'resolvido', 'fechado', 'Chamado fechado pelo cliente após confirmação de resolução')
-    ");
-    
-    $stmt->bind_param("ii", $chamado_id, $usuario_id);
-    $stmt->execute();
-    $stmt->close();
+    registrarHistoricoStatus($conn, $chamado_id, $usuario_id, 'resolvido', 'fechado', 'Chamado fechado pelo cliente após confirmação de resolução');
+
+    $conn->commit();
 
     // Enviar email para o técnico notificando
     try {
@@ -116,13 +115,14 @@ try {
     $conn->close();
     
     // Redirecionar com sucesso
-    header('Location: detalhe_chamado.php?id=' . $chamado_id . '&sucesso=chamado_fechado');
+    header('Location: visualizar_chamado.php?id=' . $chamado_id . '&sucesso=chamado_fechado');
     exit();
     
 } catch (Exception $e) {
+    $conn->rollback();
     $conn->close();
     error_log("Erro ao fechar chamado: " . $e->getMessage());
-    header('Location: detalhe_chamado.php?id=' . $chamado_id . '&erro=erro_servidor');
+    header('Location: visualizar_chamado.php?id=' . $chamado_id . '&erro=erro_servidor');
     exit();
 }
 ?>

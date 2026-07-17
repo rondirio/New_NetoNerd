@@ -4,7 +4,6 @@
  * Listagem completa de chamados atribuídos ao técnico
  */
 
-session_start();
 require_once '../controller/auth_middleware.php';
 require_once '../config/bandoDeDados/conexao.php';
 
@@ -132,6 +131,7 @@ require_once '../includes/header.php';
                     case 'iniciado': echo 'Atendimento iniciado com sucesso!'; break;
                     case 'atualizado': echo 'Chamado atualizado com sucesso!'; break;
                     case 'resolvido': echo 'Chamado marcado como resolvido!'; break;
+                    case 'encerrado_sem_resolucao': echo 'Chamado encerrado sem resolução por falta de resposta do cliente.'; break;
                     default: echo 'Operação realizada com sucesso!';
                 }
                 ?>
@@ -198,11 +198,11 @@ require_once '../includes/header.php';
                     <div class="row g-3">
                         <div class="col-md-5">
                             <div class="nn-form-group">
-                                <label class="nn-form-label">
+                                <label class="nn-form-label" for="status">
                                     <i class="fas fa-info-circle"></i>
                                     Status
                                 </label>
-                                <select name="status" class="nn-form-control">
+                                <select id="status" name="status" class="nn-form-control">
                                     <option value="">Todos</option>
                                     <option value="aberto" <?php echo $filtro_status === 'aberto' ? 'selected' : ''; ?>>Abertos</option>
                                     <option value="em andamento" <?php echo $filtro_status === 'em andamento' ? 'selected' : ''; ?>>Em Andamento</option>
@@ -214,11 +214,11 @@ require_once '../includes/header.php';
 
                         <div class="col-md-5">
                             <div class="nn-form-group">
-                                <label class="nn-form-label">
+                                <label class="nn-form-label" for="prioridade">
                                     <i class="fas fa-exclamation-triangle"></i>
                                     Prioridade
                                 </label>
-                                <select name="prioridade" class="nn-form-control">
+                                <select id="prioridade" name="prioridade" class="nn-form-control">
                                     <option value="">Todas</option>
                                     <option value="critica" <?php echo $filtro_prioridade === 'critica' ? 'selected' : ''; ?>>Crítica</option>
                                     <option value="alta" <?php echo $filtro_prioridade === 'alta' ? 'selected' : ''; ?>>Alta</option>
@@ -350,6 +350,7 @@ require_once '../includes/header.php';
                             <div class="col-md-4 text-end d-flex flex-column gap-2">
                                 <?php if ($chamado['status'] === 'aberto'): ?>
                                     <form action="processar_chamado.php" method="POST">
+                                        <?php echo csrfField(); ?>
                                         <input type="hidden" name="chamado_id" value="<?php echo $chamado['id']; ?>">
                                         <input type="hidden" name="acao" value="iniciar">
                                         <button type="submit" class="nn-btn nn-btn-primary nn-btn-lg w-100">
@@ -376,6 +377,7 @@ require_once '../includes/header.php';
                                     </button>
 
                                     <form action="processar_chamado.php" method="POST">
+                                        <?php echo csrfField(); ?>
                                         <input type="hidden" name="chamado_id" value="<?php echo $chamado['id']; ?>">
                                         <input type="hidden" name="acao" value="pausar">
                                         <button type="submit" class="nn-btn nn-btn-secondary w-100">
@@ -387,6 +389,7 @@ require_once '../includes/header.php';
 
                                 <?php if ($chamado['status'] === 'pendente'): ?>
                                     <form action="processar_chamado.php" method="POST">
+                                        <?php echo csrfField(); ?>
                                         <input type="hidden" name="chamado_id" value="<?php echo $chamado['id']; ?>">
                                         <input type="hidden" name="acao" value="retomar">
                                         <button type="submit" class="nn-btn nn-btn-info nn-btn-lg w-100">
@@ -429,13 +432,14 @@ require_once '../includes/header.php';
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <form action="processar_chamado.php" method="POST">
+                <?php echo csrfField(); ?>
                 <input type="hidden" name="chamado_id" id="atualizar_chamado_id">
                 <input type="hidden" name="acao" value="atualizar">
 
                 <div class="modal-body">
                     <div class="nn-form-group mb-3">
-                        <label class="nn-form-label">Tipo de Atualização</label>
-                        <select name="tipo_atualizacao" class="nn-form-control" required>
+                        <label class="nn-form-label" for="tipo_atualizacao">Tipo de Atualização</label>
+                        <select id="tipo_atualizacao" name="tipo_atualizacao" class="nn-form-control" required>
                             <option value="comentario">Comentário</option>
                             <option value="necessita_peca">Necessita Peça</option>
                             <option value="aguardando_cliente">Aguardando Cliente</option>
@@ -443,8 +447,8 @@ require_once '../includes/header.php';
                     </div>
 
                     <div class="nn-form-group">
-                        <label class="nn-form-label">Descrição</label>
-                        <textarea name="descricao" class="nn-form-control" rows="4" required placeholder="Descreva a atualização do chamado..."></textarea>
+                        <label class="nn-form-label" for="descricao">Descrição</label>
+                        <textarea id="descricao" name="descricao" class="nn-form-control" rows="4" required placeholder="Descreva a atualização do chamado..."></textarea>
                     </div>
                 </div>
 
@@ -475,67 +479,21 @@ document.getElementById('modalAtualizar').addEventListener('show.bs.modal', func
     console.log('Modal aberto para chamado ID:', chamadoId); // Debug
 });
 </script>
-<!-- Bootstrap JS - FORÇAR CARREGAMENTO -->
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
-
 <script>
-// Aguarda o Bootstrap carregar
 document.addEventListener('DOMContentLoaded', function() {
-    console.log('=== INICIANDO DEBUG DO MODAL ===');
-    
-    // 1. Verifica se Bootstrap está carregado
-    if (typeof bootstrap !== 'undefined') {
-        console.log('✓ Bootstrap carregado:', bootstrap.Modal.VERSION);
-    } else {
-        console.error('✗ Bootstrap NÃO está carregado!');
-        return; // Para aqui se Bootstrap não estiver carregado
-    }
-    
-    // 2. Verifica se o modal existe no DOM
     const modalElement = document.getElementById('modalAtualizar');
-    if (modalElement) {
-        console.log('✓ Modal encontrado no DOM');
-    } else {
-        console.error('✗ Modal NÃO encontrado no DOM');
-        return;
-    }
-    
-    // 3. Verifica se o campo hidden existe
-    const hiddenField = document.getElementById('atualizar_chamado_id');
-    if (hiddenField) {
-        console.log('✓ Campo hidden encontrado');
-    } else {
-        console.error('✗ Campo hidden NÃO encontrado');
-    }
-    
-    // 4. Event listener do modal
+    if (!modalElement) return;
+
     modalElement.addEventListener('show.bs.modal', function (event) {
-        console.log('=== EVENTO show.bs.modal DISPARADO ===');
-        
         const button = event.relatedTarget;
-        
-        if (button) {
-            const chamadoId = button.getAttribute('data-chamado-id');
-            console.log('✓ ID do chamado capturado:', chamadoId);
-            
-            const hiddenInput = document.getElementById('atualizar_chamado_id');
-            if (hiddenInput) {
-                hiddenInput.value = chamadoId;
-                console.log('✓ Valor definido no campo hidden:', hiddenInput.value);
-            }
-        } else {
-            console.error('✗ relatedTarget está vazio');
+        if (!button) return;
+
+        const chamadoId = button.getAttribute('data-chamado-id');
+        const hiddenInput = document.getElementById('atualizar_chamado_id');
+        if (hiddenInput) {
+            hiddenInput.value = chamadoId;
         }
     });
-    
-    modalElement.addEventListener('shown.bs.modal', function() {
-        console.log('=== MODAL ABERTO COM SUCESSO ===');
-        const hiddenValue = document.getElementById('atualizar_chamado_id').value;
-        console.log('Valor no campo hidden:', hiddenValue);
-    });
-    
-    console.log('✓ Event listeners registrados com sucesso');
-    console.log('=== FIM DO DEBUG ===');
 });
 </script>
 

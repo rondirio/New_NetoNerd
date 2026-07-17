@@ -8,10 +8,23 @@ $auth = new Auth();
 $auth->protegerPagina();
 $usuarioId = $auth->getUsuarioId();
 
+// Gerar CSRF token
+if (empty($_SESSION['csrf_token'])) {
+    $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+}
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    // Validar CSRF
+    if (!hash_equals($_SESSION['csrf_token'], $_POST['csrf_token'] ?? '')) {
+        $_SESSION['mensagem'] = 'Requisição inválida. Recarregue a página e tente novamente.';
+        $_SESSION['tipo_mensagem'] = 'error';
+        header('Location: adicionar.php');
+        exit;
+    }
+
     try {
         $despesa = new Despesa();
-        
+
         // Extrair dia do vencimento
         $dataVencimento = $_POST['data_vencimento'];
         $diaVencimento = (int) date('d', strtotime($dataVencimento));
@@ -26,7 +39,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 'usuario_id' => $usuarioId,
                 'nome_conta' => $_POST['nome_conta'],
                 'descricao' => $_POST['descricao'],
-                'valor_total' => str_replace(['.', ','], ['', '.'], $_POST['valor']),
+                'valor_total' => (function($v) {
+                    $v = str_replace(['.', ','], ['', '.'], $v);
+                    if (!is_numeric($v) || floatval($v) <= 0) throw new Exception("Valor inválido.");
+                    return floatval($v);
+                })($_POST['valor']),
                 'data_vencimento' => $dataVencimento,
                 'modo_pagamento' => $_POST['modo_pagamento'],
                 'debito_automatico' => isset($_POST['debito_automatico']) ? 1 : 0,
@@ -44,7 +61,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 'usuario_id' => $usuarioId,
                 'nome_conta' => $_POST['nome_conta'],
                 'descricao' => $_POST['descricao'],
-                'valor' => str_replace(['.', ','], ['', '.'], $_POST['valor']),
+                'valor' => (function($v) {
+                    $v = str_replace(['.', ','], ['', '.'], $v);
+                    if (!is_numeric($v) || floatval($v) <= 0) throw new Exception("Valor inválido.");
+                    return floatval($v);
+                })($_POST['valor']),
                 'data_vencimento' => $dataVencimento,
                 'modo_pagamento' => $_POST['modo_pagamento'],
                 'debito_automatico' => isset($_POST['debito_automatico']) ? 1 : 0,
@@ -77,7 +98,10 @@ require_once 'includes/header.php';
 <div class="container fade-in">
     <header>
         <h1>➕ Adicionar Nova Despesa</h1>
-        <a href="despesas.php" class="btn btn-primary">← Voltar</a>
+        <div class="btn-group">
+            <a href="despesas.php" class="btn btn-primary">← Voltar</a>
+            <a href="logout.php" class="btn btn-danger" onclick="return confirm('Deseja sair do sistema?')">⏻ Sair</a>
+        </div>
     </header>
     
     <?php if (isset($_SESSION['mensagem'])): ?>
@@ -91,6 +115,7 @@ require_once 'includes/header.php';
     <?php endif; ?>
     
     <form method="POST" id="formDespesa">
+        <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($_SESSION['csrf_token']); ?>">
         <div class="form-row">
             <div class="form-group">
                 <label for="nome_conta">Nome da Conta *</label>
@@ -281,15 +306,28 @@ function toggleRecorrenteParcelado(checkbox) {
 }
 
 // Validação do formulário
+function mostrarErro(msg) {
+    let div = document.getElementById('form-error');
+    if (!div) {
+        div = document.createElement('div');
+        div.id = 'form-error';
+        div.className = 'alert alert-error';
+        document.getElementById('formDespesa').prepend(div);
+    }
+    div.textContent = msg;
+    div.style.display = 'block';
+    div.scrollIntoView({ behavior: 'smooth', block: 'center' });
+}
+
 document.getElementById('formDespesa').addEventListener('submit', function(e) {
     const parcelado = document.getElementById('parcelado');
     const totalParcelas = document.getElementById('total_parcelas');
-    
+
     if (parcelado.checked) {
         const parcelas = parseInt(totalParcelas.value);
         if (isNaN(parcelas) || parcelas < 2 || parcelas > 360) {
             e.preventDefault();
-            alert('Por favor, insira um número de parcelas entre 2 e 360');
+            mostrarErro('Por favor, insira um número de parcelas entre 2 e 360.');
             totalParcelas.focus();
             return false;
         }

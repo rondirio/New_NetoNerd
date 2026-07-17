@@ -5,7 +5,6 @@
  */
  include('../controller/configurar_log.php');
 
-session_start();
 require_once '../controller/auth_middleware.php';
 require_once '../config/bandoDeDados/conexao.php';
 
@@ -41,6 +40,7 @@ $stmt->close();
 
 // Processar atualização
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    requireCsrfToken();
     $nome = trim($_POST['nome'] ?? '');
     $carro_do_dia = trim($_POST['carro_do_dia'] ?? '');
     $email = trim($_POST['email'] ?? '');
@@ -105,35 +105,36 @@ require_once '../includes/header.php';
         <div class="nn-card nn-animate-slide">
             <div class="nn-card-body">
                 <form method="POST" action="">
+                    <?php echo csrfField(); ?>
                     <div class="row g-3">
                         <div class="col-md-6">
                             <div class="nn-form-group">
-                                <label class="nn-form-label">Nome Completo *</label>
-                                <input type="text" name="nome" class="nn-form-control"
+                                <label class="nn-form-label" for="nome">Nome Completo *</label>
+                                <input type="text" id="nome" name="nome" class="nn-form-control"
                                        value="<?php echo htmlspecialchars($tecnico['nome']); ?>" required>
                             </div>
                         </div>
 
                         <div class="col-md-6">
                             <div class="nn-form-group">
-                                <label class="nn-form-label">Email *</label>
-                                <input type="email" name="email" class="nn-form-control"
+                                <label class="nn-form-label" for="email">Email *</label>
+                                <input type="email" id="email" name="email" class="nn-form-control"
                                        value="<?php echo htmlspecialchars($tecnico['email']); ?>" required>
                             </div>
                         </div>
 
                         <div class="col-md-4">
                             <div class="nn-form-group">
-                                <label class="nn-form-label">Matrícula *</label>
-                                <input type="text" name="matricula" class="nn-form-control"
+                                <label class="nn-form-label" for="matricula">Matrícula *</label>
+                                <input type="text" id="matricula" name="matricula" class="nn-form-control"
                                        value="<?php echo htmlspecialchars($tecnico['matricula']); ?>" required>
                             </div>
                         </div>
 
                         <div class="col-md-4">
                             <div class="nn-form-group">
-                                <label class="nn-form-label">Telefone</label>
-                                <input type="tel" name="telefone" class="nn-form-control"
+                                <label class="nn-form-label" for="telefone">Telefone</label>
+                                <input type="tel" id="telefone" name="telefone" class="nn-form-control" data-mask="phone" maxlength="15"
                                        value="<?php echo htmlspecialchars($tecnico['telefone'] ?? ''); ?>"
                                        placeholder="(00) 00000-0000">
                             </div>
@@ -141,8 +142,8 @@ require_once '../includes/header.php';
 
                         <div class="col-md-4">
                             <div class="nn-form-group">
-                                <label class="nn-form-label">Status *</label>
-                                <select name="status_tecnico" class="nn-form-control" required>
+                                <label class="nn-form-label" for="status_tecnico">Status *</label>
+                                <select id="status_tecnico" name="status_tecnico" class="nn-form-control" required>
                                     <option value="Active" <?php echo $tecnico['status_tecnico'] === 'Active' ? 'selected' : ''; ?>>Ativo</option>
                                     <option value="Inactive" <?php echo $tecnico['status_tecnico'] === 'Inactive' ? 'selected' : ''; ?>>Inativo</option>
                                 </select>
@@ -151,8 +152,8 @@ require_once '../includes/header.php';
 
                         <div class="col-md-12">
                             <div class="nn-form-group">
-                                <label class="nn-form-label">Carro do Dia</label>
-                                <input type="text" name="carro_do_dia" class="nn-form-control"
+                                <label class="nn-form-label" for="carro_do_dia">Carro do Dia</label>
+                                <input type="text" id="carro_do_dia" name="carro_do_dia" class="nn-form-control"
                                        value="<?php echo htmlspecialchars($tecnico['carro_do_dia'] ?? ''); ?>"
                                        placeholder="Ex: Fiat Uno Branco - ABC-1234">
                             </div>

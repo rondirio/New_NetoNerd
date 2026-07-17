@@ -4,13 +4,16 @@
  * NetoNerd ITSM
  */
 
-session_start();
+// 1. Validação de Acesso (Apenas Admins podem excluir)
+require_once "../controller/auth_middleware.php";
+requireAdmin();
 
-// // 1. Validação de Acesso (Apenas Admins podem excluir)
-// if (!isset($_SESSION['autenticado']) || $_SESSION['autenticado'] !== 'SIM' || $_SESSION['tipo_usuario'] !== 'admin') {
-//     header('Location: ../tecnico/loginTecnico.php?login=erro_acesso');
-//     exit();
-// }
+if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+    header('Location: dashboard.php?error=invalid_method');
+    exit();
+}
+
+requireCsrfToken();
 
 // 2. Importa a conexão centralizada do seu projeto
 require_once "../config/bandoDeDados/conexao.php";
@@ -23,7 +26,7 @@ if (!$conn) {
 }
 
 // 3. Recebe e sanitiza o ID
-$id = filter_input(INPUT_GET, 'id', FILTER_VALIDATE_INT);
+$id = filter_input(INPUT_POST, 'id', FILTER_VALIDATE_INT);
 
 if (!$id) {
     header('Location: dashboard.php?error=invalid_id');
@@ -35,6 +38,14 @@ try {
     // Iniciamos uma transação para garantir segurança
     $conn->begin_transaction();
 
+    // Não existe FK entre chamados.tecnico_id e tecnicos.id — sem isto, os
+    // chamados do técnico excluído ficariam com tecnico_id órfão, invisíveis
+    // tanto na fila do técnico (que não existe mais) quanto na de não-atribuídos.
+    $stmt_orfaos = $conn->prepare("UPDATE chamados SET tecnico_id = NULL WHERE tecnico_id = ?");
+    $stmt_orfaos->bind_param('i', $id);
+    $stmt_orfaos->execute();
+    $stmt_orfaos->close();
+
     $stmt = $conn->prepare("DELETE FROM tecnicos WHERE id = ?");
     $stmt->bind_param('i', $id);
     $stmt->execute();
@@ -42,12 +53,8 @@ try {
     if ($stmt->affected_rows > 0) {
         $conn->commit();
         $redirect_params = 'deleted=1';
-        
-        // Registrar ação no log do sistema (opcional, se você tiver a tabela logs_sistema)
-        // $log_stmt = $conn->prepare("INSERT INTO logs_sistema (usuario_id, acao) VALUES (?, ?)");
-        // $acao = "Excluiu o técnico com ID: " . $id;
-        // $log_stmt->bind_param("is", $_SESSION['usuario_id'], $acao);
-        // $log_stmt->execute();
+
+        registrarLogSistema($conn, $_SESSION['usuario_id'] ?? $_SESSION['id'] ?? null, "Excluiu o técnico com ID: $id", 'tecnico', $id);
 
     } else {
         $conn->rollback();

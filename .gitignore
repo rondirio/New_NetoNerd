@@ -2,6 +2,7 @@
 .env
 .env.local
 .env.*.local
+.env.production
 
 # Dump de produção (contém dados reais)
 config/bandoDeDados/u478690921_netonerd.sql

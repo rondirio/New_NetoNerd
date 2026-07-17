@@ -1,5 +1,4 @@
 <?php
-session_start();
 require_once '../controller/auth_middleware.php';
 require_once '../config/bandoDeDados/conexao.php';
 
@@ -10,6 +9,8 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     header('Location: atribuir_chamados.php?erro=metodo_invalido');
     exit();
 }
+
+requireCsrfToken();
 
 $conn = getConnection();
 
@@ -40,7 +41,7 @@ try {
     }
 
     // Verificar se técnico existe e está ativo
-    $stmt = $conn->prepare("SELECT id, nome, matricula FROM tecnicos WHERE id = ? AND Ativo = 1");
+    $stmt = $conn->prepare("SELECT id, nome, matricula FROM tecnicos WHERE id = ? AND status_tecnico = 'Active'");
     $stmt->bind_param("i", $tecnico_id);
     $stmt->execute();
     $tecnico = $stmt->get_result()->fetch_assoc();
@@ -48,11 +49,6 @@ try {
 
     if (!$tecnico) {
         throw new Exception("Técnico não encontrado ou inativo");
-    }
-
-    // Verificar se é admin (não pode atribuir a admins)
-    if (stripos($tecnico['matricula'], 'ADM') !== false || preg_match('/\d{4}A\d{3}/', $tecnico['matricula'])) {
-        throw new Exception("Não é possível atribuir chamados a administradores");
     }
 
     // Se já tinha um técnico, desativar atribuição anterior
@@ -98,10 +94,7 @@ try {
 
     // Registrar log do sistema
     $log_acao = "Atribuiu chamado #$chamado_id ao técnico " . $tecnico['nome'] . " (ID: $tecnico_id)";
-    $stmt = $conn->prepare("INSERT INTO logs_sistema (usuario_id, acao) VALUES (?, ?)");
-    $stmt->bind_param("is", $admin_id, $log_acao);
-    $stmt->execute();
-    $stmt->close();
+    registrarLogSistema($conn, $admin_id, $log_acao, 'chamado', $chamado_id);
 
     $conn->commit();
 

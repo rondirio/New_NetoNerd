@@ -80,8 +80,8 @@ class Despesa {
     /**
      * Atualiza uma despesa existente
      */
-    public function atualizar($id, $dados) {
-        $sql = "UPDATE despesas SET 
+    public function atualizar($id, $dados, $usuarioId = null) {
+        $sql = "UPDATE despesas SET
                 nome_conta = :nome_conta,
                 descricao = :descricao,
                 valor = :valor,
@@ -94,23 +94,37 @@ class Despesa {
                 observacoes = :observacoes,
                 status = :status
                 WHERE id = :id";
-        
+
+        $params = [
+            ':id' => $id,
+            ':nome_conta' => $dados['nome_conta'],
+            ':descricao' => $dados['descricao'] ?? null,
+            ':valor' => $dados['valor'],
+            ':data_vencimento' => $dados['data_vencimento'],
+            ':modo_pagamento' => $dados['modo_pagamento'],
+            ':debito_automatico' => $dados['debito_automatico'] ?? 0,
+            ':recorrente' => $dados['recorrente'] ?? 0,
+            ':dia_vencimento_recorrente' => $dados['dia_vencimento_recorrente'] ?? null,
+            ':categoria' => $dados['categoria'] ?? null,
+            ':observacoes' => $dados['observacoes'] ?? null,
+            ':status' => $dados['status']
+        ];
+
+        // Se usuario_id foi fornecido, restringe o UPDATE à despesa do próprio usuário
+        if ($usuarioId) {
+            $sql .= " AND usuario_id = :usuario_id";
+            $params[':usuario_id'] = $usuarioId;
+        }
+
         try {
             $stmt = $this->conn->prepare($sql);
-            return $stmt->execute([
-                ':id' => $id,
-                ':nome_conta' => $dados['nome_conta'],
-                ':descricao' => $dados['descricao'] ?? null,
-                ':valor' => $dados['valor'],
-                ':data_vencimento' => $dados['data_vencimento'],
-                ':modo_pagamento' => $dados['modo_pagamento'],
-                ':debito_automatico' => $dados['debito_automatico'] ?? 0,
-                ':recorrente' => $dados['recorrente'] ?? 0,
-                ':dia_vencimento_recorrente' => $dados['dia_vencimento_recorrente'] ?? null,
-                ':categoria' => $dados['categoria'] ?? null,
-                ':observacoes' => $dados['observacoes'] ?? null,
-                ':status' => $dados['status']
-            ]);
+            $result = $stmt->execute($params);
+
+            if ($stmt->rowCount() === 0) {
+                throw new Exception("Despesa não encontrada ou você não tem permissão para alterá-la.");
+            }
+
+            return $result;
         } catch(PDOException $e) {
             throw new Exception("Erro ao atualizar despesa: " . $e->getMessage());
         }
@@ -341,47 +355,74 @@ class Despesa {
     /**
      * Busca boletos pendentes (para integração com API)
      */
-    public function boletosPendentes() {
-        $sql = "SELECT * FROM despesas 
-                WHERE modo_pagamento = 'Boleto' 
-                AND status IN ('Pendente', 'Vencido')
-                ORDER BY data_vencimento ASC";
-        
+    public function boletosPendentes($usuarioId = null) {
+        $sql = "SELECT * FROM despesas
+                WHERE modo_pagamento = 'Boleto'
+                AND status IN ('Pendente', 'Vencido')";
+
+        $params = [];
+        if ($usuarioId) {
+            $sql .= " AND usuario_id = :usuario_id";
+            $params[':usuario_id'] = $usuarioId;
+        }
+
+        $sql .= " ORDER BY data_vencimento ASC";
+
         try {
-            $stmt = $this->conn->query($sql);
+            $stmt = $this->conn->prepare($sql);
+            $stmt->execute($params);
             return $stmt->fetchAll();
         } catch(PDOException $e) {
-            throw new Exception("Erro ao buscar boletos: " . $e->getMessage());
+            error_log("Despesa::boletosPendentes - " . $e->getMessage());
+            throw new Exception("Erro ao buscar boletos.");
         }
     }
-    
+
     /**
-     * Obtém categorias únicas
+     * Obtém categorias únicas do usuário
      */
-    public function obterCategorias() {
-        $sql = "SELECT DISTINCT categoria FROM despesas WHERE categoria IS NOT NULL ORDER BY categoria";
-        
+    public function obterCategorias($usuarioId = null) {
+        $sql = "SELECT DISTINCT categoria FROM despesas WHERE categoria IS NOT NULL";
+        $params = [];
+
+        if ($usuarioId) {
+            $sql .= " AND usuario_id = :usuario_id";
+            $params[':usuario_id'] = $usuarioId;
+        }
+
+        $sql .= " ORDER BY categoria";
+
         try {
-            $stmt = $this->conn->query($sql);
+            $stmt = $this->conn->prepare($sql);
+            $stmt->execute($params);
             return $stmt->fetchAll(PDO::FETCH_COLUMN);
         } catch(PDOException $e) {
-            throw new Exception("Erro ao obter categorias: " . $e->getMessage());
+            error_log("Despesa::obterCategorias - " . $e->getMessage());
+            throw new Exception("Erro ao obter categorias.");
         }
     }
-    
+
     /**
-     * Lista apenas despesas recorrentes
+     * Lista apenas despesas recorrentes do usuário
      */
-    public function listarRecorrentes() {
-        $sql = "SELECT * FROM despesas 
-                WHERE recorrente = TRUE 
-                ORDER BY dia_vencimento_recorrente ASC";
-        
+    public function listarRecorrentes($usuarioId = null) {
+        $sql = "SELECT * FROM despesas WHERE recorrente = TRUE";
+        $params = [];
+
+        if ($usuarioId) {
+            $sql .= " AND usuario_id = :usuario_id";
+            $params[':usuario_id'] = $usuarioId;
+        }
+
+        $sql .= " ORDER BY dia_vencimento_recorrente ASC";
+
         try {
-            $stmt = $this->conn->query($sql);
+            $stmt = $this->conn->prepare($sql);
+            $stmt->execute($params);
             return $stmt->fetchAll();
         } catch(PDOException $e) {
-            throw new Exception("Erro ao listar recorrentes: " . $e->getMessage());
+            error_log("Despesa::listarRecorrentes - " . $e->getMessage());
+            throw new Exception("Erro ao listar recorrentes.");
         }
     }
     
@@ -435,17 +476,18 @@ class Despesa {
                     $novaData = sprintf('%04d-%02d-%02d', $proxAno, $proxMes, $diaVenc);
                     
                     $sqlInsert = "INSERT INTO despesas (
-                        nome_conta, descricao, valor, data_vencimento,
-                        modo_pagamento, debito_automatico, recorrente, 
+                        usuario_id, nome_conta, descricao, valor, data_vencimento,
+                        modo_pagamento, debito_automatico, recorrente,
                         dia_vencimento_recorrente, categoria, observacoes, status
                     ) VALUES (
-                        :nome_conta, :descricao, :valor, :data_vencimento,
+                        :usuario_id, :nome_conta, :descricao, :valor, :data_vencimento,
                         :modo_pagamento, :debito_automatico, :recorrente,
                         :dia_vencimento_recorrente, :categoria, :observacoes, 'Pendente'
                     )";
-                    
+
                     $stmtInsert = $this->conn->prepare($sqlInsert);
                     $stmtInsert->execute([
+                        ':usuario_id' => $despesa['usuario_id'],
                         ':nome_conta' => $despesa['nome_conta'],
                         ':descricao' => $despesa['descricao'],
                         ':valor' => $despesa['valor'],
@@ -503,28 +545,48 @@ class Despesa {
      * Cria despesas parceladas
      */
     public function criarParceladas($dados, $totalParcelas) {
+        $totalParcelas = (int) $totalParcelas;
+        if ($totalParcelas < 2 || $totalParcelas > 360) {
+            throw new Exception("Número de parcelas deve ser entre 2 e 360.");
+        }
+        $valorTotal = (float) $dados['valor_total'];
+        if (!is_numeric($valorTotal) || $valorTotal <= 0) {
+            throw new Exception("Valor total inválido.");
+        }
+
         try {
             // Gerar UUID para o grupo de parcelamento
             $grupoParcelamento = $this->gerarUUID();
-            
+
             $parcelasCriadas = 0;
-            $valorParcela = $dados['valor_total'] / $totalParcelas;
-            
+            $valorParcela = round($valorTotal / $totalParcelas, 2);
+            $somaParcelas = 0;
+
             // Data inicial
             $dataInicial = new DateTime($dados['data_vencimento']);
-            
+
+            $this->conn->beginTransaction();
+
             // Criar cada parcela
             for ($i = 1; $i <= $totalParcelas; $i++) {
                 // Calcular data de vencimento da parcela
                 if ($i > 1) {
                     $dataInicial->modify('+1 month');
                 }
-                
+
+                // Última parcela absorve o resíduo de arredondamento, para a soma fechar com valorTotal
+                if ($i === $totalParcelas) {
+                    $valorDestaParcela = round($valorTotal - $somaParcelas, 2);
+                } else {
+                    $valorDestaParcela = $valorParcela;
+                    $somaParcelas += $valorDestaParcela;
+                }
+
                 $despesaParcela = [
                     'usuario_id' => $dados['usuario_id'],
                     'nome_conta' => $dados['nome_conta'] . " ({$i}/{$totalParcelas})",
                     'descricao' => $dados['descricao'],
-                    'valor' => round($valorParcela, 2),
+                    'valor' => $valorDestaParcela,
                     'data_vencimento' => $dataInicial->format('Y-m-d'),
                     'modo_pagamento' => $dados['modo_pagamento'],
                     'debito_automatico' => $dados['debito_automatico'] ?? 0,
@@ -538,18 +600,21 @@ class Despesa {
                     'observacoes' => $dados['observacoes'] ?? null,
                     'status' => 'Pendente'
                 ];
-                
+
                 $this->adicionarParcelada($despesaParcela);
                 $parcelasCriadas++;
             }
-            
+
+            $this->conn->commit();
+
             return [
                 'parcelas_criadas' => $parcelasCriadas,
                 'grupo_parcelamento' => $grupoParcelamento,
-                'valor_parcela' => round($valorParcela, 2)
+                'valor_parcela' => $valorParcela
             ];
-            
+
         } catch (Exception $e) {
+            $this->conn->rollBack();
             throw new Exception("Erro ao criar parcelas: " . $e->getMessage());
         }
     }

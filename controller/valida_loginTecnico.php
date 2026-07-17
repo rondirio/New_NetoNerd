@@ -7,52 +7,8 @@
 // Ativa exibição de erros técnicos do MySQLi para depuração
 mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT);
 
-session_start();
+require_once "../controller/auth_middleware.php";
 require_once "../config/bandoDeDados/conexao.php";
-
-// Constantes de segurança
-define('MAX_TENTATIVAS', 5);
-define('TEMPO_BLOQUEIO', 900); // 15 minutos
-
-/**
- * Identifica perfil pelo padrão da matrícula
- */
-function isAdmin($matricula) {
-    return (
-        stripos($matricula, 'ADM') !== false ||
-        preg_match('/\d{4}A\d{3}/', $matricula) === 1
-    );
-}
-
-/**
- * Funções de controle de tentativas (Brute Force)
- */
-function verificarBloqueio($matricula) {
-    if (!isset($_SESSION['login_tentativas'])) $_SESSION['login_tentativas'] = [];
-    if (isset($_SESSION['login_tentativas'][$matricula])) {
-        $t = $_SESSION['login_tentativas'][$matricula];
-        if ($t['contador'] >= MAX_TENTATIVAS) {
-            $decorrido = time() - $t['ultimo_tempo'];
-            if ($decorrido < TEMPO_BLOQUEIO) return ['bloqueado' => true, 'minutos' => ceil((TEMPO_BLOQUEIO - $decorrido) / 60)];
-            unset($_SESSION['login_tentativas'][$matricula]);
-        }
-    }
-    return ['bloqueado' => false];
-}
-
-function registrarTentativa($matricula, $sucesso = false) {
-    if (!isset($_SESSION['login_tentativas'])) $_SESSION['login_tentativas'] = [];
-    if ($sucesso) {
-        unset($_SESSION['login_tentativas'][$matricula]);
-    } else {
-        if (!isset($_SESSION['login_tentativas'][$matricula])) {
-            $_SESSION['login_tentativas'][$matricula] = ['contador' => 1, 'ultimo_tempo' => time()];
-        } else {
-            $_SESSION['login_tentativas'][$matricula]['contador']++;
-            $_SESSION['login_tentativas'][$matricula]['ultimo_tempo'] = time();
-        }
-    }
-}
 
 /**
  * Configuração da Sessão Autenticada
@@ -100,31 +56,38 @@ if (empty($matricula) || empty($senha)) {
     exit();
 }
 
-$bloqueio = verificarBloqueio($matricula);
+$bloqueio = isLoginBloqueado($conn, $matricula, 'tecnico');
 if ($bloqueio['bloqueado']) {
-    header('Location: ../tecnico/loginTecnico.php?erro=bloqueado&tempo=' . $bloqueio['minutos']);
+    header('Location: ../tecnico/loginTecnico.php?msg=bloqueado&tempo=' . $bloqueio['minutos']);
     exit();
 }
 
-// 1. BUSCA DE DADOS
-$stmt = $conn->prepare("
-    SELECT id, nome, email, matricula, senha_hash 
-    FROM tecnicos 
-    WHERE matricula = ? 
-    LIMIT 1
-");
+// 1. BUSCA DE DADOS — tenta admins primeiro, depois tecnicos (tabelas
+// separadas desde a Fase 4: admin não é mais decidido por padrão de
+// matrícula, é uma pessoa cadastrada explicitamente na tabela admins)
+$tipo = 'admin';
+$stmt = $conn->prepare("SELECT id, nome, email, matricula, senha_hash FROM admins WHERE matricula = ? AND Ativo = 1 LIMIT 1");
 $stmt->bind_param("s", $matricula);
 $stmt->execute();
 $result = $stmt->get_result();
+$tecnico = $result->fetch_assoc();
+$stmt->close();
 
-if ($result->num_rows === 0) {
-    registrarTentativa($matricula, false);
+if (!$tecnico) {
+    $tipo = 'tecnico';
+    $stmt = $conn->prepare("SELECT id, nome, email, matricula, senha_hash FROM tecnicos WHERE matricula = ? LIMIT 1");
+    $stmt->bind_param("s", $matricula);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    $tecnico = $result->fetch_assoc();
+    $stmt->close();
+}
+
+if (!$tecnico) {
+    registrarTentativaLogin($conn, $matricula, 'tecnico', false);
     header('Location: ../tecnico/loginTecnico.php?erro=credenciais_invalidas');
     exit();
 }
-
-$tecnico = $result->fetch_assoc();
-$stmt->close();
 
 // 2. VALIDAÇÃO DE SENHA
 $senha_valida = false;
@@ -134,45 +97,26 @@ if (!empty($tecnico['senha_hash']) && password_get_info($tecnico['senha_hash'])[
     // Migração automática para Hash seguro
     $senha_valida = true;
     $novo_hash = password_hash($senha, PASSWORD_DEFAULT);
-    $upd = $conn->prepare("UPDATE tecnicos SET senha_hash = ? WHERE id = ?");
+    $tabela = ($tipo === 'admin') ? 'admins' : 'tecnicos';
+    $upd = $conn->prepare("UPDATE $tabela SET senha_hash = ? WHERE id = ?");
     $upd->bind_param("si", $novo_hash, $tecnico['id']);
     $upd->execute();
     $upd->close();
 }
 
 if (!$senha_valida) {
-    registrarTentativa($matricula, false);
+    registrarTentativaLogin($conn, $matricula, 'tecnico', false);
     header('Location: ../tecnico/loginTecnico.php?erro=credenciais_invalidas');
     exit();
 }
 
 // 3. SUCESSO NO LOGIN
-registrarTentativa($matricula, true);
-$tipo = isAdmin($matricula) ? 'admin' : 'tecnico';
+registrarTentativaLogin($conn, $matricula, 'tecnico', true);
 criarSessaoTecnico($tecnico, $tipo);
 
-// 4. GRAVAÇÃO DE LOG (PROTEÇÃO CONTRA ERRO DE FK)
-// Verificamos se o ID existe na tabela 'usuarios' antes do insert para evitar o Fatal Error
-$check = $conn->prepare("SELECT id FROM usuarios WHERE id = ?");
-$check->bind_param("i", $tecnico['id']);
-$check->execute();
-$idValidoParaLog = $check->get_result()->num_rows > 0;
-$check->close();
-
-if ($idValidoParaLog) {
-    $stmt_log = $conn->prepare("INSERT INTO logs_sistema (usuario_id, acao) VALUES (?, ?)");
-    $acao = "Login realizado: " . $tipo;
-    $stmt_log->bind_param("is", $tecnico['id'], $acao);
-    $stmt_log->execute();
-    $stmt_log->close();
-} else {
-    // Grava log sem o ID caso o usuário não esteja na tabela vinculada
-    $stmt_log = $conn->prepare("INSERT INTO logs_sistema (acao) VALUES (?)");
-    $acao = "Login externo detectado ($tipo): " . $tecnico['nome'];
-    $stmt_log->bind_param("s", $acao);
-    $stmt_log->execute();
-    $stmt_log->close();
-}
+// 4. GRAVAÇÃO DE LOG
+$acao = "Login realizado: " . $tipo;
+registrarLogSistema($conn, $tecnico['id'], $acao, $tipo, $tecnico['id']);
 
 $conn->close();
 

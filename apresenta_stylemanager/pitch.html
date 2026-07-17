@@ -1,0 +1,674 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>StyleManager — Sistema de Gestão para Salões</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --preto: #111111;
+      --dourado: #d4af37;
+      --dourado-claro: #f0d060;
+      --cinza-escuro: #1e1e1e;
+      --cinza-medio: #2d2d2d;
+      --cinza-claro: #f5f5f5;
+      --branco: #ffffff;
+      --texto-muted: #888888;
+      --radius: 16px;
+      --sombra: 0 8px 32px rgba(0,0,0,0.25);
+    }
+
+    html { scroll-behavior: smooth; }
+    body { font-family: 'Poppins', sans-serif; background: var(--preto); color: var(--branco); line-height: 1.6; }
+
+    /* ── UTILITÁRIOS ─────────────────────────────────────── */
+    .container { max-width: 1100px; margin: 0 auto; padding: 0 24px; }
+    .tag {
+      display: inline-block;
+      background: rgba(212,175,55,0.15);
+      color: var(--dourado);
+      border: 1px solid rgba(212,175,55,0.4);
+      font-size: 0.72rem;
+      font-weight: 600;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      padding: 5px 14px;
+      border-radius: 50px;
+      margin-bottom: 16px;
+    }
+    .section-title {
+      font-size: clamp(1.8rem, 4vw, 2.6rem);
+      font-weight: 800;
+      line-height: 1.2;
+      margin-bottom: 16px;
+    }
+    .section-sub {
+      color: var(--texto-muted);
+      font-size: 1rem;
+      max-width: 560px;
+      margin: 0 auto 56px;
+    }
+    .gold { color: var(--dourado); }
+    .text-center { text-align: center; }
+    section { padding: 96px 0; }
+
+    /* ── NAV ─────────────────────────────────────────────── */
+    nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+      background: rgba(17,17,17,0.92);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+    }
+    .nav-inner {
+      display: flex; align-items: center; justify-content: space-between;
+      height: 64px;
+    }
+    .nav-logo {
+      font-size: 1.25rem; font-weight: 800; letter-spacing: -0.5px;
+      color: var(--branco); text-decoration: none;
+    }
+    .nav-logo span { color: var(--dourado); }
+    .nav-cta {
+      background: var(--dourado); color: var(--preto);
+      font-weight: 700; font-size: 0.85rem;
+      padding: 10px 22px; border-radius: 8px;
+      text-decoration: none; transition: opacity .2s;
+    }
+    .nav-cta:hover { opacity: .85; }
+
+    /* ── HERO ────────────────────────────────────────────── */
+    #hero {
+      padding: 160px 0 96px;
+      background: radial-gradient(ellipse 80% 60% at 50% 0%, rgba(212,175,55,0.12) 0%, transparent 70%);
+      text-align: center;
+    }
+    #hero h1 {
+      font-size: clamp(2.2rem, 6vw, 4rem);
+      font-weight: 800;
+      line-height: 1.1;
+      margin-bottom: 24px;
+    }
+    #hero p {
+      font-size: clamp(1rem, 2vw, 1.2rem);
+      color: var(--texto-muted);
+      max-width: 620px;
+      margin: 0 auto 40px;
+    }
+    .hero-btns { display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; }
+    .btn-primary {
+      background: var(--dourado); color: var(--preto);
+      font-weight: 700; font-size: 1rem;
+      padding: 14px 32px; border-radius: 10px;
+      text-decoration: none; transition: transform .15s, box-shadow .15s;
+      box-shadow: 0 4px 20px rgba(212,175,55,0.35);
+    }
+    .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 28px rgba(212,175,55,0.5); }
+    .btn-outline {
+      background: transparent; color: var(--branco);
+      border: 1px solid rgba(255,255,255,0.25);
+      font-weight: 600; font-size: 1rem;
+      padding: 14px 32px; border-radius: 10px;
+      text-decoration: none; transition: border-color .2s, background .2s;
+    }
+    .btn-outline:hover { border-color: var(--dourado); background: rgba(212,175,55,0.08); }
+
+    .hero-badges {
+      display: flex; gap: 24px; justify-content: center; flex-wrap: wrap;
+      margin-top: 56px;
+    }
+    .hero-badge {
+      display: flex; align-items: center; gap: 8px;
+      font-size: 0.85rem; color: var(--texto-muted);
+    }
+    .hero-badge span { color: var(--dourado); font-size: 1.1rem; }
+
+    /* ── TIPOS DE EMPRESA ────────────────────────────────── */
+    #tipos { background: var(--cinza-escuro); }
+    .tipos-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 20px;
+    }
+    .tipo-card {
+      background: var(--cinza-medio);
+      border: 1px solid rgba(255,255,255,0.07);
+      border-radius: var(--radius);
+      padding: 32px 24px;
+      text-align: center;
+      transition: border-color .2s, transform .2s;
+    }
+    .tipo-card:hover { border-color: var(--dourado); transform: translateY(-4px); }
+    .tipo-icon { font-size: 2.5rem; margin-bottom: 12px; }
+    .tipo-card h3 { font-size: 1.05rem; font-weight: 700; }
+    .tipo-card p { font-size: 0.82rem; color: var(--texto-muted); margin-top: 6px; }
+
+    /* ── FUNCIONALIDADES ─────────────────────────────────── */
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 24px;
+    }
+    .feature-card {
+      background: var(--cinza-escuro);
+      border: 1px solid rgba(255,255,255,0.07);
+      border-radius: var(--radius);
+      padding: 28px;
+      transition: border-color .2s;
+    }
+    .feature-card:hover { border-color: rgba(212,175,55,0.35); }
+    .feature-icon {
+      width: 48px; height: 48px;
+      background: rgba(212,175,55,0.12);
+      border-radius: 12px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.4rem;
+      margin-bottom: 16px;
+    }
+    .feature-card h3 { font-size: 1rem; font-weight: 700; margin-bottom: 8px; }
+    .feature-card p { font-size: 0.85rem; color: var(--texto-muted); }
+
+    /* ── MÉTRICAS ────────────────────────────────────────── */
+    #metricas { background: var(--cinza-escuro); }
+    .metricas-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 24px;
+    }
+    .metrica-card {
+      text-align: center;
+      padding: 40px 24px;
+      background: var(--cinza-medio);
+      border-radius: var(--radius);
+      border: 1px solid rgba(212,175,55,0.15);
+    }
+    .metrica-num {
+      font-size: 2.8rem; font-weight: 800;
+      color: var(--dourado); line-height: 1;
+    }
+    .metrica-label { font-size: 0.88rem; color: var(--texto-muted); margin-top: 8px; }
+
+    /* ── PLANOS ──────────────────────────────────────────── */
+    .planos-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 24px;
+      align-items: start;
+    }
+    .plano-card {
+      background: var(--cinza-escuro);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: var(--radius);
+      padding: 36px 28px;
+      position: relative;
+    }
+    .plano-card.popular {
+      border-color: var(--dourado);
+      background: linear-gradient(135deg, rgba(212,175,55,0.08) 0%, var(--cinza-escuro) 60%);
+    }
+    .badge-popular {
+      position: absolute; top: -12px; left: 50%; transform: translateX(-50%);
+      background: var(--dourado); color: var(--preto);
+      font-size: 0.72rem; font-weight: 700; letter-spacing: 1px;
+      padding: 4px 16px; border-radius: 50px;
+      text-transform: uppercase;
+    }
+    .plano-nome { font-size: 0.8rem; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: var(--dourado); }
+    .plano-preco {
+      margin: 12px 0 4px;
+      font-size: 2.6rem; font-weight: 800; line-height: 1;
+    }
+    .plano-preco sup { font-size: 1rem; font-weight: 600; vertical-align: super; }
+    .plano-preco small { font-size: 0.85rem; font-weight: 400; color: var(--texto-muted); }
+    .plano-desc { font-size: 0.85rem; color: var(--texto-muted); margin-bottom: 24px; min-height: 40px; }
+    .plano-itens { list-style: none; margin-bottom: 32px; }
+    .plano-itens li {
+      font-size: 0.88rem; padding: 7px 0;
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+      display: flex; align-items: flex-start; gap: 10px;
+    }
+    .plano-itens li::before { content: "✓"; color: var(--dourado); font-weight: 700; flex-shrink: 0; }
+    .btn-plano {
+      display: block; width: 100%; text-align: center;
+      padding: 14px; border-radius: 10px; font-weight: 700; font-size: 0.95rem;
+      text-decoration: none; transition: opacity .2s;
+    }
+    .btn-plano.gold { background: var(--dourado); color: var(--preto); }
+    .btn-plano.outline { border: 1px solid rgba(255,255,255,0.2); color: var(--branco); }
+    .btn-plano:hover { opacity: .85; }
+
+    /* ── PERFIS ──────────────────────────────────────────── */
+    #perfis { background: var(--cinza-escuro); }
+    .perfis-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 20px;
+    }
+    .perfil-card {
+      background: var(--cinza-medio);
+      border: 1px solid rgba(255,255,255,0.06);
+      border-radius: var(--radius);
+      padding: 28px 24px;
+    }
+    .perfil-card h3 { font-size: 1rem; font-weight: 700; margin-bottom: 12px; }
+    .perfil-card ul { list-style: none; }
+    .perfil-card li {
+      font-size: 0.82rem; color: var(--texto-muted);
+      padding: 4px 0; display: flex; gap: 8px;
+    }
+    .perfil-card li::before { content: "→"; color: var(--dourado); flex-shrink: 0; }
+
+    /* ── DEPOIMENTO ──────────────────────────────────────── */
+    #depoimento { text-align: center; }
+    .quote-box {
+      max-width: 700px; margin: 0 auto;
+      background: var(--cinza-escuro);
+      border: 1px solid rgba(212,175,55,0.2);
+      border-radius: var(--radius);
+      padding: 48px 40px;
+    }
+    .quote-text {
+      font-size: 1.15rem; font-style: italic; color: rgba(255,255,255,0.85);
+      margin-bottom: 24px; line-height: 1.8;
+    }
+    .quote-author { font-size: 0.85rem; color: var(--texto-muted); }
+    .quote-author strong { color: var(--branco); display: block; margin-bottom: 2px; }
+
+    /* ── APP MOBILE ──────────────────────────────────────── */
+    #app { background: var(--cinza-escuro); }
+    .app-content {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 64px; align-items: center;
+    }
+    @media (max-width: 768px) { .app-content { grid-template-columns: 1fr; } }
+    .app-mockup {
+      background: var(--cinza-medio);
+      border: 1px solid rgba(212,175,55,0.2);
+      border-radius: 28px;
+      padding: 40px 32px;
+      text-align: center;
+    }
+    .app-screen-title { font-size: 2.5rem; margin-bottom: 12px; }
+    .app-mockup p { color: var(--texto-muted); font-size: 0.9rem; }
+    .app-features { list-style: none; margin-top: 32px; }
+    .app-features li {
+      padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.06);
+      font-size: 0.9rem; display: flex; align-items: center; gap: 12px;
+    }
+    .app-features li:last-child { border: none; }
+    .app-features li::before { content: "📱"; flex-shrink: 0; }
+
+    /* ── CTA FINAL ───────────────────────────────────────── */
+    #cta-final {
+      text-align: center;
+      background: radial-gradient(ellipse 80% 60% at 50% 100%, rgba(212,175,55,0.1) 0%, transparent 70%);
+    }
+    #cta-final h2 { font-size: clamp(1.8rem, 4vw, 2.8rem); font-weight: 800; margin-bottom: 16px; }
+    #cta-final p { color: var(--texto-muted); margin-bottom: 40px; }
+    .whatsapp-btn {
+      display: inline-flex; align-items: center; gap: 12px;
+      background: #25D366; color: var(--branco);
+      font-weight: 700; font-size: 1.05rem;
+      padding: 16px 36px; border-radius: 12px;
+      text-decoration: none;
+      box-shadow: 0 4px 24px rgba(37,211,102,0.3);
+      transition: transform .15s, box-shadow .15s;
+    }
+    .whatsapp-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 32px rgba(37,211,102,0.45); }
+
+    /* ── FOOTER ──────────────────────────────────────────── */
+    footer {
+      background: #0a0a0a;
+      border-top: 1px solid rgba(255,255,255,0.05);
+      padding: 32px 0;
+      text-align: center;
+      font-size: 0.82rem; color: var(--texto-muted);
+    }
+    footer strong { color: var(--dourado); }
+
+    /* ── RESPONSIVO ──────────────────────────────────────── */
+    @media (max-width: 600px) {
+      section { padding: 64px 0; }
+      .hero-btns { flex-direction: column; align-items: center; }
+      .plano-card { padding: 28px 20px; }
+      .quote-box { padding: 32px 24px; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="container nav-inner">
+    <a class="nav-logo" href="#">Style<span>Manager</span></a>
+    <a class="nav-cta" href="https://netonerd.com.br/StyleManager/suporte/">Quero uma Demo</a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section id="hero">
+  <div class="container">
+    <div class="tag">Sistema de Gestão para Beleza</div>
+    <h1>Seu salão organizado.<br /><span class="gold">Sua agenda cheia.</span></h1>
+    <p>Agendamento online, controle de caixa, comissões automáticas e app para profissionais — tudo em um único sistema.</p>
+    <div class="hero-btns">
+      <a class="btn-primary" href="#planos">Ver Planos</a>
+      <a class="btn-outline" href="#funcionalidades">O que o sistema faz</a>
+    </div>
+    <div class="hero-badges">
+      <div class="hero-badge"><span>✓</span> Sem instalar nada</div>
+      <div class="hero-badge"><span>✓</span> Acessa pelo celular</div>
+      <div class="hero-badge"><span>✓</span> Suporte incluso</div>
+      <div class="hero-badge"><span>✓</span> Cancela quando quiser</div>
+    </div>
+  </div>
+</section>
+
+<!-- TIPOS -->
+<section id="tipos">
+  <div class="container">
+    <div class="text-center">
+      <div class="tag">Para quem é?</div>
+      <h2 class="section-title">Feito para o mercado de beleza</h2>
+      <p class="section-sub">O sistema se adapta ao seu tipo de estabelecimento com cores, menus e funcionalidades específicas.</p>
+    </div>
+    <div class="tipos-grid">
+      <div class="tipo-card">
+        <div class="tipo-icon">✂️</div>
+        <h3>Barbearia</h3>
+        <p>Agenda por barbeiro, controle de gorjetas, app mobile</p>
+      </div>
+      <div class="tipo-card">
+        <div class="tipo-icon">💇</div>
+        <h3>Salão de Beleza</h3>
+        <p>Multi-profissional, venda de produtos, relatórios</p>
+      </div>
+      <div class="tipo-card">
+        <div class="tipo-icon">💅</div>
+        <h3>Manicure</h3>
+        <p>Agenda simplificada, comissões por serviço</p>
+      </div>
+      <div class="tipo-card">
+        <div class="tipo-icon">🌿</div>
+        <h3>Estética</h3>
+        <p>Controle de tratamentos, histórico do cliente</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FUNCIONALIDADES -->
+<section id="funcionalidades">
+  <div class="container">
+    <div class="text-center">
+      <div class="tag">Funcionalidades</div>
+      <h2 class="section-title">Tudo que você precisa<br /><span class="gold">em um só lugar</span></h2>
+      <p class="section-sub">Sem planilha, sem caderno, sem confusão. Tudo automatizado.</p>
+    </div>
+    <div class="features-grid">
+      <div class="feature-card">
+        <div class="feature-icon">📅</div>
+        <h3>Agenda Online 24h</h3>
+        <p>Cliente agenda pelo celular a qualquer hora. Você recebe o agendamento e confirma com um clique.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">💰</div>
+        <h3>Comissões Automáticas</h3>
+        <p>Define uma vez, o sistema calcula sozinho. Comissão sobre serviço, produto, gorjeta — tudo separado.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">📦</div>
+        <h3>Controle de Estoque</h3>
+        <p>Cada venda desconta do estoque automaticamente. Alerta quando o produto estiver acabando.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">💳</div>
+        <h3>Fechamento de Caixa</h3>
+        <p>Relatório completo por profissional e período. Gera PDF para pagar cada um com precisão.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">📊</div>
+        <h3>Relatórios Detalhados</h3>
+        <p>Veja quanto cada profissional faturou, quais serviços vendem mais, dias de pico e tendências.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">🔔</div>
+        <h3>Lembretes por E-mail</h3>
+        <p>Cliente recebe lembrete automático do agendamento. Menos faltas, mais faturamento.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">🎂</div>
+        <h3>Aniversariantes</h3>
+        <p>O sistema avisa os clientes que fazem aniversário hoje. Ótima oportunidade para fidelizar.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">🧾</div>
+        <h3>Vales e Adiantamentos</h3>
+        <p>Profissional pede vale, admin aprova, e o valor já é descontado automaticamente no fechamento.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">🎨</div>
+        <h3>Identidade Visual Própria</h3>
+        <p>Coloca o logo e as cores do seu salão. O sistema fica com a cara do seu negócio.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- MÉTRICAS -->
+<section id="metricas">
+  <div class="container">
+    <div class="metricas-grid">
+      <div class="metrica-card">
+        <div class="metrica-num">100%</div>
+        <div class="metrica-label">Online — sem instalar nada</div>
+      </div>
+      <div class="metrica-card">
+        <div class="metrica-num">4</div>
+        <div class="metrica-label">Perfis de acesso: dono, profissional, recepcionista e cliente</div>
+      </div>
+      <div class="metrica-card">
+        <div class="metrica-num">0</div>
+        <div class="metrica-label">Planilhas ou cadernos necessários</div>
+      </div>
+      <div class="metrica-card">
+        <div class="metrica-num">24h</div>
+        <div class="metrica-label">Agenda disponível para seus clientes</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PERFIS DE ACESSO -->
+<section id="perfis">
+  <div class="container">
+    <div class="text-center">
+      <div class="tag">Perfis de Acesso</div>
+      <h2 class="section-title">Cada um acessa<br /><span class="gold">só o que precisa</span></h2>
+      <p class="section-sub">Dono, profissional, recepcionista e cliente — cada um com seu painel dedicado.</p>
+    </div>
+    <div class="perfis-grid">
+      <div class="perfil-card">
+        <h3>👑 Dono / Admin</h3>
+        <ul>
+          <li>Dashboard com métricas em tempo real</li>
+          <li>Gerencia profissionais e serviços</li>
+          <li>Fecha caixa e gera PDF</li>
+          <li>Aprova gorjetas e vales</li>
+          <li>Controla estoque</li>
+          <li>Configura identidade visual</li>
+        </ul>
+      </div>
+      <div class="perfil-card">
+        <h3>✂️ Profissional</h3>
+        <ul>
+          <li>Registra atendimentos com poucos toques</li>
+          <li>Vende produtos durante o atendimento</li>
+          <li>Vê sua agenda do dia</li>
+          <li>Acompanha comissões e gorjetas</li>
+          <li>App mobile dedicado</li>
+        </ul>
+      </div>
+      <div class="perfil-card">
+        <h3>🗓️ Recepcionista</h3>
+        <ul>
+          <li>Agenda clientes presencialmente</li>
+          <li>Vê agenda geral do dia</li>
+          <li>Confirma ou cancela agendamentos</li>
+          <li>Vê aniversariantes do dia</li>
+        </ul>
+      </div>
+      <div class="perfil-card">
+        <h3>👤 Cliente</h3>
+        <ul>
+          <li>Agenda pelo celular sem ligar</li>
+          <li>Vê histórico de atendimentos</li>
+          <li>Recebe lembrete por e-mail</li>
+          <li>Acompanha profissionais favoritos</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- APP MOBILE -->
+<section id="app">
+  <div class="container">
+    <div class="app-content">
+      <div>
+        <div class="tag">App Mobile</div>
+        <h2 class="section-title">Na palma da mão<br /><span class="gold">do seu profissional</span></h2>
+        <p style="color: var(--texto-muted); margin-bottom: 32px;">Além do painel web, o StyleManager tem um app mobile dedicado. Seu barbeiro registra o atendimento direto do celular, sem precisar do computador.</p>
+        <ul class="app-features">
+          <li>Registra atendimentos em segundos</li>
+          <li>Vê a agenda do dia no celular</li>
+          <li>Vende produtos com controle de estoque</li>
+          <li>Funciona em Android e iPhone</li>
+        </ul>
+      </div>
+      <div class="app-mockup">
+        <div class="app-screen-title">📱</div>
+        <p style="font-size: 1.1rem; font-weight: 700; margin-bottom: 8px;">App StyleManager</p>
+        <p>Disponível para profissionais e clientes</p>
+        <div style="margin-top: 24px; padding: 16px; background: rgba(212,175,55,0.08); border-radius: 12px; border: 1px solid rgba(212,175,55,0.2);">
+          <p style="font-size: 0.82rem; color: var(--dourado);">✓ Acesso por código do estabelecimento<br />✓ Multi-salão: profissional em dois locais<br />✓ Tema com a cor do seu salão</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PLANOS -->
+<section id="planos">
+  <div class="container">
+    <div class="text-center">
+      <div class="tag">Planos e Preços</div>
+      <h2 class="section-title">Simples, sem surpresa,<br /><span class="gold">sem fidelidade</span></h2>
+      <p class="section-sub">Cancela quando quiser. Sem taxa de setup. Começa a usar no mesmo dia.</p>
+    </div>
+    <div class="planos-grid">
+
+      <!-- STARTER -->
+      <div class="plano-card">
+        <div class="plano-nome">Starter</div>
+        <div class="plano-preco"><sup>R$</sup>49<small>,90/mês</small></div>
+        <p class="plano-desc">Ideal para autônomos e salões com até 2 profissionais.</p>
+        <ul class="plano-itens">
+          <li>Até 2 profissionais</li>
+          <li>Agenda online para clientes</li>
+          <li>Controle de atendimentos</li>
+          <li>Comissões automáticas</li>
+          <li>Controle de estoque</li>
+          <li>Fechamento de caixa (PDF)</li>
+          <li>App mobile (profissional)</li>
+          <li>Suporte por WhatsApp</li>
+        </ul>
+        <a class="btn-plano outline" href="#cta-final">Quero o Starter</a>
+      </div>
+
+      <!-- PRO (POPULAR) -->
+      <div class="plano-card popular">
+        <div class="badge-popular">Mais popular</div>
+        <div class="plano-nome">Pro</div>
+        <div class="plano-preco"><sup>R$</sup>79<small>,90/mês</small></div>
+        <p class="plano-desc">Perfeito para salões em crescimento. Inclui site próprio com domínio.</p>
+        <ul class="plano-itens">
+          <li>Até 5 profissionais</li>
+          <li>Tudo do plano Starter</li>
+          <li><strong>Site próprio com domínio</strong></li>
+          <li>Perfil de recepcionista</li>
+          <li>Relatórios avançados</li>
+          <li>Aniversariantes + e-mail automático</li>
+          <li>App mobile (profissional + cliente)</li>
+          <li>Suporte prioritário</li>
+        </ul>
+        <a class="btn-plano gold" href="#cta-final">Quero o Pro</a>
+      </div>
+
+      <!-- PREMIUM -->
+      <div class="plano-card">
+        <div class="plano-nome">Premium</div>
+        <div class="plano-preco"><sup>R$</sup>129<small>,90/mês</small></div>
+        <p class="plano-desc">Para salões maiores que precisam de escala e suporte dedicado.</p>
+        <ul class="plano-itens">
+          <li>Profissionais ilimitados</li>
+          <li>Tudo do plano Pro</li>
+          <li>Múltiplas unidades</li>
+          <li>Relatórios por unidade</li>
+          <li>Suporte dedicado (WhatsApp prioritário)</li>
+          <li>Onboarding personalizado</li>
+          <li>Backup mensal dos dados</li>
+        </ul>
+        <a class="btn-plano outline" href="#cta-final">Quero o Premium</a>
+      </div>
+
+    </div>
+
+    <p style="text-align:center; margin-top: 32px; font-size: 0.82rem; color: var(--texto-muted);">
+      Todos os planos incluem acesso ao painel web + app mobile + suporte. Sem fidelidade mínima.
+    </p>
+  </div>
+</section>
+
+<!-- DEPOIMENTO -->
+<section id="depoimento">
+  <div class="container">
+    <div class="quote-box">
+      <div style="font-size: 2rem; margin-bottom: 16px; color: var(--dourado);">"</div>
+      <p class="quote-text">Antes eu controlava tudo no WhatsApp e no caderno. Hoje o sistema avisa o cliente, calcula a comissão de cada barbeiro e ainda gera o PDF do fechamento. Economizei pelo menos 3 horas por semana.</p>
+      <div class="quote-author">
+        <strong>Bruno</strong>
+        Cliente NetoNerd — StyleManager
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA FINAL -->
+<section id="cta-final">
+  <div class="container">
+    <div class="tag">Comece hoje</div>
+    <h2>Pronto para organizar<br /><span class="gold">o seu salão?</span></h2>
+    <p>Fala comigo no WhatsApp. Configuro o sistema no seu nome, no mesmo dia.</p>
+    <a class="whatsapp-btn" href="https://wa.me/5521977395867?text=Oi%2C%20vi%20a%20apresenta%C3%A7%C3%A3o%20do%20StyleManager%20e%20quero%20saber%20mais!" target="_blank">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+      Falar no WhatsApp
+    </a>
+    <p style="margin-top: 20px; font-size: 0.82rem; color: var(--texto-muted);">Ou mande um e-mail para <strong style="color: var(--branco);">rondi.rio@gmail.com</strong></p>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="container">
+    <p><strong>StyleManager</strong> — Um produto <strong>NetoNerd Soluções Digitais</strong></p>
+    <p style="margin-top: 8px;">Sistema SaaS para salões, barbearias, manicures e estéticas &nbsp;·&nbsp; netonerd.com.br</p>
+  </div>
+</footer>
+
+</body>
+</html>

@@ -159,11 +159,11 @@ require_once '../includes/header.php';
                     <div class="row g-3">
                         <div class="col-md-4">
                             <div class="nn-form-group">
-                                <label class="nn-form-label">
+                                <label class="nn-form-label" for="filtroStatus">
                                     <i class="fas fa-info-circle"></i>
                                     Status
                                 </label>
-                                <select name="status" class="nn-form-control" onchange="document.getElementById('filterForm').submit()">
+                                <select name="status" id="filtroStatus" class="nn-form-control" onchange="document.getElementById('filterForm').submit()">
                                     <option value="">Todos</option>
                                     <option value="aberto" <?php echo $filtro_status === 'aberto' ? 'selected' : ''; ?>>Aberto</option>
                                     <option value="em andamento" <?php echo $filtro_status === 'em andamento' ? 'selected' : ''; ?>>Em Andamento</option>
@@ -177,11 +177,11 @@ require_once '../includes/header.php';
 
                         <div class="col-md-4">
                             <div class="nn-form-group">
-                                <label class="nn-form-label">
+                                <label class="nn-form-label" for="filtroPrioridade">
                                     <i class="fas fa-exclamation-triangle"></i>
                                     Prioridade
                                 </label>
-                                <select name="prioridade" class="nn-form-control" onchange="document.getElementById('filterForm').submit()">
+                                <select name="prioridade" id="filtroPrioridade" class="nn-form-control" onchange="document.getElementById('filterForm').submit()">
                                     <option value="">Todas</option>
                                     <option value="baixa" <?php echo $filtro_prioridade === 'baixa' ? 'selected' : ''; ?>>Baixa</option>
                                     <option value="media" <?php echo $filtro_prioridade === 'media' ? 'selected' : ''; ?>>Média</option>
@@ -193,12 +193,12 @@ require_once '../includes/header.php';
 
                         <div class="col-md-4">
                             <div class="nn-form-group">
-                                <label class="nn-form-label">
+                                <label class="nn-form-label" for="filtroBusca">
                                     <i class="fas fa-search"></i>
                                     Buscar
                                 </label>
                                 <div class="input-group">
-                                    <input type="text" name="busca" class="nn-form-control" placeholder="Protocolo ou descrição..." value="<?php echo htmlspecialchars($filtro_busca); ?>">
+                                    <input type="text" name="busca" id="filtroBusca" class="nn-form-control" placeholder="Protocolo ou descrição..." value="<?php echo htmlspecialchars($filtro_busca); ?>">
                                     <button class="nn-btn nn-btn-primary" type="submit">
                                         <i class="fas fa-search"></i>
                                     </button>
@@ -269,7 +269,7 @@ require_once '../includes/header.php';
                             default => 'nn-badge-secondary'
                         };
                     ?>
-                        <div class="nn-chamado-cliente-item" onclick="window.location.href='detalhe_chamado.php?id=<?php echo $chamado['id']; ?>'">
+                        <div class="nn-chamado-cliente-item" onclick="window.location.href='visualizar_chamado.php?id=<?php echo $chamado['id']; ?>'">
                             <div class="d-flex justify-content-between align-items-start mb-2">
                                 <div>
                                     <span class="nn-protocolo">#<?php echo htmlspecialchars($chamado['protocolo']); ?></span>

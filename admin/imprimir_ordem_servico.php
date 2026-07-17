@@ -2,7 +2,6 @@
 /**
  * Imprimir Ordem de Serviço - NetoNerd ITSM v2.0
  */
-session_start();
 require_once '../controller/auth_middleware.php';
 require_once '../config/bandoDeDados/conexao.php';
 
@@ -17,18 +16,22 @@ if (!isset($_GET['id']) || !is_numeric($_GET['id'])) {
 
 $os_id = intval($_GET['id']);
 
-// Buscar dados da OS
+// Buscar dados da OS — tecnico_id e created_by podem apontar para
+// tecnicos ou admins (tabelas separadas desde a Fase 4), por isso
+// LEFT JOIN em ambas + COALESCE em vez de INNER JOIN único
 $sql = "
-    SELECT 
+    SELECT
         os.*,
-        t.nome as tecnico_nome,
-        t.matricula as tecnico_matricula,
-        t.email as tecnico_email,
-        tc.nome as criado_por_nome,
-        tc.matricula as criado_por_matricula
+        COALESCE(t.nome, ta.nome) as tecnico_nome,
+        COALESCE(t.matricula, ta.matricula) as tecnico_matricula,
+        COALESCE(t.email, ta.email) as tecnico_email,
+        COALESCE(tc.nome, tca.nome) as criado_por_nome,
+        COALESCE(tc.matricula, tca.matricula) as criado_por_matricula
     FROM ordens_servico os
-    INNER JOIN tecnicos t ON os.tecnico_id = t.id
-    INNER JOIN tecnicos tc ON os.created_by = tc.id
+    LEFT JOIN tecnicos t ON os.tecnico_id = t.id
+    LEFT JOIN admins ta ON os.tecnico_id = ta.id
+    LEFT JOIN tecnicos tc ON os.created_by = tc.id
+    LEFT JOIN admins tca ON os.created_by = tca.id
     WHERE os.id = ?
 ";
 
@@ -382,9 +385,9 @@ $status_texto = match($os['status']) {
         <div class="header">
             <div class="header-left">
                 <h1>NetoNerd</h1>
-                <p>R. Conselheiro Macedo Soares, 354 Sala 216 - Centro - Araruama/RJ</p>
+                <p>Rua Alameda Monte Castelo, 182 - Quebra Frascos - Teresópolis/RJ</p>
                 <p>Tel: (21) 977395867 | Email: netonerdinterno@gmail.com</p>
-                <p>CNPJ: 51.243.583/0001-12</p>
+                <p>CNPJ: 65.663.425/0001-26</p>
             </div>
             <div class="header-right">
                 <div class="os-number">

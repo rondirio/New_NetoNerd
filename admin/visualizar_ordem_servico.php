@@ -3,13 +3,31 @@
  * Visualizar Ordem de Serviço - NetoNerd ITSM v2.0
  * Com edição de status e exclusão
  */
-session_start();
 require_once '../controller/auth_middleware.php';
 require_once '../config/bandoDeDados/conexao.php';
 
 requireAdmin();
 
 $conn = getConnection();
+
+/**
+ * Renderiza o CPF mascarado por padrão, com botão para revelar mediante
+ * confirmação de senha do admin logado (JS/endpoint em includes/header.php
+ * e admin/confirmar_senha_cpf.php) — o CPF real vai para o HTML via
+ * data-cpf, mas só fica visível ao usuário depois da senha confirmada.
+ */
+function cpfProtegido(string $cpf, int $id = 0): string {
+    $digitos = preg_replace('/[^0-9]/', '', $cpf);
+    $formatado = strlen($digitos) === 11
+        ? substr($digitos, 0, 3) . '.' . substr($digitos, 3, 3) . '.' . substr($digitos, 6, 3) . '-' . substr($digitos, 9, 2)
+        : $cpf;
+    $uid = 'nn-cpf-' . $id . '-' . uniqid();
+    return '<span class="nn-cpf-protected" id="' . htmlspecialchars($uid) . '" data-cpf="' . htmlspecialchars($formatado) . '">'
+         . '<span class="nn-cpf-value">***.***.***-**</span>'
+         . '<button type="button" class="nn-cpf-reveal-btn" data-target-id="' . htmlspecialchars($uid) . '">'
+         . '<i class="fas fa-eye"></i> Ver CPF</button>'
+         . '</span>';
+}
 
 if (!isset($_GET['id']) || !is_numeric($_GET['id'])) {
     header('Location: listar_ordens_servico.php?erro=id_invalido');
@@ -18,18 +36,22 @@ if (!isset($_GET['id']) || !is_numeric($_GET['id'])) {
 
 $os_id = intval($_GET['id']);
 
-// Buscar OS com dados do técnico - CORRIGIDO: created_by aponta para tecnicos
+// Buscar OS com dados do técnico/admin — tecnico_id e created_by podem
+// apontar para tecnicos ou admins (tabelas separadas desde a Fase 4),
+// por isso LEFT JOIN em ambas + COALESCE em vez de INNER JOIN único
 $sql = "
-    SELECT 
+    SELECT
         os.*,
-        t.nome as tecnico_nome,
-        t.matricula as tecnico_matricula,
-        t.email as tecnico_email,
-        tc.nome as criado_por_nome,
-        tc.matricula as criado_por_matricula
+        COALESCE(t.nome, ta.nome) as tecnico_nome,
+        COALESCE(t.matricula, ta.matricula) as tecnico_matricula,
+        COALESCE(t.email, ta.email) as tecnico_email,
+        COALESCE(tc.nome, tca.nome) as criado_por_nome,
+        COALESCE(tc.matricula, tca.matricula) as criado_por_matricula
     FROM ordens_servico os
-    INNER JOIN tecnicos t ON os.tecnico_id = t.id
-    INNER JOIN tecnicos tc ON os.created_by = tc.id
+    LEFT JOIN tecnicos t ON os.tecnico_id = t.id
+    LEFT JOIN admins ta ON os.tecnico_id = ta.id
+    LEFT JOIN tecnicos tc ON os.created_by = tc.id
+    LEFT JOIN admins tca ON os.created_by = tca.id
     WHERE os.id = ?
 ";
 
@@ -197,7 +219,7 @@ require_once '../includes/header.php';
                                     <i class="fas fa-id-card"></i> CPF
                                 </label>
                                 <div class="nn-info-value">
-                                    <?= $os['cliente_cpf'] ? htmlspecialchars($os['cliente_cpf']) : '<span class="text-muted">Não informado</span>' ?>
+                                    <?= $os['cliente_cpf'] ? cpfProtegido($os['cliente_cpf'], $os_id) : '<span class="text-muted">Não informado</span>' ?>
                                 </div>
                             </div>
                         </div>
@@ -341,13 +363,14 @@ require_once '../includes/header.php';
                         
                         <!-- Alterar Status -->
                         <form action="atualizar_status_os.php" method="POST" class="mb-3">
+                            <?php echo csrfField(); ?>
                             <input type="hidden" name="os_id" value="<?= $os_id ?>">
                             
-                            <label class="nn-form-label">
+                            <label class="nn-form-label" for="novo_status">
                                 <i class="fas fa-exchange-alt"></i>
                                 Alterar Status
                             </label>
-                            <select name="novo_status" class="nn-form-control mb-2" required>
+                            <select id="novo_status" name="novo_status" class="nn-form-control mb-2" required>
                                 <option value="aberta" <?= $os['status'] === 'aberta' ? 'selected' : '' ?>>Aberta</option>
                                 <option value="em_andamento" <?= $os['status'] === 'em_andamento' ? 'selected' : '' ?>>Em Andamento</option>
                                 <option value="concluida" <?= $os['status'] === 'concluida' ? 'selected' : '' ?>>Concluída</option>
@@ -590,6 +613,7 @@ require_once '../includes/header.php';
                     Cancelar
                 </button>
                 <form action="excluir_ordem_servico.php" method="POST" style="display: inline;">
+                    <?php echo csrfField(); ?>
                     <input type="hidden" name="os_id" value="<?= $os_id ?>">
                     <button type="submit" class="nn-btn nn-btn-danger">
                         <i class="fas fa-trash"></i>

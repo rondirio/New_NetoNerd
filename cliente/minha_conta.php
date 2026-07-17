@@ -1,5 +1,6 @@
-<?php 
+<?php
 require_once "../controller/validador_acesso.php";
+require_once "../controller/auth_middleware.php";
 include '../config/bandoDeDados/conexao.php';
 
 $conn = getConnection();
@@ -29,6 +30,7 @@ $stmt_s->close();
 
 // 3. PROCESSAR ATUALIZAÇÃO DE DADOS
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['atualizar_dados'])) {
+    requireCsrfToken();
     $nome = trim($_POST['nome']);
     $telefone = trim($_POST['telefone']);
     $endereco = trim($_POST['endereco']);
@@ -49,6 +51,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['atualizar_dados'])) {
 
 // 4. PROCESSAR ALTERAÇÃO DE SENHA (SEGURANÇA CORRIGIDA)
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['alterar_senha'])) {
+    requireCsrfToken();
     $senha_atual = $_POST['senha_atual'];
     $senha_nova = $_POST['senha_nova'];
     $senha_confirma = $_POST['senha_confirma'];
@@ -136,30 +139,31 @@ require_once '../includes/header.php';
                     </div>
                     <div class="nn-card-body">
                         <form method="POST">
+                            <?php echo csrfField(); ?>
                             <div class="row g-3">
                                 <div class="col-md-6">
-                                    <label class="nn-form-label">Nome Completo</label>
-                                    <input type="text" name="nome" class="nn-form-control" value="<?php echo htmlspecialchars($cliente['nome']); ?>" required>
+                                    <label class="nn-form-label" for="nome">Nome Completo</label>
+                                    <input type="text" name="nome" id="nome" class="nn-form-control" value="<?php echo htmlspecialchars($cliente['nome']); ?>" required>
                                 </div>
                                 <div class="col-md-6">
-                                    <label class="nn-form-label">Email (Login)</label>
-                                    <input type="email" class="nn-form-control bg-light" value="<?php echo htmlspecialchars($cliente['email']); ?>" readonly>
+                                    <label class="nn-form-label" for="email_login">Email (Login)</label>
+                                    <input type="email" id="email_login" class="nn-form-control bg-light" value="<?php echo htmlspecialchars($cliente['email']); ?>" readonly>
                                 </div>
                                 <div class="col-md-6">
-                                    <label class="nn-form-label">Telefone</label>
-                                    <input type="text" name="telefone" class="nn-form-control" value="<?php echo htmlspecialchars($cliente['telefone']); ?>">
+                                    <label class="nn-form-label" for="telefone">Telefone</label>
+                                    <input type="text" name="telefone" id="telefone" class="nn-form-control" data-mask="phone" maxlength="15" value="<?php echo htmlspecialchars($cliente['telefone']); ?>">
                                 </div>
                                 <div class="col-md-6">
-                                    <label class="nn-form-label">CEP</label>
-                                    <input type="text" name="cep" class="nn-form-control" value="<?php echo htmlspecialchars($cliente['cep']); ?>">
+                                    <label class="nn-form-label" for="cep">CEP</label>
+                                    <input type="text" name="cep" id="cep" class="nn-form-control" data-mask="cep" maxlength="9" value="<?php echo htmlspecialchars($cliente['cep']); ?>">
                                 </div>
                                 <div class="col-12">
-                                    <label class="nn-form-label">Endereço</label>
-                                    <input type="text" name="endereco" class="nn-form-control" value="<?php echo htmlspecialchars($cliente['endereco']); ?>">
+                                    <label class="nn-form-label" for="endereco">Endereço</label>
+                                    <input type="text" name="endereco" id="endereco" class="nn-form-control" value="<?php echo htmlspecialchars($cliente['endereco']); ?>">
                                 </div>
                                 <div class="col-12">
-                                    <label class="nn-form-label">Complemento</label>
-                                    <input type="text" name="complemento" class="nn-form-control" value="<?php echo htmlspecialchars($cliente['complemento']); ?>">
+                                    <label class="nn-form-label" for="complemento">Complemento</label>
+                                    <input type="text" name="complemento" id="complemento" class="nn-form-control" value="<?php echo htmlspecialchars($cliente['complemento']); ?>">
                                 </div>
                             </div>
                             <button type="submit" name="atualizar_dados" class="nn-btn nn-btn-primary mt-4">
@@ -177,18 +181,19 @@ require_once '../includes/header.php';
                     </div>
                     <div class="nn-card-body">
                         <form method="POST">
+                            <?php echo csrfField(); ?>
                             <div class="mb-3">
-                                <label class="nn-form-label">Senha Atual</label>
-                                <input type="password" name="senha_atual" class="nn-form-control" required>
+                                <label class="nn-form-label" for="senha_atual">Senha Atual</label>
+                                <input type="password" name="senha_atual" id="senha_atual" class="nn-form-control" required>
                             </div>
                             <hr>
                             <div class="mb-3">
-                                <label class="nn-form-label">Nova Senha</label>
-                                <input type="password" name="senha_nova" class="nn-form-control" required>
+                                <label class="nn-form-label" for="senha_nova">Nova Senha</label>
+                                <input type="password" name="senha_nova" id="senha_nova" class="nn-form-control" required>
                             </div>
                             <div class="mb-3">
-                                <label class="nn-form-label">Confirmar Nova Senha</label>
-                                <input type="password" name="senha_confirma" class="nn-form-control" required>
+                                <label class="nn-form-label" for="senha_confirma">Confirmar Nova Senha</label>
+                                <input type="password" name="senha_confirma" id="senha_confirma" class="nn-form-control" required>
                             </div>
                             <button type="submit" name="alterar_senha" class="nn-btn nn-btn-secondary w-100">
                                 <i class="fas fa-key"></i> Alterar Senha

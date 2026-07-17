@@ -4,7 +4,6 @@
  * Visualização completa de chamado para técnicos
  */
 
-session_start();
 require_once '../controller/auth_middleware.php';
 require_once '../config/bandoDeDados/conexao.php';
 
@@ -67,6 +66,16 @@ $stmt = $conn->prepare("
 $stmt->bind_param("i", $chamado_id);
 $stmt->execute();
 $fotos = $stmt->get_result();
+
+// Buscar anexos enviados na abertura do chamado (cliente, técnico ou admin)
+$stmt = $conn->prepare("
+    SELECT * FROM anexos_chamado
+    WHERE chamado_id = ?
+    ORDER BY data_upload DESC
+");
+$stmt->bind_param("i", $chamado_id);
+$stmt->execute();
+$anexos = $stmt->get_result();
 
 $page_title = "Chamado #" . $chamado['protocolo'] . " - NetoNerd ITSM";
 require_once '../includes/header.php';
@@ -217,6 +226,39 @@ require_once '../includes/header.php';
                         </div>
                     </div>
                 <?php endif; ?>
+
+                <!-- Anexos enviados -->
+                <?php if ($anexos->num_rows > 0): ?>
+                    <div class="nn-card nn-animate-fade">
+                        <div class="nn-card-header">
+                            <h2 class="nn-card-title">
+                                <i class="fas fa-paperclip"></i>
+                                Anexos (<?php echo $anexos->num_rows; ?>)
+                            </h2>
+                        </div>
+                        <div class="nn-card-body">
+                            <div class="row g-3">
+                                <?php while ($anexo = $anexos->fetch_assoc()): ?>
+                                    <div class="col-md-4">
+                                        <a href="<?php echo htmlspecialchars($anexo['caminho_arquivo']); ?>"
+                                           target="_blank" class="nn-card" style="text-align: center; margin-bottom: 0; text-decoration: none;">
+                                            <div style="font-size: 2.5rem; margin-bottom: 10px;">
+                                                <?php
+                                                $ext = pathinfo($anexo['nome_original'], PATHINFO_EXTENSION);
+                                                echo in_array(strtolower($ext), ['jpg', 'jpeg', 'png', 'gif', 'webp']) ? '<i class="fas fa-image"></i>' : '<i class="fas fa-file"></i>';
+                                                ?>
+                                            </div>
+                                            <div style="font-weight: 600; word-break: break-all; margin-bottom: 5px;"><?php echo htmlspecialchars($anexo['nome_original']); ?></div>
+                                            <div class="nn-text-light" style="font-size: 0.8rem;">
+                                                Enviado por <?php echo htmlspecialchars(ucfirst($anexo['tipo_usuario'])); ?> em <?php echo date('d/m/Y', strtotime($anexo['data_upload'])); ?>
+                                            </div>
+                                        </a>
+                                    </div>
+                                <?php endwhile; ?>
+                            </div>
+                        </div>
+                    </div>
+                <?php endif; ?>
             </div>
 
             <!-- Coluna Direita: Cliente e Ações -->
@@ -306,6 +348,7 @@ require_once '../includes/header.php';
                     <div class="nn-card-body">
                         <?php if ($chamado['status'] === 'aberto'): ?>
                             <form action="processar_chamado.php" method="POST" class="mb-2">
+                                <?php echo csrfField(); ?>
                                 <input type="hidden" name="chamado_id" value="<?php echo $chamado['id']; ?>">
                                 <input type="hidden" name="acao" value="iniciar">
                                 <button type="submit" class="nn-btn nn-btn-primary w-100">
@@ -348,20 +391,21 @@ require_once '../includes/header.php';
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
             </div>
             <form action="processar_chamado.php" method="POST">
+                <?php echo csrfField(); ?>
                 <input type="hidden" name="chamado_id" value="<?php echo $chamado['id']; ?>">
                 <input type="hidden" name="acao" value="atualizar">
                 <div class="modal-body">
                     <div class="nn-form-group">
-                        <label class="nn-form-label">Tipo de Atualização</label>
-                        <select name="tipo_atualizacao" class="nn-form-control" required>
+                        <label class="nn-form-label" for="tipo_atualizacao">Tipo de Atualização</label>
+                        <select id="tipo_atualizacao" name="tipo_atualizacao" class="nn-form-control" required>
                             <option value="comentario">Comentário</option>
                             <option value="necessita_peca">Necessita Peça</option>
                             <option value="aguardando_cliente">Aguardando Cliente</option>
                         </select>
                     </div>
                     <div class="nn-form-group">
-                        <label class="nn-form-label">Descrição</label>
-                        <textarea name="descricao" class="nn-form-control" rows="4" required></textarea>
+                        <label class="nn-form-label" for="descricao">Descrição</label>
+                        <textarea id="descricao" name="descricao" class="nn-form-control" rows="4" required></textarea>
                     </div>
                 </div>
                 <div class="modal-footer">

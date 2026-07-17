@@ -77,7 +77,7 @@ $currentYear = date('Y');
                     </li>
                     <li>
                         <i class="fas fa-envelope"></i>
-                        <span>contato@netonerd.com.br</span>
+                        <span>contato@netonerd.com.br.br</span>
                     </li>
                     <li>
                         <i class="fas fa-clock"></i>

@@ -1,0 +1,2 @@
+Instalado — arquivo criado manualmente em 2026-07-13 como correção de segurança (S8, docs/AUDITORIA_SEGURANCA.md).
+O sistema de despesas já possui config/database.php configurado; install.php/processar_instalacao.php não devem ser reexecutados.

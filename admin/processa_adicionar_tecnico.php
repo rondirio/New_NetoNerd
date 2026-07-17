@@ -4,29 +4,35 @@
  * NetoNerd ITSM v2.0
  */
 
+require_once '../controller/auth_middleware.php';
+requireAdmin();
+
 // Inclui o arquivo de conexão com o banco de dados
 require_once '../config/bandoDeDados/conexao.php';
 
 // Verifica se o formulário foi enviado
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    
+    requireCsrfToken();
+
+
     // Obtém os dados enviados pelo formulário
     $nome = isset($_POST['nome']) ? trim($_POST['nome']) : '';
     $email = isset($_POST['email']) ? trim($_POST['email']) : '';
     $status = isset($_POST['status_technician']) ? trim($_POST['status_technician']) : '';
     $matricula = isset($_POST['registration']) ? trim($_POST['registration']) : '';
     $veiculo = isset($_POST['vehicle_of_the_day']) ? trim($_POST['vehicle_of_the_day']) : '';
+    $veiculo = $veiculo !== '' ? $veiculo : null;
     $senha = isset($_POST['password']) ? trim($_POST['password']) : '';
-    
-    // Valida se os campos obrigatórios foram preenchidos
-    if (empty($nome) || empty($email) || empty($status) || empty($matricula) || empty($veiculo) || empty($senha)) {
-        header('Location: ../admin/cadastrar_tecnico.php?erro=campos_obrigatorios');
+
+    // Valida se os campos obrigatórios foram preenchidos (veículo é opcional — técnico interno pode não ter)
+    if (empty($nome) || empty($email) || empty($status) || empty($matricula) || empty($senha)) {
+        header('Location: dashboard.php?erro=campos_obrigatorios');
         exit();
     }
     
     // Valida formato do email
     if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-        header('Location: ../admin/cadastrar_tecnico.php?erro=email_invalido');
+        header('Location: dashboard.php?erro=email_invalido');
         exit();
     }
     
@@ -40,7 +46,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if ($result_check->num_rows > 0) {
         $stmt_check->close();
         $conn->close();
-        header('Location: ../admin/cadastrar_tecnico.php?erro=email_existente');
+        header('Location: dashboard.php?erro=email_existente');
         exit();
     }
     $stmt_check->close();
@@ -55,7 +61,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if ($result_check_mat->num_rows > 0) {
         $stmt_check_mat->close();
         $conn->close();
-        header('Location: ../admin/cadastrar_tecnico.php?erro=matricula_existente');
+        header('Location: dashboard.php?erro=matricula_existente');
         exit();
     }
     $stmt_check_mat->close();
@@ -64,8 +70,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $senha_hash = password_hash($senha, PASSWORD_DEFAULT);
     
     // Prepara a consulta SQL para inserir os dados (SEM o campo 'id' - auto_increment)
-    $sql = "INSERT INTO tecnicos (nome, email, status_tecnico, Ativo, matricula, carro_do_dia, senha_hash) 
-            VALUES (?, ?, ?, 1, ?, ?, ?)";
+    $sql = "INSERT INTO tecnicos (nome, email, status_tecnico, matricula, carro_do_dia, senha_hash)
+            VALUES (?, ?, ?, ?, ?, ?)";
     
     // Prepara a declaração
     $stmt = $conn->prepare($sql);
@@ -86,20 +92,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $erro_msg = urlencode($stmt->error);
             $stmt->close();
             $conn->close();
-            header('Location: ../admin/cadastrar_tecnico.php?erro=erro_banco&msg=' . $erro_msg);
+            header('Location: dashboard.php?erro=erro_banco&msg=' . $erro_msg);
             exit();
         }
     } else {
         // Erro na preparação
         $erro_msg = urlencode($conn->error);
         $conn->close();
-        header('Location: ../admin/cadastrar_tecnico.php?erro=erro_preparacao&msg=' . $erro_msg);
+        header('Location: dashboard.php?erro=erro_preparacao&msg=' . $erro_msg);
         exit();
     }
     
 } else {
     // Método de requisição inválido
-    header('Location: ../admin/cadastrar_tecnico.php?erro=metodo_invalido');
+    header('Location: dashboard.php?erro=metodo_invalido');
     exit();
 }
 ?>

@@ -1,5 +1,4 @@
 <?php
-session_start();
 require_once '../controller/auth_middleware.php';
 require_once '../config/bandoDeDados/conexao.php';
 require_once '../config/LicenseManager.php';
@@ -7,6 +6,10 @@ require_once '../config/EmailService.php';
 
 // PROTEÇÃO: Apenas administradores podem acessar
 requireAdmin();
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    requireCsrfToken();
+}
 
 $conn = getConnection();
 $licenseManager = new LicenseManager();
@@ -99,7 +102,13 @@ $conn->close();
  * Envia email com informações da licença gerada
  */
 function enviarEmailLicenca($emailService, $cliente, $produto, $licenca) {
-    $assunto = "[NetoNerd] Sua Licença do {$produto['nome']} foi Gerada!";
+    // Escapa nome de cliente/produto antes de interpolar no corpo HTML do
+    // e-mail — ambos vêm de cadastro no banco, não de input desta requisição,
+    // mas continuam sendo dado de usuário e podem conter HTML malicioso.
+    $produto_nome_html = htmlspecialchars($produto['nome']);
+    $cliente_nome_html = htmlspecialchars($cliente['nome']);
+
+    $assunto = "[NetoNerd] Sua Licença do {$produto_nome_html} foi Gerada!";
 
     $corpo = "
     <!DOCTYPE html>
@@ -121,15 +130,15 @@ function enviarEmailLicenca($emailService, $cliente, $produto, $licenca) {
     <body>
         <div class='container'>
             <div class='header'>
-                <h1>🎉 Bem-vindo ao {$produto['nome']}!</h1>
+                <h1>🎉 Bem-vindo ao {$produto_nome_html}!</h1>
             </div>
             <div class='content'>
-                <p>Olá <strong>{$cliente['nome']}</strong>,</p>
-                <p>Sua licença do <strong>{$produto['nome']}</strong> foi gerada com sucesso!</p>
+                <p>Olá <strong>{$cliente_nome_html}</strong>,</p>
+                <p>Sua licença do <strong>{$produto_nome_html}</strong> foi gerada com sucesso!</p>
 
                 <div class='info-box'>
                     <h3>📋 Informações da Licença</h3>
-                    <p><strong>Produto:</strong> {$produto['nome']}</p>
+                    <p><strong>Produto:</strong> {$produto_nome_html}</p>
                     <p><strong>Tipo:</strong> " . ucfirst($licenca['tipo_licenca']) . "</p>
                     <p><strong>Status:</strong> Ativa (30 dias de trial)</p>
                     <p><strong>Valor:</strong> R$ " . number_format($licenca['valor_licenca'], 2, ',', '.') . "</p>
@@ -160,9 +169,9 @@ function enviarEmailLicenca($emailService, $cliente, $produto, $licenca) {
                     <h4>📞 Precisa de Ajuda?</h4>
                     <p>Entre em contato conosco:</p>
                     <p>
-                        📧 Email: suporte@netonerd.com.br<br>
+                        📧 Email: suporte@netonerd.com.br.br<br>
                         📱 WhatsApp: (21) 97739-5867<br>
-                        🌐 Site: www.netonerd.com.br
+                        🌐 Site: www.netonerd.com.br.br
                     </p>
                 </div>
 

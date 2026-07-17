@@ -1,7 +1,12 @@
 <?php
 session_start();
+require_once 'classes/Auth.php';
 require_once 'classes/Despesa.php';
 require_once 'classes/EmailService.php';
+
+$auth = new Auth();
+$auth->protegerPagina();
+$usuarioId = $auth->getUsuarioId();
 
 // Verificar se é POST
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
@@ -10,15 +15,18 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
 }
 
 try {
-    $mes = $_POST['mes'];
-    $ano = $_POST['ano'];
-    $emailDestinatario = $_POST['email'];
-    $nomeDestinatario = $_POST['nome'] ?? 'Usuário';
-    
-    // Buscar dados
+    $mes = str_pad(max(1, min(12, intval($_POST['mes'] ?? date('m')))), 2, '0', STR_PAD_LEFT);
+    $ano = max(2000, min(2100, intval($_POST['ano'] ?? date('Y'))));
+    $emailDestinatario = filter_var(trim($_POST['email'] ?? ''), FILTER_VALIDATE_EMAIL);
+    if (!$emailDestinatario) {
+        throw new Exception("E-mail destinatário inválido.");
+    }
+    $nomeDestinatario = htmlspecialchars(trim($_POST['nome'] ?? 'Usuário'), ENT_QUOTES, 'UTF-8');
+
+    // Buscar dados filtrados pelo usuário autenticado
     $despesa = new Despesa();
-    $despesas = $despesa->listar(['mes' => $mes, 'ano' => $ano]);
-    $estatisticas = $despesa->estatisticasMes($mes, $ano);
+    $despesas    = $despesa->listar(['usuario_id' => $usuarioId, 'mes' => $mes, 'ano' => $ano]);
+    $estatisticas = $despesa->estatisticasMes($mes, $ano, $usuarioId);
     
     $meses = [
         '01' => 'Janeiro', '02' => 'Fevereiro', '03' => 'Março',
@@ -44,7 +52,8 @@ try {
     $_SESSION['tipo_mensagem'] = 'success';
     
 } catch (Exception $e) {
-    $_SESSION['mensagem'] = 'Erro ao enviar relatório: ' . $e->getMessage();
+    error_log("enviar_relatorio.php - " . $e->getMessage());
+    $_SESSION['mensagem'] = 'Erro ao enviar relatório. Tente novamente ou contate o suporte.';
     $_SESSION['tipo_mensagem'] = 'error';
 }
 

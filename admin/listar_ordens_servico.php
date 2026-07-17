@@ -2,7 +2,6 @@
 /**
  * Listar Ordens de Serviço - NetoNerd ITSM v2.0
  */
-session_start();
 require_once '../controller/auth_middleware.php';
 require_once '../config/bandoDeDados/conexao.php';
 
@@ -13,17 +12,19 @@ $conn = getConnection();
 // Filtros
 $filtro_status = $_GET['status'] ?? '';
 $filtro_tecnico = $_GET['tecnico'] ?? '';
-$busca = $_GET['busca'] ?? '';
+$busca = trim($_GET['busca'] ?? '');
 
-// Query principal
+// Query principal — tecnico_id pode apontar para tecnicos ou admins
+// (tabelas separadas desde a Fase 4), por isso LEFT JOIN + COALESCE
 $sql = "
-    SELECT 
+    SELECT
         os.*,
-        t.nome as tecnico_nome,
-        t.matricula as tecnico_matricula,
+        COALESCE(t.nome, ta.nome) as tecnico_nome,
+        COALESCE(t.matricula, ta.matricula) as tecnico_matricula,
         DATEDIFF(CURDATE(), DATE(os.data_criacao)) as dias_aberta
     FROM ordens_servico os
-    INNER JOIN tecnicos t ON os.tecnico_id = t.id
+    LEFT JOIN tecnicos t ON os.tecnico_id = t.id
+    LEFT JOIN admins ta ON os.tecnico_id = ta.id
     WHERE 1=1
 ";
 
@@ -67,7 +68,7 @@ while ($row = $result->fetch_assoc()) {
 }
 
 // Buscar técnicos para filtro
-$tecnicos = $conn->query("SELECT id, nome FROM tecnicos WHERE Ativo = 1 ORDER BY nome");
+$tecnicos = $conn->query("SELECT id, nome FROM tecnicos WHERE status_tecnico = 'Active' ORDER BY nome");
 
 // Estatísticas
 $stats = $conn->query("
@@ -175,19 +176,19 @@ require_once '../includes/header.php';
             <div class="nn-card-body">
                 <form method="GET" class="row g-3">
                     <div class="col-md-4">
-                        <label class="nn-form-label">
+                        <label class="nn-form-label" for="busca">
                             <i class="fas fa-search"></i> Buscar
                         </label>
-                        <input type="text" name="busca" class="nn-form-control" 
+                        <input type="text" id="busca" name="busca" class="nn-form-control"
                                placeholder="Número, cliente, problema..." 
                                value="<?= htmlspecialchars($busca) ?>">
                     </div>
 
                     <div class="col-md-3">
-                        <label class="nn-form-label">
+                        <label class="nn-form-label" for="filtro_status">
                             <i class="fas fa-info-circle"></i> Status
                         </label>
-                        <select name="status" class="nn-form-control">
+                        <select id="filtro_status" name="status" class="nn-form-control">
                             <option value="">Todos</option>
                             <option value="aberta" <?= $filtro_status === 'aberta' ? 'selected' : '' ?>>Abertas</option>
                             <option value="em_andamento" <?= $filtro_status === 'em_andamento' ? 'selected' : '' ?>>Em Andamento</option>
@@ -197,10 +198,10 @@ require_once '../includes/header.php';
                     </div>
 
                     <div class="col-md-3">
-                        <label class="nn-form-label">
+                        <label class="nn-form-label" for="filtro_tecnico">
                             <i class="fas fa-user-cog"></i> Técnico
                         </label>
-                        <select name="tecnico" class="nn-form-control">
+                        <select id="filtro_tecnico" name="tecnico" class="nn-form-control">
                             <option value="">Todos</option>
                             <?php
                             $tecnicos->data_seek(0);

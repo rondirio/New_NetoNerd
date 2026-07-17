@@ -2,7 +2,6 @@
 /**
  * Atualizar Status da Ordem de Serviço - NetoNerd ITSM v2.0
  */
-session_start();
 require_once '../controller/auth_middleware.php';
 require_once '../config/bandoDeDados/conexao.php';
 
@@ -12,6 +11,8 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     header('Location: listar_ordens_servico.php?erro=metodo_invalido');
     exit();
 }
+
+requireCsrfToken();
 
 $conn = getConnection();
 

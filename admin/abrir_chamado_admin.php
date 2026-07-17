@@ -1,16 +1,10 @@
 <?php
-session_start();
+require_once '../controller/auth_middleware.php';
 include_once '../config/bandoDeDados/conexao.php';
 
-// Buscar clientes existentes para autocompletar
-$clientes = [];
-$sql_clientes = "SELECT id, nome, email, telefone FROM clientes ORDER BY nome";
-$result_clientes = $conn->query($sql_clientes);
-if ($result_clientes) {
-    while ($row = $result_clientes->fetch_assoc()) {
-        $clientes[] = $row;
-    }
-}
+requireAdmin();
+
+$conn = getConnection();
 
 // Buscar técnicos para atribuição
 $tecnicos = [];
@@ -22,22 +16,23 @@ if ($result_tecnicos) {
     }
 }
 
-// Categorias disponíveis
-$categorias = [
-    'Hardware' => ['Computador não liga', 'Tela quebrada', 'Teclado com defeito', 'Mouse não funciona', 'Periféricos'],
-    'Software' => ['Instalação de programa', 'Atualização', 'Erro de sistema', 'Lentidão', 'Vírus/Malware'],
-    'Rede' => ['Internet lenta', 'Wi-Fi não conecta', 'Sem acesso à rede', 'Problema de VPN', 'Configuração de rede'],
-    'Segurança' => ['Antivírus', 'Firewall', 'Backup', 'Recuperação de dados', 'Criptografia'],
-    'Impressão' => ['Impressora offline', 'Problema de driver', 'Papel atolado', 'Qualidade de impressão'],
-    'Email' => ['Não recebe emails', 'Erro ao enviar', 'Configuração de conta', 'Outlook/Thunderbird'],
-    'Outros' => ['Consultoria', 'Treinamento', 'Suporte geral', 'Dúvidas']
-];
+// Categorias disponíveis (tabela categorias_chamado, não mais lista hardcoded)
+$categorias = [];
+$sql_categorias = "SELECT id, nome FROM categorias_chamado WHERE ativo = 1 ORDER BY nome";
+$result_categorias = $conn->query($sql_categorias);
+if ($result_categorias) {
+    while ($row = $result_categorias->fetch_assoc()) {
+        $categorias[] = $row;
+    }
+}
 
 $mensagem = '';
 $tipo_mensagem = '';
 
 // Processar formulário
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    requireCsrfToken();
+    $transacao_aberta = false;
     try {
         $tipo_cliente = $_POST['tipo_cliente'] ?? 'novo';
         $cliente_id = null;
@@ -64,51 +59,90 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
 
         $titulo = str_replace('#', '-', trim($_POST['titulo']));
-        $categoria = str_replace('#', '-', trim($_POST['categoria']));
+        $categoria_id = !empty($_POST['categoria_id']) ? intval($_POST['categoria_id']) : null;
         $descricao = str_replace('#', '-', trim($_POST['descricao']));
         $prioridade = $_POST['prioridade'] ?? 'media';
         $tecnico_id = !empty($_POST['tecnico_id']) ? intval($_POST['tecnico_id']) : null;
 
-        // Gerar protocolo
-        $query = "SELECT MAX(protocolo) as ultimo_protocolo FROM chamados";
-        $result = $conn->query($query);
-        $row = $result->fetch_assoc();
-        $ultimo_protocolo = isset($row['ultimo_protocolo']) ? intval(substr($row['ultimo_protocolo'], 4)) : 0;
-        $novo_protocolo = $ultimo_protocolo + 1;
-        $ano_atual = date('Y');
-        $protocolo = $ano_atual . str_pad($novo_protocolo, 4, '0', STR_PAD_LEFT);
-
-        // Inserir chamado
-        $sql = "INSERT INTO chamados (cliente_id, cliente_nome, cliente_email, cliente_telefone, titulo, categoria, descricao, protocolo, nome_usuario, prioridade, tecnico_id, criado_por_admin)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
-
-        $stmt = $conn->prepare($sql);
-        if (!$stmt) {
-            throw new Exception("Erro ao preparar query: " . $conn->error);
+        if (!$categoria_id) {
+            throw new Exception("Categoria é obrigatória.");
         }
 
-        $admin_id = $_SESSION['id'] ?? 1;
-        $stmt->bind_param("isssssssssii",
-            $cliente_id,
-            $cliente_nome,
-            $cliente_email,
-            $cliente_telefone,
-            $titulo,
-            $categoria,
-            $descricao,
-            $protocolo,
-            $cliente_nome,
-            $prioridade,
-            $tecnico_id,
-            $admin_id
-        );
+        $stmt_cat = $conn->prepare("SELECT nome FROM categorias_chamado WHERE id = ?");
+        $stmt_cat->bind_param("i", $categoria_id);
+        $stmt_cat->execute();
+        $categoria_row = $stmt_cat->get_result()->fetch_assoc();
+        $stmt_cat->close();
 
-        if (!$stmt->execute()) {
-            throw new Exception("Erro ao inserir chamado: " . $stmt->error);
+        if (!$categoria_row) {
+            throw new Exception("Categoria inválida.");
         }
 
-        $chamado_id = $conn->insert_id;
-        $stmt->close();
+        $categoria = $categoria_row['nome'];
+        $admin_id = $_SESSION['id'];
+
+        $conn->begin_transaction();
+        $transacao_aberta = true;
+
+        // Gerar protocolo. FOR UPDATE trava a linha de maior protocolo do ano
+        // contra leituras concorrentes; chamados.protocolo tem UNIQUE como
+        // segunda rede de segurança (retry abaixo se ainda assim colidir).
+        $tentativas_restantes = 3;
+        $chamado_id = null;
+
+        while (true) {
+            $ano_atual = date('Y');
+            $query = "SELECT MAX(protocolo) as ultimo_protocolo FROM chamados WHERE protocolo LIKE ? FOR UPDATE";
+            $stmt_proto = $conn->prepare($query);
+            $like = $ano_atual . '%';
+            $stmt_proto->bind_param("s", $like);
+            $stmt_proto->execute();
+            $row = $stmt_proto->get_result()->fetch_assoc();
+            $stmt_proto->close();
+
+            $ultimo_protocolo = isset($row['ultimo_protocolo']) ? intval(substr($row['ultimo_protocolo'], 4)) : 0;
+            $novo_protocolo = $ultimo_protocolo + 1;
+            $protocolo = $ano_atual . str_pad($novo_protocolo, 4, '0', STR_PAD_LEFT);
+
+            // Inserir chamado
+            $sql = "INSERT INTO chamados (cliente_id, cliente_nome, cliente_email, cliente_telefone, titulo, categoria, categoria_id, descricao, protocolo, nome_usuario, prioridade, tecnico_id, criado_por_admin)
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+
+            $stmt = $conn->prepare($sql);
+            if (!$stmt) {
+                throw new Exception("Erro ao preparar query: " . $conn->error);
+            }
+
+            $stmt->bind_param("isssssisssiii",
+                $cliente_id,
+                $cliente_nome,
+                $cliente_email,
+                $cliente_telefone,
+                $titulo,
+                $categoria,
+                $categoria_id,
+                $descricao,
+                $protocolo,
+                $cliente_nome,
+                $prioridade,
+                $tecnico_id,
+                $admin_id
+            );
+
+            if ($stmt->execute()) {
+                $chamado_id = $conn->insert_id;
+                $stmt->close();
+                break;
+            }
+
+            $erro_duplicado = $conn->errno === 1062;
+            $stmt->close();
+
+            if (!$erro_duplicado || --$tentativas_restantes <= 0) {
+                throw new Exception("Erro ao inserir chamado: " . $conn->error);
+            }
+            // Protocolo colidiu (corrida rara mesmo com FOR UPDATE) — tenta de novo.
+        }
 
         // Processar upload de arquivos
         if (isset($_FILES['anexos']) && !empty($_FILES['anexos']['name'][0])) {
@@ -126,8 +160,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             ];
             $tamanho_maximo = 10 * 1024 * 1024;
 
-            $sql_anexo = "INSERT INTO anexos_chamado (chamado_id, nome_arquivo, nome_original, caminho_arquivo, tipo_arquivo, tamanho)
-                          VALUES (?, ?, ?, ?, ?, ?)";
+            $sql_anexo = "INSERT INTO anexos_chamado (chamado_id, nome_arquivo, nome_original, caminho_arquivo, tipo_mime, tamanho_bytes, usuario_upload_id, tipo_usuario)
+                          VALUES (?, ?, ?, ?, ?, ?, ?, 'admin')";
             $stmt_anexo = $conn->prepare($sql_anexo);
 
             if ($stmt_anexo) {
@@ -135,9 +169,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 for ($i = 0; $i < $total_arquivos; $i++) {
                     if ($_FILES['anexos']['error'][$i] === UPLOAD_ERR_OK) {
                         $nome_original = $_FILES['anexos']['name'][$i];
-                        $tipo_arquivo = $_FILES['anexos']['type'][$i];
                         $tamanho = $_FILES['anexos']['size'][$i];
                         $tmp_name = $_FILES['anexos']['tmp_name'][$i];
+
+                        // Validar usando finfo (magic bytes), não o Content-Type declarado pelo cliente (falsificável)
+                        $finfo = new finfo(FILEINFO_MIME_TYPE);
+                        $tipo_arquivo = $finfo->file($tmp_name);
 
                         if (in_array($tipo_arquivo, $tipos_permitidos) && $tamanho <= $tamanho_maximo) {
                             $extensao = pathinfo($nome_original, PATHINFO_EXTENSION);
@@ -145,7 +182,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             $caminho_arquivo = $upload_dir . $nome_arquivo;
 
                             if (move_uploaded_file($tmp_name, $caminho_arquivo)) {
-                                $stmt_anexo->bind_param("issssi", $chamado_id, $nome_arquivo, $nome_original, $caminho_arquivo, $tipo_arquivo, $tamanho);
+                                $stmt_anexo->bind_param("issssii", $chamado_id, $nome_arquivo, $nome_original, $caminho_arquivo, $tipo_arquivo, $tamanho, $_SESSION['id']);
                                 $stmt_anexo->execute();
                             }
                         }
@@ -155,460 +192,439 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
         }
 
+        $conn->commit();
+        $transacao_aberta = false;
+
         $mensagem = "Chamado criado com sucesso! Protocolo: #" . $protocolo;
         $tipo_mensagem = 'success';
 
     } catch (Exception $e) {
+        if ($transacao_aberta) {
+            $conn->rollback();
+        }
         $mensagem = "Erro ao criar chamado: " . $e->getMessage();
         $tipo_mensagem = 'danger';
     }
 }
+
+$page_title = "Abrir Chamado - NetoNerd ITSM";
+$extra_css = '<style>
+    .nn-cliente-toggle {
+        display: flex;
+        gap: 15px;
+        margin-bottom: 20px;
+    }
+
+    .nn-cliente-toggle .nn-btn {
+        flex: 1;
+        justify-content: center;
+    }
+
+    .nn-cliente-toggle .nn-btn.active {
+        background: var(--gradient-primary);
+        color: white;
+    }
+
+    .nn-cliente-section {
+        display: none;
+        padding: 20px;
+        background: var(--bg-light);
+        border-radius: var(--radius-md);
+        margin-bottom: 20px;
+    }
+
+    .nn-cliente-section.active {
+        display: block;
+    }
+
+    .nn-prioridade-card {
+        border: 2px solid var(--bg-lighter);
+        border-radius: var(--radius-md);
+        padding: 15px;
+        cursor: pointer;
+        transition: all 0.3s;
+        text-align: center;
+        display: block;
+    }
+
+    .nn-prioridade-card:hover {
+        border-color: var(--primary-blue);
+    }
+
+    .nn-prioridade-card.selected {
+        border-color: var(--primary-blue);
+        background: rgba(11, 61, 145, 0.08);
+    }
+
+    .nn-prioridade-card input {
+        display: none;
+    }
+
+    .nn-prioridade-icon {
+        font-size: 2rem;
+        margin-bottom: 10px;
+    }
+
+    .nn-drop-zone {
+        border: 2px dashed var(--bg-lighter);
+        border-radius: var(--radius-md);
+        padding: 40px;
+        text-align: center;
+        cursor: pointer;
+        transition: all 0.3s;
+    }
+
+    .nn-drop-zone:hover, .nn-drop-zone.dragover {
+        border-color: var(--primary-blue);
+        background: rgba(11, 61, 145, 0.05);
+    }
+
+    .nn-file-item-simple {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 10px;
+        background: var(--bg-light);
+        border-radius: var(--radius-sm);
+        margin-bottom: 5px;
+    }
+</style>';
+require_once '../includes/header.php';
 ?>
-<!DOCTYPE html>
-<html lang="pt-br">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Abrir Chamado - Admin - NetoNerd</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" type="text/css" href="../src/css/mobile-fixes.css">
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js" defer></script>
-    <style>
-        :root {
-            --primary: #0A1128;
-            --secondary: #001F54;
-            --accent: #FDB827;
-            --light: #F4F4F9;
-            --dark: #061A40;
-        }
 
-        body {
-            background-color: var(--light);
-            color: var(--dark);
-        }
+<div class="nn-main-wrapper">
+    <div class="nn-content nn-content-full">
 
-        .sidebar {
-            background-color: var(--primary);
-            color: var(--light);
-            min-height: 100vh;
-            width: 250px;
-            position: fixed;
-            left: 0;
-            top: 0;
-        }
-
-        .sidebar h2 {
-            color: var(--accent);
-        }
-
-        .sidebar a {
-            color: var(--light);
-            text-decoration: none;
-            padding: 10px 15px;
-            display: block;
-            border-radius: 5px;
-            margin: 5px 0;
-        }
-
-        .sidebar a:hover, .sidebar a.active {
-            background-color: var(--secondary);
-        }
-
-        .main-content {
-            margin-left: 250px;
-            padding: 30px;
-        }
-
-        .form-card {
-            background: white;
-            border-radius: 15px;
-            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
-            padding: 30px;
-            border-left: 5px solid var(--accent);
-        }
-
-        .section-title {
-            font-size: 1.3rem;
-            font-weight: 700;
-            color: var(--primary);
-            margin-bottom: 20px;
-            padding-bottom: 10px;
-            border-bottom: 2px solid var(--accent);
-        }
-
-        .cliente-toggle {
-            display: flex;
-            gap: 15px;
-            margin-bottom: 20px;
-        }
-
-        .cliente-toggle .btn {
-            flex: 1;
-            padding: 15px;
-            border-radius: 10px;
-            font-weight: 600;
-        }
-
-        .cliente-toggle .btn.active {
-            background: var(--accent);
-            color: var(--dark);
-            border-color: var(--accent);
-        }
-
-        .cliente-section {
-            display: none;
-            padding: 20px;
-            background: #f8f9fa;
-            border-radius: 10px;
-            margin-bottom: 20px;
-        }
-
-        .cliente-section.active {
-            display: block;
-        }
-
-        .prioridade-card {
-            border: 2px solid #e0e0e0;
-            border-radius: 10px;
-            padding: 15px;
-            cursor: pointer;
-            transition: all 0.3s;
-            text-align: center;
-        }
-
-        .prioridade-card:hover {
-            border-color: var(--accent);
-        }
-
-        .prioridade-card.selected {
-            border-color: var(--accent);
-            background: rgba(253, 184, 39, 0.1);
-        }
-
-        .prioridade-card input {
-            display: none;
-        }
-
-        .prioridade-icon {
-            font-size: 2rem;
-            margin-bottom: 10px;
-        }
-
-        .drop-zone {
-            border: 2px dashed #ccc;
-            border-radius: 10px;
-            padding: 40px;
-            text-align: center;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-
-        .drop-zone:hover, .drop-zone.dragover {
-            border-color: var(--accent);
-            background: rgba(253, 184, 39, 0.05);
-        }
-
-        .file-list {
-            margin-top: 15px;
-        }
-
-        .file-item {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 10px;
-            background: #f8f9fa;
-            border-radius: 5px;
-            margin-bottom: 5px;
-        }
-
-        @media (max-width: 768px) {
-            .sidebar {
-                width: 100%;
-                position: relative;
-                min-height: auto;
-            }
-            .main-content {
-                margin-left: 0;
-            }
-        }
-    </style>
-</head>
-<body>
-    <div class="d-flex">
-        <div class="sidebar p-3">
-            <h2 class="text-center mb-4">NetoNerd</h2>
-            <ul class="nav flex-column">
-                <li class="nav-item"><a href="dashboard.php" class="nav-link"><i class="fas fa-home me-2"></i>Dashboard</a></li>
-                <li class="nav-item"><a href="apresenta_tecnicos.php" class="nav-link"><i class="fas fa-users me-2"></i>Técnicos</a></li>
-                <li class="nav-item"><a href="chamados_ativos.php" class="nav-link"><i class="fas fa-ticket-alt me-2"></i>Chamados</a></li>
-                <li class="nav-item"><a href="abrir_chamado_admin.php" class="nav-link active"><i class="fas fa-plus-circle me-2"></i>Novo Chamado</a></li>
-                <li class="nav-item"><a href="relatorios.php" class="nav-link"><i class="fas fa-chart-bar me-2"></i>Relatórios</a></li>
-                <li class="nav-item"><a href="configura.php" class="nav-link"><i class="fas fa-cog me-2"></i>Configurações</a></li>
-                <li class="nav-item mt-4"><a href="../tecnico/logoff.php" class="nav-link btn btn-outline-light"><i class="fas fa-sign-out-alt me-2"></i>Sair</a></li>
-            </ul>
+        <div class="nn-card nn-animate-fade">
+            <div class="nn-card-header">
+                <h1 class="nn-card-title">
+                    <i class="fas fa-plus-circle"></i>
+                    Abrir Novo Chamado
+                </h1>
+            </div>
+            <div class="nn-card-body">
+                <p class="nn-text-medium">Crie um chamado para cliente registrado ou não registrado</p>
+            </div>
         </div>
 
-        <div class="main-content flex-grow-1">
-            <header class="mb-4">
-                <h1><i class="fas fa-plus-circle me-2"></i>Abrir Novo Chamado</h1>
-                <p class="text-muted">Crie um chamado para cliente registrado ou não registrado</p>
-            </header>
+        <?php if ($mensagem): ?>
+            <div class="nn-alert nn-alert-<?php echo $tipo_mensagem === 'danger' ? 'danger' : 'success'; ?> nn-animate-fade">
+                <i class="fas fa-<?php echo $tipo_mensagem === 'danger' ? 'exclamation-circle' : 'check-circle'; ?>"></i>
+                <?php echo htmlspecialchars($mensagem); ?>
+            </div>
+        <?php endif; ?>
 
-            <?php if ($mensagem): ?>
-                <div class="alert alert-<?php echo $tipo_mensagem; ?> alert-dismissible fade show" role="alert">
-                    <?php echo htmlspecialchars($mensagem); ?>
-                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        <form method="POST" enctype="multipart/form-data" id="formChamado">
+            <?php echo csrfField(); ?>
+            <div class="nn-card">
+                <div class="nn-card-header">
+                    <h2 class="nn-card-title">
+                        <i class="fas fa-user"></i>
+                        Dados do Cliente
+                    </h2>
                 </div>
-            <?php endif; ?>
-
-            <form method="POST" enctype="multipart/form-data" id="formChamado">
-                <div class="form-card mb-4">
-                    <div class="section-title"><i class="fas fa-user me-2"></i>Dados do Cliente</div>
-
-                    <div class="cliente-toggle">
-                        <button type="button" class="btn btn-outline-secondary active" onclick="toggleCliente('novo')">
-                            <i class="fas fa-user-plus me-2"></i>Cliente Novo / Não Registrado
+                <div class="nn-card-body">
+                    <div class="nn-cliente-toggle">
+                        <button type="button" class="nn-btn nn-btn-secondary active" onclick="toggleCliente('novo')">
+                            <i class="fas fa-user-plus"></i>
+                            Cliente Novo / Não Registrado
                         </button>
-                        <button type="button" class="btn btn-outline-secondary" onclick="toggleCliente('existente')">
-                            <i class="fas fa-user-check me-2"></i>Cliente Registrado
+                        <button type="button" class="nn-btn nn-btn-secondary" onclick="toggleCliente('existente')">
+                            <i class="fas fa-user-check"></i>
+                            Cliente Registrado
                         </button>
                     </div>
 
                     <input type="hidden" name="tipo_cliente" id="tipo_cliente" value="novo">
 
                     <!-- Cliente Novo -->
-                    <div class="cliente-section active" id="cliente-novo">
+                    <div class="nn-cliente-section active" id="cliente-novo">
                         <div class="row">
-                            <div class="col-md-6 mb-3">
-                                <label class="form-label">Nome do Cliente *</label>
-                                <input type="text" class="form-control" name="cliente_nome" id="cliente_nome" required>
+                            <div class="col-md-6">
+                                <div class="nn-form-group">
+                                    <label class="nn-form-label" for="cliente_nome">Nome do Cliente *</label>
+                                    <input type="text" class="nn-form-control" name="cliente_nome" id="cliente_nome" required>
+                                </div>
                             </div>
-                            <div class="col-md-6 mb-3">
-                                <label class="form-label">Telefone *</label>
-                                <input type="tel" class="form-control" name="cliente_telefone" id="cliente_telefone" required>
+                            <div class="col-md-6">
+                                <div class="nn-form-group">
+                                    <label class="nn-form-label" for="cliente_telefone">Telefone *</label>
+                                    <input type="tel" class="nn-form-control" name="cliente_telefone" id="cliente_telefone" data-mask="phone" maxlength="15" required>
+                                </div>
                             </div>
-                            <div class="col-12 mb-3">
-                                <label class="form-label">Email (opcional)</label>
-                                <input type="email" class="form-control" name="cliente_email" id="cliente_email">
+                            <div class="col-12">
+                                <div class="nn-form-group">
+                                    <label class="nn-form-label" for="cliente_email">Email (opcional)</label>
+                                    <input type="email" class="nn-form-control" name="cliente_email" id="cliente_email">
+                                </div>
                             </div>
                         </div>
                     </div>
 
                     <!-- Cliente Existente -->
-                    <div class="cliente-section" id="cliente-existente">
-                        <div class="mb-3">
-                            <label class="form-label">Selecionar Cliente *</label>
-                            <select class="form-select" name="cliente_id" id="cliente_id">
-                                <option value="">-- Selecione um cliente --</option>
-                                <?php foreach ($clientes as $cliente): ?>
-                                    <option value="<?php echo $cliente['id']; ?>" data-email="<?php echo htmlspecialchars($cliente['email']); ?>" data-telefone="<?php echo htmlspecialchars($cliente['telefone']); ?>">
-                                        <?php echo htmlspecialchars($cliente['nome']); ?> - <?php echo htmlspecialchars($cliente['email']); ?>
-                                    </option>
-                                <?php endforeach; ?>
-                            </select>
+                    <div class="nn-cliente-section" id="cliente-existente">
+                        <div class="nn-form-group" style="position: relative;">
+                            <label class="nn-form-label" for="cliente_busca">Buscar Cliente * <small class="nn-text-light">(digite ao menos 3 letras do nome)</small></label>
+                            <input type="text" class="nn-form-control" id="cliente_busca" autocomplete="off" placeholder="Nome do cliente...">
+                            <input type="hidden" name="cliente_id" id="cliente_id">
+                            <div id="cliente-resultados" class="nn-card" style="position: absolute; width: 100%; z-index: 1000; max-height: 250px; overflow-y: auto; padding: 0; display: none;"></div>
                         </div>
-                        <div id="cliente-info" class="alert alert-info d-none">
+                        <div id="cliente-info" class="nn-alert nn-alert-info" style="display: none;">
+                            <strong>Cliente selecionado:</strong> <span id="info-nome"></span><br>
                             <strong>Email:</strong> <span id="info-email"></span><br>
                             <strong>Telefone:</strong> <span id="info-telefone"></span>
                         </div>
                     </div>
                 </div>
+            </div>
 
-                <div class="form-card mb-4">
-                    <div class="section-title"><i class="fas fa-clipboard-list me-2"></i>Detalhes do Chamado</div>
-
+            <div class="nn-card">
+                <div class="nn-card-header">
+                    <h2 class="nn-card-title">
+                        <i class="fas fa-clipboard-list"></i>
+                        Detalhes do Chamado
+                    </h2>
+                </div>
+                <div class="nn-card-body">
                     <div class="row">
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label">Categoria *</label>
-                            <select class="form-select" name="categoria" id="categoria" required>
-                                <option value="">-- Selecione --</option>
-                                <?php foreach ($categorias as $cat => $subcats): ?>
-                                    <optgroup label="<?php echo htmlspecialchars($cat); ?>">
-                                        <?php foreach ($subcats as $subcat): ?>
-                                            <option value="<?php echo htmlspecialchars($cat . ' - ' . $subcat); ?>">
-                                                <?php echo htmlspecialchars($subcat); ?>
-                                            </option>
-                                        <?php endforeach; ?>
-                                    </optgroup>
-                                <?php endforeach; ?>
-                            </select>
+                        <div class="col-md-6">
+                            <div class="nn-form-group">
+                                <label class="nn-form-label" for="categoria_id">Categoria *</label>
+                                <select class="nn-form-control" name="categoria_id" id="categoria_id" required>
+                                    <option value="">-- Selecione --</option>
+                                    <?php foreach ($categorias as $cat): ?>
+                                        <option value="<?php echo $cat['id']; ?>">
+                                            <?php echo htmlspecialchars($cat['nome']); ?>
+                                        </option>
+                                    <?php endforeach; ?>
+                                </select>
+                            </div>
                         </div>
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label">Técnico Responsável</label>
-                            <select class="form-select" name="tecnico_id" id="tecnico_id">
-                                <option value="">-- Atribuição automática --</option>
-                                <?php foreach ($tecnicos as $tecnico): ?>
-                                    <option value="<?php echo $tecnico['id']; ?>">
-                                        <?php echo htmlspecialchars($tecnico['nome']); ?>
-                                    </option>
-                                <?php endforeach; ?>
-                            </select>
+                        <div class="col-md-6">
+                            <div class="nn-form-group">
+                                <label class="nn-form-label" for="tecnico_id">Técnico Responsável</label>
+                                <select class="nn-form-control" name="tecnico_id" id="tecnico_id">
+                                    <option value="">-- Atribuição automática --</option>
+                                    <?php foreach ($tecnicos as $tecnico): ?>
+                                        <option value="<?php echo $tecnico['id']; ?>">
+                                            <?php echo htmlspecialchars($tecnico['nome']); ?>
+                                        </option>
+                                    <?php endforeach; ?>
+                                </select>
+                            </div>
                         </div>
                     </div>
 
-                    <div class="mb-3">
-                        <label class="form-label">Título do Chamado *</label>
-                        <input type="text" class="form-control" name="titulo" required maxlength="255"
+                    <div class="nn-form-group">
+                        <label class="nn-form-label" for="titulo">Título do Chamado *</label>
+                        <input type="text" class="nn-form-control" name="titulo" id="titulo" required maxlength="255"
                                placeholder="Ex: Computador não liga após queda de energia">
                     </div>
 
-                    <div class="mb-3">
-                        <label class="form-label">Descrição do Problema *</label>
-                        <textarea class="form-control" name="descricao" rows="5" required maxlength="5000"
+                    <div class="nn-form-group">
+                        <label class="nn-form-label" for="descricao">Descrição do Problema *</label>
+                        <textarea class="nn-form-control" name="descricao" id="descricao" rows="5" required maxlength="5000"
                                   placeholder="Descreva o problema detalhadamente..."></textarea>
                     </div>
                 </div>
+            </div>
 
-                <div class="form-card mb-4">
-                    <div class="section-title"><i class="fas fa-exclamation-triangle me-2"></i>Prioridade</div>
-
+            <div class="nn-card">
+                <div class="nn-card-header">
+                    <h2 class="nn-card-title">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        Prioridade
+                    </h2>
+                </div>
+                <div class="nn-card-body">
                     <div class="row">
-                        <div class="col-md-3 col-6 mb-3">
-                            <label class="prioridade-card">
+                        <div class="col-md-3 col-6">
+                            <label class="nn-prioridade-card">
                                 <input type="radio" name="prioridade" value="baixa">
-                                <div class="prioridade-icon text-success">🟢</div>
-                                <div class="fw-bold">Baixa</div>
-                                <small class="text-muted">Pode aguardar</small>
+                                <div class="nn-prioridade-icon">🟢</div>
+                                <div style="font-weight: 700;">Baixa</div>
+                                <small class="nn-text-light">Pode aguardar</small>
                             </label>
                         </div>
-                        <div class="col-md-3 col-6 mb-3">
-                            <label class="prioridade-card selected">
+                        <div class="col-md-3 col-6">
+                            <label class="nn-prioridade-card selected">
                                 <input type="radio" name="prioridade" value="media" checked>
-                                <div class="prioridade-icon text-warning">🟡</div>
-                                <div class="fw-bold">Média</div>
-                                <small class="text-muted">Normal</small>
+                                <div class="nn-prioridade-icon">🟡</div>
+                                <div style="font-weight: 700;">Média</div>
+                                <small class="nn-text-light">Normal</small>
                             </label>
                         </div>
-                        <div class="col-md-3 col-6 mb-3">
-                            <label class="prioridade-card">
+                        <div class="col-md-3 col-6">
+                            <label class="nn-prioridade-card">
                                 <input type="radio" name="prioridade" value="alta">
-                                <div class="prioridade-icon text-danger">🔴</div>
-                                <div class="fw-bold">Alta</div>
-                                <small class="text-muted">Urgente</small>
+                                <div class="nn-prioridade-icon">🔴</div>
+                                <div style="font-weight: 700;">Alta</div>
+                                <small class="nn-text-light">Urgente</small>
                             </label>
                         </div>
-                        <div class="col-md-3 col-6 mb-3">
-                            <label class="prioridade-card">
+                        <div class="col-md-3 col-6">
+                            <label class="nn-prioridade-card">
                                 <input type="radio" name="prioridade" value="critica">
-                                <div class="prioridade-icon">⚫</div>
-                                <div class="fw-bold">Crítica</div>
-                                <small class="text-muted">Impede trabalho</small>
+                                <div class="nn-prioridade-icon">⚫</div>
+                                <div style="font-weight: 700;">Crítica</div>
+                                <small class="nn-text-light">Impede trabalho</small>
                             </label>
                         </div>
                     </div>
                 </div>
+            </div>
 
-                <div class="form-card mb-4">
-                    <div class="section-title"><i class="fas fa-paperclip me-2"></i>Anexos (opcional)</div>
-
-                    <div class="drop-zone" id="dropZone" onclick="document.getElementById('anexos').click()">
-                        <i class="fas fa-cloud-upload-alt fa-3x text-muted mb-3"></i>
-                        <p class="mb-1">Arraste arquivos aqui ou clique para selecionar</p>
-                        <small class="text-muted">Imagens, PDFs, DOC (máx. 10MB cada)</small>
+            <div class="nn-card">
+                <div class="nn-card-header">
+                    <h2 class="nn-card-title">
+                        <i class="fas fa-paperclip"></i>
+                        Anexos (opcional)
+                    </h2>
+                </div>
+                <div class="nn-card-body">
+                    <div class="nn-drop-zone" id="dropZone" onclick="document.getElementById('anexos').click()">
+                        <i class="fas fa-cloud-upload-alt" style="font-size: 2.5rem; margin-bottom: 10px; color: var(--text-light);"></i>
+                        <p>Arraste arquivos aqui ou clique para selecionar</p>
+                        <small class="nn-text-light">Imagens, PDFs, DOC (máx. 10MB cada)</small>
                     </div>
                     <input type="file" name="anexos[]" id="anexos" multiple accept="image/*,.pdf,.doc,.docx,.txt" style="display: none">
-                    <div class="file-list" id="fileList"></div>
+                    <div id="fileList" class="nn-mt-2"></div>
                 </div>
+            </div>
 
-                <div class="d-flex justify-content-between">
-                    <a href="dashboard.php" class="btn btn-outline-secondary btn-lg">
-                        <i class="fas fa-arrow-left me-2"></i>Voltar
-                    </a>
-                    <button type="submit" class="btn btn-warning btn-lg">
-                        <i class="fas fa-paper-plane me-2"></i>Criar Chamado
-                    </button>
-                </div>
-            </form>
-        </div>
+            <div class="nn-d-flex nn-justify-between">
+                <a href="dashboard.php" class="nn-btn nn-btn-secondary nn-btn-lg">
+                    <i class="fas fa-arrow-left"></i>
+                    Voltar
+                </a>
+                <button type="submit" class="nn-btn nn-btn-primary nn-btn-lg">
+                    <i class="fas fa-paper-plane"></i>
+                    Criar Chamado
+                </button>
+            </div>
+        </form>
+
     </div>
+</div>
 
-    <script>
-        function toggleCliente(tipo) {
-            document.getElementById('tipo_cliente').value = tipo;
+<?php
+$extra_js = '<script>
+    function toggleCliente(tipo) {
+        document.getElementById("tipo_cliente").value = tipo;
 
-            document.querySelectorAll('.cliente-toggle .btn').forEach(btn => btn.classList.remove('active'));
-            event.target.closest('.btn').classList.add('active');
+        document.querySelectorAll(".nn-cliente-toggle .nn-btn").forEach(function (btn) { btn.classList.remove("active"); });
+        event.target.closest(".nn-btn").classList.add("active");
 
-            document.getElementById('cliente-novo').classList.remove('active');
-            document.getElementById('cliente-existente').classList.remove('active');
-            document.getElementById('cliente-' + tipo).classList.add('active');
+        document.getElementById("cliente-novo").classList.remove("active");
+        document.getElementById("cliente-existente").classList.remove("active");
+        document.getElementById("cliente-" + tipo).classList.add("active");
 
-            // Ajustar required
-            if (tipo === 'novo') {
-                document.getElementById('cliente_nome').required = true;
-                document.getElementById('cliente_telefone').required = true;
-                document.getElementById('cliente_id').required = false;
-            } else {
-                document.getElementById('cliente_nome').required = false;
-                document.getElementById('cliente_telefone').required = false;
-                document.getElementById('cliente_id').required = true;
-            }
+        if (tipo === "novo") {
+            document.getElementById("cliente_nome").required = true;
+            document.getElementById("cliente_telefone").required = true;
+            document.getElementById("cliente_busca").required = false;
+        } else {
+            document.getElementById("cliente_nome").required = false;
+            document.getElementById("cliente_telefone").required = false;
+            document.getElementById("cliente_busca").required = true;
+        }
+    }
+
+    // Busca de cliente com autocomplete (mínimo 3 letras)
+    var buscaInput = document.getElementById("cliente_busca");
+    var resultadosDiv = document.getElementById("cliente-resultados");
+    var clienteIdInput = document.getElementById("cliente_id");
+    var infoDiv = document.getElementById("cliente-info");
+    var buscaTimeout = null;
+
+    buscaInput.addEventListener("input", function () {
+        var termo = this.value.trim();
+        clienteIdInput.value = "";
+        infoDiv.style.display = "none";
+
+        clearTimeout(buscaTimeout);
+
+        if (termo.length < 3) {
+            resultadosDiv.innerHTML = "";
+            resultadosDiv.style.display = "none";
+            return;
         }
 
-        // Mostrar info do cliente selecionado
-        document.getElementById('cliente_id').addEventListener('change', function() {
-            const selected = this.options[this.selectedIndex];
-            const infoDiv = document.getElementById('cliente-info');
+        buscaTimeout = setTimeout(function () {
+            fetch("buscar_clientes.php?termo=" + encodeURIComponent(termo))
+                .then(function (res) { return res.json(); })
+                .then(function (clientes) {
+                    resultadosDiv.innerHTML = "";
+                    resultadosDiv.style.display = clientes.length ? "block" : "none";
+                    clientes.forEach(function (cliente) {
+                        var item = document.createElement("button");
+                        item.type = "button";
+                        item.className = "nn-btn nn-btn-secondary";
+                        item.style.cssText = "width:100%; justify-content:flex-start; border-radius:0; text-align:left;";
+                        item.textContent = cliente.nome + (cliente.email ? " - " + cliente.email : "");
+                        item.addEventListener("click", function () {
+                            clienteIdInput.value = cliente.id;
+                            buscaInput.value = cliente.nome;
+                            resultadosDiv.innerHTML = "";
+                            resultadosDiv.style.display = "none";
 
-            if (this.value) {
-                document.getElementById('info-email').textContent = selected.dataset.email || 'Não informado';
-                document.getElementById('info-telefone').textContent = selected.dataset.telefone || 'Não informado';
-                infoDiv.classList.remove('d-none');
-            } else {
-                infoDiv.classList.add('d-none');
-            }
+                            document.getElementById("info-nome").textContent = cliente.nome;
+                            document.getElementById("info-email").textContent = cliente.email || "Não informado";
+                            document.getElementById("info-telefone").textContent = cliente.telefone || "Não informado";
+                            infoDiv.style.display = "block";
+                        });
+                        resultadosDiv.appendChild(item);
+                    });
+                });
+        }, 300);
+    });
+
+    // Prioridade cards
+    document.querySelectorAll(".nn-prioridade-card").forEach(function (card) {
+        card.addEventListener("click", function () {
+            document.querySelectorAll(".nn-prioridade-card").forEach(function (c) { c.classList.remove("selected"); });
+            this.classList.add("selected");
         });
+    });
 
-        // Prioridade cards
-        document.querySelectorAll('.prioridade-card').forEach(card => {
-            card.addEventListener('click', function() {
-                document.querySelectorAll('.prioridade-card').forEach(c => c.classList.remove('selected'));
-                this.classList.add('selected');
-            });
+    // Drop zone
+    var dropZone = document.getElementById("dropZone");
+    var fileInput = document.getElementById("anexos");
+    var fileList = document.getElementById("fileList");
+
+    ["dragenter", "dragover", "dragleave", "drop"].forEach(function (eventName) {
+        dropZone.addEventListener(eventName, preventDefaults, false);
+    });
+
+    function preventDefaults(e) {
+        e.preventDefault();
+        e.stopPropagation();
+    }
+
+    ["dragenter", "dragover"].forEach(function (eventName) {
+        dropZone.addEventListener(eventName, function () { dropZone.classList.add("dragover"); });
+    });
+
+    ["dragleave", "drop"].forEach(function (eventName) {
+        dropZone.addEventListener(eventName, function () { dropZone.classList.remove("dragover"); });
+    });
+
+    dropZone.addEventListener("drop", function (e) {
+        fileInput.files = e.dataTransfer.files;
+        updateFileList();
+    });
+
+    fileInput.addEventListener("change", updateFileList);
+
+    function updateFileList() {
+        fileList.innerHTML = "";
+        Array.from(fileInput.files).forEach(function (file) {
+            var div = document.createElement("div");
+            div.className = "nn-file-item-simple";
+            div.innerHTML = "<span><i class=\\"fas fa-file\\"></i> " + file.name + " (" + (file.size / 1024).toFixed(1) + " KB)</span>";
+            fileList.appendChild(div);
         });
-
-        // Drop zone
-        const dropZone = document.getElementById('dropZone');
-        const fileInput = document.getElementById('anexos');
-        const fileList = document.getElementById('fileList');
-
-        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
-            dropZone.addEventListener(eventName, preventDefaults, false);
-        });
-
-        function preventDefaults(e) {
-            e.preventDefault();
-            e.stopPropagation();
-        }
-
-        ['dragenter', 'dragover'].forEach(eventName => {
-            dropZone.addEventListener(eventName, () => dropZone.classList.add('dragover'));
-        });
-
-        ['dragleave', 'drop'].forEach(eventName => {
-            dropZone.addEventListener(eventName, () => dropZone.classList.remove('dragover'));
-        });
-
-        dropZone.addEventListener('drop', function(e) {
-            fileInput.files = e.dataTransfer.files;
-            updateFileList();
-        });
-
-        fileInput.addEventListener('change', updateFileList);
-
-        function updateFileList() {
-            fileList.innerHTML = '';
-            Array.from(fileInput.files).forEach((file, index) => {
-                const div = document.createElement('div');
-                div.className = 'file-item';
-                div.innerHTML = `
-                    <span><i class="fas fa-file me-2"></i>${file.name} (${(file.size / 1024).toFixed(1)} KB)</span>
-                `;
-                fileList.appendChild(div);
-            });
-        }
-    </script>
-</body>
-</html>
+    }
+</script>';
+require_once '../includes/footer.php';
+?>

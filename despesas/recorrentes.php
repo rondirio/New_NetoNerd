@@ -1,6 +1,11 @@
 <?php
 session_start();
+require_once 'classes/Auth.php';
 require_once 'classes/Despesa.php';
+
+$auth = new Auth();
+$auth->protegerPagina();
+$usuarioId = $auth->getUsuarioId();
 
 $despesa = new Despesa();
 
@@ -21,7 +26,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     break;
                     
                 case 'remover_recorrencia':
-                    $despesa->removerRecorrencia($_POST['id']);
+                    // Verifica se a despesa pertence ao usuário antes de remover
+                    $despOwner = $despesa->buscarPorId(intval($_POST['id']), $usuarioId);
+                    if (!$despOwner) {
+                        throw new Exception("Despesa não encontrada ou sem permissão.");
+                    }
+                    $despesa->removerRecorrencia(intval($_POST['id']));
                     $_SESSION['mensagem'] = 'Recorrência removida com sucesso!';
                     $_SESSION['tipo_mensagem'] = 'success';
                     break;
@@ -35,8 +45,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 
-// Buscar despesas recorrentes
-$recorrentes = $despesa->listarRecorrentes();
+// Buscar despesas recorrentes do usuário autenticado
+$recorrentes = $despesa->listarRecorrentes($usuarioId);
 
 $titulo = 'Despesas Recorrentes';
 require_once 'includes/header.php';
@@ -53,6 +63,7 @@ require_once 'includes/header.php';
                     ⚡ Gerar Próximo Mês
                 </button>
             </form>
+            <a href="logout.php" class="btn btn-danger" onclick="return confirm('Deseja sair do sistema?')">⏻ Sair</a>
         </div>
     </header>
     

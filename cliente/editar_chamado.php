@@ -1,13 +1,10 @@
 <?php
-session_start();
-require 'bandoDeDados/conexao.php';
+require_once '../controller/auth_middleware.php';
+require_once '../config/bandoDeDados/conexao.php';
+
+requireCliente();
 
 $conn = getConnection();
-
-// Verifica se o usuário está autenticado
-if (!isset($_SESSION['id'])) {
-    die("Usuário não autenticado.");
-}
 
 // Verifica se o ID do chamado foi enviado via GET
 if (!isset($_GET['id']) || empty($_GET['id'])) {
@@ -30,45 +27,67 @@ if (!$chamado) {
 
 $stmt->close();
 $conn->close();
+
+$page_title = "Editar Chamado - NetoNerd ITSM";
+require_once '../includes/header.php';
 ?>
 
-<!DOCTYPE html>
-<html lang="pt-br">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Editar Chamado</title>
-    <link rel="stylesheet" href="estilos.css">
-</head>
-<body>
-    <h2>Editar Chamado</h2>
-    <form action="salvar_edicao.php" method="POST">
-        <input type="hidden" name="id" value="<?= $chamado_id ?>">
+<div class="nn-main-wrapper">
+    <div class="nn-content nn-content-full">
 
-        <label for="titulo">Título:</label>
-        <input type="text" name="titulo" value="<?= htmlspecialchars($chamado['titulo']) ?>" required>
+        <div class="nn-card nn-animate-fade">
+            <div class="nn-card-header">
+                <h1 class="nn-card-title">
+                    <i class="fas fa-edit"></i>
+                    Editar Chamado
+                </h1>
+            </div>
 
-        <label for="descricao">Descrição:</label>
-        <textarea name="descricao" required><?= htmlspecialchars($chamado['descricao']) ?></textarea>
+            <div class="nn-card-body">
+                <form action="salvar_edicao.php" method="POST">
+                    <?php echo csrfField(); ?>
+                    <input type="hidden" name="id" value="<?= htmlspecialchars($chamado_id) ?>">
 
-        <label for="prioridade">Prioridade:</label>
-        <select name="prioridade">
-            <option value="baixa" <?= $chamado['prioridade'] == 'baixa' ? 'selected' : '' ?>>Baixa</option>
-            <option value="media" <?= $chamado['prioridade'] == 'media' ? 'selected' : '' ?>>Média</option>
-            <option value="alta" <?= $chamado['prioridade'] == 'alta' ? 'selected' : '' ?>>Alta</option>
-            <option value="critica" <?= $chamado['prioridade'] == 'critica' ? 'selected' : '' ?>>Crítica</option>
-        </select>
+                    <div class="nn-form-group">
+                        <label class="nn-form-label" for="titulo">Título</label>
+                        <input type="text" id="titulo" name="titulo" class="nn-form-control" value="<?= htmlspecialchars($chamado['titulo']) ?>" required>
+                    </div>
 
-        <label for="status">Status:</label>
-        <select name="status">
-            <option value="aberto" <?= $chamado['status'] == 'aberto' ? 'selected' : '' ?>>Aberto</option>
-            <option value="em andamento" <?= $chamado['status'] == 'em andamento' ? 'selected' : '' ?>>Em Andamento</option>
-            <option value="pendente" <?= $chamado['status'] == 'pendente' ? 'selected' : '' ?>>Pendente</option>
-            <option value="resolvido" <?= $chamado['status'] == 'resolvido' ? 'selected' : '' ?>>Resolvido</option>
-            <option value="cancelado" <?= $chamado['status'] == 'cancelado' ? 'selected' : '' ?>>Cancelado</option>
-        </select>
+                    <div class="nn-form-group">
+                        <label class="nn-form-label" for="descricao">Descrição</label>
+                        <textarea id="descricao" name="descricao" class="nn-form-control" rows="5" required><?= htmlspecialchars($chamado['descricao']) ?></textarea>
+                    </div>
 
-        <button type="submit">Salvar Alterações</button>
-    </form>
-</body>
-</html>
+                    <div class="nn-form-group">
+                        <label class="nn-form-label" for="prioridade">Prioridade</label>
+                        <select id="prioridade" name="prioridade" class="nn-form-control">
+                            <option value="baixa" <?= $chamado['prioridade'] == 'baixa' ? 'selected' : '' ?>>Baixa</option>
+                            <option value="media" <?= $chamado['prioridade'] == 'media' ? 'selected' : '' ?>>Média</option>
+                            <option value="alta" <?= $chamado['prioridade'] == 'alta' ? 'selected' : '' ?>>Alta</option>
+                            <option value="critica" <?= $chamado['prioridade'] == 'critica' ? 'selected' : '' ?>>Crítica</option>
+                        </select>
+                    </div>
+
+                    <div class="nn-form-group">
+                        <label class="nn-form-label" for="status">Status</label>
+                        <select id="status" name="status" class="nn-form-control">
+                            <option value="aberto" <?= $chamado['status'] == 'aberto' ? 'selected' : '' ?>>Aberto</option>
+                            <option value="em andamento" <?= $chamado['status'] == 'em andamento' ? 'selected' : '' ?>>Em Andamento</option>
+                            <option value="pendente" <?= $chamado['status'] == 'pendente' ? 'selected' : '' ?>>Pendente</option>
+                            <option value="resolvido" <?= $chamado['status'] == 'resolvido' ? 'selected' : '' ?>>Resolvido</option>
+                            <option value="cancelado" <?= $chamado['status'] == 'cancelado' ? 'selected' : '' ?>>Cancelado</option>
+                        </select>
+                    </div>
+
+                    <button type="submit" class="nn-btn nn-btn-primary nn-btn-lg">
+                        <i class="fas fa-save"></i>
+                        Salvar Alterações
+                    </button>
+                </form>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<?php require_once '../includes/footer.php'; ?>

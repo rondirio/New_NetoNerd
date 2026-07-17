@@ -1,18 +1,29 @@
 <?php
 header('Content-Type: application/json; charset=utf-8');
-header('Access-Control-Allow-Origin: *');
-header('Access-Control-Allow-Methods: GET, POST');
 
+require_once __DIR__ . '/../classes/Auth.php';
 require_once __DIR__ . '/../classes/Despesa.php';
+
+// Autenticação obrigatória
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+$auth = new Auth();
+if (!$auth->verificarAutenticacao()) {
+    http_response_code(401);
+    echo json_encode(['success' => false, 'error' => 'Não autorizado.']);
+    exit;
+}
+$usuarioId = $auth->getUsuarioId();
 
 try {
     $despesa = new Despesa();
-    
+
     // Atualiza despesas vencidas
     $despesa->atualizarVencidas();
-    
-    // Busca boletos pendentes
-    $boletos = $despesa->boletosPendentes();
+
+    // Busca boletos pendentes do usuário autenticado
+    $boletos = $despesa->boletosPendentes($usuarioId);
     
     // Formata resposta
     $response = [

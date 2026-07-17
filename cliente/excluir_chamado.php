@@ -1,20 +1,23 @@
 <?php
-session_start();
-require 'bandoDeDados/conexao.php';
+require_once '../controller/auth_middleware.php';
+require_once '../config/bandoDeDados/conexao.php';
+
+requireCliente();
+
+if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+    die("Método inválido.");
+}
+
+requireCsrfToken();
 
 $conn = getConnection();
 
-// Verifica se o usuário está autenticado
-if (!isset($_SESSION['id'])) {
-    die("Usuário não autenticado.");
-}
-
-// Verifica se o ID do chamado foi enviado via GET
-if (!isset($_GET['id']) || empty($_GET['id'])) {
+// Verifica se o ID do chamado foi enviado via POST
+if (!isset($_POST['id']) || empty($_POST['id'])) {
     die("Chamado inválido.");
 }
 
-$chamado_id = $_GET['id'];
+$chamado_id = $_POST['id'];
 $usuario_id = $_SESSION['id'];
 
 // Verifica se o chamado pertence ao usuário logado antes de excluir

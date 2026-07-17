@@ -32,7 +32,7 @@ Crie o arquivo `includes/LicenseValidator.php` no seu projeto:
  */
 
 class LicenseValidator {
-    private $api_url = 'https://sistema.netonerd.com.br/api/validar_licenca.php';
+    private $api_url = 'https://sistema.netonerd.com.br.br/api/validar_licenca.php';
     private $config_file;
     private $cache_file;
 
@@ -393,7 +393,7 @@ if (!$resultado['valida']) {
         <h1 style="color: #dc3545;">🚫 Sistema Bloqueado</h1>
         <p>' . htmlspecialchars($resultado['mensagem']) . '</p>
         <p>Entre em contato com a NetoNerd:</p>
-        <p>📧 suporte@netonerd.com.br | 📱 (21) 97739-5867</p>
+        <p>📧 suporte@netonerd.com.br.br | 📱 (21) 97739-5867</p>
     </body>
     </html>
     ');
@@ -479,9 +479,9 @@ if (!$resultado['valida']) {
 
 Dúvidas na integração? Entre em contato:
 
-- 📧 **Email:** suporte@netonerd.com.br
+- 📧 **Email:** suporte@netonerd.com.br.br
 - 📱 **WhatsApp:** (21) 97739-5867
-- 🌐 **Site:** www.netonerd.com.br
+- 🌐 **Site:** www.netonerd.com.br.br
 
 ---
 

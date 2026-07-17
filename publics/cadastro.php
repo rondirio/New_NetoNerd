@@ -1,3 +1,4 @@
+<?php require_once __DIR__ . '/../controller/auth_middleware.php'; ?>
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -434,6 +435,7 @@
 
                 <!-- Formulário Multi-Etapas -->
                 <form action="../controller/processa_cadastro.php" method="POST" id="cadastroForm">
+                    <?php echo csrfField(); ?>
                     <!-- ETAPA 1: Dados Pessoais -->
                     <div class="form-step active" id="step-1">
                         <div class="form-group">

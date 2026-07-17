@@ -4,8 +4,8 @@
  * Sistema inteligente: vincula ou cadastra cliente automaticamente
  */
 require('../controller/configurar_log.php');
-session_start();
 require_once '../controller/auth_middleware.php';
+require_once '../controller/historico_chamados.php';
 require_once '../config/bandoDeDados/conexao.php';
 
 requireAdmin();
@@ -14,6 +14,8 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     header('Location: listar_ordens_servico.php?erro=metodo_invalido');
     exit();
 }
+
+requireCsrfToken();
 
 $conn = getConnection();
 
@@ -193,11 +195,21 @@ if ($stmt->execute()) {
 
     // Se veio de um chamado, atualizar status
     if ($chamado_id) {
+        $stmt_status = $conn->prepare("SELECT status FROM chamados WHERE id = ?");
+        $stmt_status->bind_param('i', $chamado_id);
+        $stmt_status->execute();
+        $status_anterior = $stmt_status->get_result()->fetch_assoc()['status'] ?? null;
+        $stmt_status->close();
+
         $sql_update = "UPDATE chamados SET status = 'em andamento' WHERE id = ?";
         $stmt_update = $conn->prepare($sql_update);
         $stmt_update->bind_param('i', $chamado_id);
         $stmt_update->execute();
         $stmt_update->close();
+
+        if ($status_anterior !== null && $status_anterior !== 'em andamento') {
+            registrarHistoricoStatus($conn, $chamado_id, $created_by, $status_anterior, 'em andamento', "Ordem de serviço #$numero_os aberta pelo admin");
+        }
     }
 
     $stmt->close();

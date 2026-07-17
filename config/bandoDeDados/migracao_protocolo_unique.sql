@@ -1,0 +1,31 @@
+-- ====================================================================
+-- MIGRAÇÃO: Correção pós-auditoria — UNIQUE em chamados.protocolo
+-- NetoNerd ITSM
+-- Data: 2026-07-15
+-- ====================================================================
+--
+-- Achado da auditoria das Fases 1-6 (revisão do docs/PLANO_DE_CORRECAO.md):
+-- BE1/BE8 foi descrito como "corrigido com transação", mas a geração de
+-- protocolo (cliente/registra_chamado.php, admin/abrir_chamado_admin.php)
+-- lê SELECT MAX(protocolo) sem FOR UPDATE. A transação evita corrupção
+-- parcial em caso de erro, mas não elimina a race condition sob
+-- concorrência real — duas requisições simultâneas podem gerar o mesmo
+-- protocolo. Esta migração adiciona a rede de segurança que faltava:
+-- se o lock otimista (FOR UPDATE, adicionado no PHP) ainda assim falhar,
+-- o INSERT duplicado é rejeitado pelo banco em vez de silenciosamente
+-- criar dois chamados com o mesmo protocolo.
+--
+-- Testar em cópia local do banco antes de aplicar em produção.
+-- ====================================================================
+
+-- A coluna já é `int(11)` (confirmado via SHOW CREATE TABLE, local e no
+-- dump de schema) e o valor gerado no PHP ("20260004", ano+sequência)
+-- cabe inteiro em int(11) sem truncar — o MySQL converte a string para
+-- inteiro na inserção. Não há necessidade de mudar o tipo da coluna,
+-- só de adicionar o UNIQUE.
+
+-- Antes de aplicar o UNIQUE, checar duplicados existentes:
+--   SELECT protocolo, COUNT(*) FROM chamados GROUP BY protocolo HAVING COUNT(*) > 1;
+-- Se houver duplicados, resolver manualmente (renumerar um dos registros)
+-- antes de rodar o ADD UNIQUE abaixo, ou o ALTER TABLE falha.
+ALTER TABLE `chamados` ADD UNIQUE INDEX `uniq_protocolo` (`protocolo`);

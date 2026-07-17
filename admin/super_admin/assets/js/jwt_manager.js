@@ -393,7 +393,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const API_BASE_URL = 'http://localhost/Super_admin_NetoNerd/api/jwt';
 
     // if it is in production ambient, include this later code:
-    // const API_BASE_URL = 'https://admin.netonerd.com/api/jwt';
+    // const API_BASE_URL = 'https://admin.netonerd.com.br/api/jwt';
     
     // Inicializar managers
     const jwtManager = new JWTManager(API_BASE_URL);

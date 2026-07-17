@@ -31,8 +31,8 @@ $contatos = [
         'tipo' => 'email',
         'icone' => 'fas fa-envelope',
         'titulo' => 'E-mail',
-        'valor' => 'contato@netonerd.com',
-        'link' => 'mailto:contato@netonerd.com',
+        'valor' => 'contato@netonerd.com.br',
+        'link' => 'mailto:contato@netonerd.com.br',
         'descricao' => 'Envie-nos um e-mail',
         'cor' => 'primary'
     ],

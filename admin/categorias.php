@@ -4,7 +4,6 @@
  * Gerenciamento de categorias de chamados
  */
 
-session_start();
 require_once '../controller/auth_middleware.php';
 require_once '../config/bandoDeDados/conexao.php';
 
@@ -24,7 +23,7 @@ $sql = "
     ORDER BY cat.nome ASC
 ";
 $result = $conn->query($sql);
-$categorias = $result->fetch_all(MYSQLI_ASSOC);
+$categorias = $result ? $result->fetch_all(MYSQLI_ASSOC) : [];
 
 $page_title = "Categorias - NetoNerd ITSM";
 require_once '../includes/header.php';
@@ -86,6 +85,7 @@ require_once '../includes/header.php';
                                             <i class="fas fa-edit"></i>
                                         </a>
                                         <form action="processar_categoria.php" method="POST" style="display:inline;" onsubmit="return confirm('Deseja realmente excluir esta categoria?');">
+                                            <?php echo csrfField(); ?>
                                             <input type="hidden" name="id" value="<?php echo $cat['id']; ?>">
                                             <input type="hidden" name="acao" value="excluir">
                                             <button type="submit" class="nn-btn nn-btn-danger nn-btn-sm">
@@ -121,27 +121,28 @@ require_once '../includes/header.php';
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
             </div>
             <form action="processar_categoria.php" method="POST">
+                <?php echo csrfField(); ?>
                 <input type="hidden" name="acao" value="criar">
                 <div class="modal-body">
                     <div class="nn-form-group">
-                        <label class="nn-form-label">Nome da Categoria *</label>
-                        <input type="text" name="nome" class="nn-form-control" required>
+                        <label class="nn-form-label" for="cat_nome">Nome da Categoria *</label>
+                        <input type="text" name="nome" id="cat_nome" class="nn-form-control" required>
                     </div>
                     <div class="nn-form-group">
-                        <label class="nn-form-label">Descrição</label>
-                        <textarea name="descricao" class="nn-form-control" rows="3"></textarea>
+                        <label class="nn-form-label" for="cat_descricao">Descrição</label>
+                        <textarea name="descricao" id="cat_descricao" class="nn-form-control" rows="3"></textarea>
                     </div>
                     <div class="row">
                         <div class="col-md-6">
                             <div class="nn-form-group">
-                                <label class="nn-form-label">Cor *</label>
-                                <input type="color" name="cor" class="nn-form-control" value="#007bff" required>
+                                <label class="nn-form-label" for="cat_cor">Cor *</label>
+                                <input type="color" name="cor" id="cat_cor" class="nn-form-control" value="#007bff" required>
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="nn-form-group">
-                                <label class="nn-form-label">Ícone (FontAwesome) *</label>
-                                <input type="text" name="icone" class="nn-form-control" placeholder="fa-tag" value="fa-tag" required>
+                                <label class="nn-form-label" for="cat_icone">Ícone (FontAwesome) *</label>
+                                <input type="text" name="icone" id="cat_icone" class="nn-form-control" placeholder="fa-tag" value="fa-tag" required>
                                 <small class="text-muted">Ex: fa-laptop, fa-network-wired, fa-bug</small>
                             </div>
                         </div>

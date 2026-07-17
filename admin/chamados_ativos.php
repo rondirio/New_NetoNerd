@@ -4,7 +4,6 @@
  * Listagem completa de todos os chamados com filtros avançados
  */
 
-session_start();
 require_once '../controller/auth_middleware.php';
 require_once '../config/bandoDeDados/conexao.php';
 
@@ -23,7 +22,7 @@ $filtro_status = $_GET['status'] ?? '';
 $filtro_prioridade = $_GET['prioridade'] ?? '';
 $filtro_categoria = $_GET['categoria'] ?? '';
 $filtro_tecnico = $_GET['tecnico'] ?? '';
-$busca = $_GET['busca'] ?? '';
+$busca = trim($_GET['busca'] ?? '');
 
 // Construir query com filtros
 $sql = "
@@ -31,14 +30,15 @@ $sql = "
         c.*,
         cl.nome as cliente_nome,
         cl.email as cliente_email,
-        t.nome as tecnico_nome,
-        t.matricula as tecnico_matricula,
+        COALESCE(t.nome, ta.nome) as tecnico_nome,
+        COALESCE(t.matricula, ta.matricula) as tecnico_matricula,
         cat.nome as categoria_nome,
         cat.cor as categoria_cor,
         cat.icone as categoria_icone
     FROM chamados c
     INNER JOIN clientes cl ON c.cliente_id = cl.id
     LEFT JOIN tecnicos t ON c.tecnico_id = t.id
+    LEFT JOIN admins ta ON c.tecnico_id = ta.id
     LEFT JOIN categorias_chamado cat ON c.categoria_id IS NOT NULL AND c.categoria_id = cat.id
     WHERE 1=1
 ";
@@ -85,6 +85,7 @@ $sql .= " ORDER BY
         WHEN 'alta' THEN 2
         WHEN 'media' THEN 3
         WHEN 'baixa' THEN 4
+        ELSE 5
     END,
     c.data_abertura DESC
 ";
@@ -153,11 +154,11 @@ require_once '../includes/header.php';
                         <!-- Busca por texto -->
                         <div class="col-md-4">
                             <div class="nn-form-group">
-                                <label class="nn-form-label">
+                                <label class="nn-form-label" for="filtro_busca">
                                     <i class="fas fa-search"></i>
                                     Buscar
                                 </label>
-                                <input type="text" name="busca" class="nn-form-control"
+                                <input type="text" name="busca" id="filtro_busca" class="nn-form-control"
                                        placeholder="Protocolo, título ou descrição..."
                                        value="<?php echo htmlspecialchars($busca); ?>">
                             </div>
@@ -166,11 +167,11 @@ require_once '../includes/header.php';
                         <!-- Filtro de Status -->
                         <div class="col-md-2">
                             <div class="nn-form-group">
-                                <label class="nn-form-label">
+                                <label class="nn-form-label" for="filtro_status">
                                     <i class="fas fa-info-circle"></i>
                                     Status
                                 </label>
-                                <select name="status" class="nn-form-control">
+                                <select name="status" id="filtro_status" class="nn-form-control">
                                     <option value="">Todos</option>
                                     <option value="aberto" <?php echo $filtro_status === 'aberto' ? 'selected' : ''; ?>>Aberto</option>
                                     <option value="em andamento" <?php echo $filtro_status === 'em andamento' ? 'selected' : ''; ?>>Em Andamento</option>
@@ -184,11 +185,11 @@ require_once '../includes/header.php';
                         <!-- Filtro de Prioridade -->
                         <div class="col-md-2">
                             <div class="nn-form-group">
-                                <label class="nn-form-label">
+                                <label class="nn-form-label" for="filtro_prioridade">
                                     <i class="fas fa-exclamation-triangle"></i>
                                     Prioridade
                                 </label>
-                                <select name="prioridade" class="nn-form-control">
+                                <select name="prioridade" id="filtro_prioridade" class="nn-form-control">
                                     <option value="">Todas</option>
                                     <option value="critica" <?php echo $filtro_prioridade === 'critica' ? 'selected' : ''; ?>>Crítica</option>
                                     <option value="alta" <?php echo $filtro_prioridade === 'alta' ? 'selected' : ''; ?>>Alta</option>
@@ -201,11 +202,11 @@ require_once '../includes/header.php';
                         <!-- Filtro de Categoria -->
                         <div class="col-md-2">
                             <div class="nn-form-group">
-                                <label class="nn-form-label">
+                                <label class="nn-form-label" for="filtro_categoria">
                                     <i class="fas fa-tag"></i>
                                     Categoria
                                 </label>
-                                <select name="categoria" class="nn-form-control">
+                                <select name="categoria" id="filtro_categoria" class="nn-form-control">
                                     <option value="">Todas</option>
                                     <?php
                                     $categorias->data_seek(0);
@@ -222,11 +223,11 @@ require_once '../includes/header.php';
                         <!-- Filtro de Técnico -->
                         <div class="col-md-2">
                             <div class="nn-form-group">
-                                <label class="nn-form-label">
+                                <label class="nn-form-label" for="filtro_tecnico">
                                     <i class="fas fa-user-cog"></i>
                                     Técnico
                                 </label>
-                                <select name="tecnico" class="nn-form-control">
+                                <select name="tecnico" id="filtro_tecnico" class="nn-form-control">
                                     <option value="">Todos</option>
                                     <?php
                                     $tecnicos->data_seek(0);

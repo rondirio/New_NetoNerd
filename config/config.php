@@ -118,8 +118,8 @@ class Config {
         return [
             'host' => self::get('DB_HOST', 'localhost'),
             'port' => self::get('DB_PORT', '3306'),
-            'name' => self::get('DB_NAME', 'netonerd_chamados'),
-            'username' => self::get('DB_USERNAME', 'root'),
+            'name' => self::get('DB_NAME', ''),
+            'username' => self::get('DB_USERNAME', ''),
             'password' => self::get('DB_PASSWORD', '')
         ];
     }
@@ -133,8 +133,8 @@ class Config {
         return [
             'host' => self::get('MAIL_HOST', 'smtp.hostinger.com'),
             'port' => self::get('MAIL_PORT', 465),
-            'username' => self::get('MAIL_USERNAME', 'contato@netonerd.com'),
-            'password' => self::get('MAIL_PASSWORD', 'NetoNerd@#$234'),
+            'username' => self::get('MAIL_USERNAME', ''),
+            'password' => self::get('MAIL_PASSWORD', ''),
             'from_email' => self::get('MAIL_FROM_EMAIL', 'noreply@netonerd.com.br'),
             'from_name' => self::get('MAIL_FROM_NAME', 'NetoNerd Suporte'),
             'encryption' => self::get('MAIL_ENCRYPTION', 'tls')
