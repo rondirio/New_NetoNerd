@@ -267,7 +267,7 @@
         <img class="logo" src="../src/imagens/logoNetoNerd.jpg" alt="Logo NetoNerd">
       </a>
       <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav">
-        <span style="color: white;">☰</span>
+        <span style="color: #007bff; font-size: 1.5rem;">☰</span>
       </button>
       <div class="collapse navbar-collapse" id="navbarNav">
         <ul class="navbar-nav ml-auto">
@@ -297,27 +297,9 @@
         <div class="timeline-item">
           <div class="timeline-marker"></div>
           <div class="timeline-content">
-            <span class="timeline-year">2020</span>
-            <h4>O Começo</h4>
-            <p>Rondineli Oliveira, formado em Ciência da Computação, identifica a necessidade de suporte tecnológico para pessoas idosas em Teresópolis-RJ. Nasce a ideia da NetoNerd.</p>
-          </div>
-        </div>
-
-        <div class="timeline-item">
-          <div class="timeline-marker"></div>
-          <div class="timeline-content">
-            <span class="timeline-year">2021</span>
-            <h4>Expansão</h4>
-            <p>O projeto cresce além do público idoso, atendendo jovens e empresas. A Four_BA é fundada com quatro sócios em parceria com a UNIFESO.</p>
-          </div>
-        </div>
-
-        <div class="timeline-item">
-          <div class="timeline-marker"></div>
-          <div class="timeline-content">
             <span class="timeline-year">2022</span>
-            <h4>Consolidação</h4>
-            <p>NetoNerd se torna a marca principal. Rondineli assume como sócio majoritário e CEO, direcionando a empresa para soluções corporativas.</p>
+            <h4>O Começo: Four_BA</h4>
+            <p>Rondineli Oliveira e três colegas da faculdade de Ciência da Computação fundam a Four_BA, com o objetivo de levar suporte tecnológico a pessoas idosas em Teresópolis-RJ. O primeiro cliente foi um senhor que precisava refatorar o site da própria empresa.</p>
           </div>
         </div>
 
@@ -325,17 +307,17 @@
           <div class="timeline-marker"></div>
           <div class="timeline-content">
             <span class="timeline-year">2023</span>
-            <h4>Inovação</h4>
-            <p>Lançamento dos primeiros produtos próprios: MyHealth (gestão hospitalar) e Escritorius (gestão jurídica). Início do desenvolvimento de soluções SaaS.</p>
+            <h4>Nasce a NetoNerd</h4>
+            <p>Os demais sócios da Four_BA optam por seguir como funcionários, não como empresários, e deixam a sociedade. Rondineli assume como sócio único e funda a NetoNerd, dando continuidade ao suporte técnico e iniciando o desenvolvimento de sistemas próprios.</p>
           </div>
         </div>
 
         <div class="timeline-item">
           <div class="timeline-marker"></div>
           <div class="timeline-content">
-            <span class="timeline-year">2024</span>
-            <h4>Crescimento</h4>
-            <p>Expansão da carteira de produtos com Style Manager. Mais de 500 clientes atendidos. Estabelecimento como referência em soluções tecnológicas na região.</p>
+            <span class="timeline-year">2023-2024</span>
+            <h4>MyHealth: do TCC à prática</h4>
+            <p>O MyHealth nasce como Trabalho de Conclusão de Curso de Rondineli: um sistema de prontuário eletrônico unificado. O projeto segue em desenvolvimento e validação, com o cuidado adicional que a área da saúde exige antes de qualquer uso em produção.</p>
           </div>
         </div>
 
@@ -343,8 +325,8 @@
           <div class="timeline-marker"></div>
           <div class="timeline-content">
             <span class="timeline-year">2025</span>
-            <h4>Consolidação</h4>
-            <p>Com a consolidação em Teresópolis. A expansão foi rápida para Araruama e Saquarema</p>
+            <h4>Escritorius e Despesas</h4>
+            <p>Desenvolvimento do Escritorius, sistema de gestão para escritórios de advocacia. Também nasce o Despesas, criado a partir de uma necessidade real de organização financeira da própria família de Rondineli.</p>
           </div>
         </div>
 
@@ -352,8 +334,8 @@
           <div class="timeline-marker"></div>
           <div class="timeline-content">
             <span class="timeline-year">2026</span>
-            <h4>Região dos Lagos</h4>
-            <p>Surge o primeiro escritório fisico da NetoNerd, em Araruama.</p>
+            <h4>Style Manager no ar</h4>
+            <p>Lançamento do Style Manager, sistema de gestão para salões e barbearias — o primeiro produto próprio da NetoNerd totalmente disponível para venda, com site e aplicativo mobile. O suporte técnico em Teresópolis segue como atividade principal da empresa, enquanto MyHealth e Escritorius avançam em desenvolvimento e testes.</p>
           </div>
         </div>
       </div>

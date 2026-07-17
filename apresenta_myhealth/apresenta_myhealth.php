@@ -84,6 +84,32 @@
 
         .nav-cta:hover { background: var(--blue-dark); color: var(--white) !important; }
 
+        .navbar-toggle {
+            display: none;
+            flex-direction: column;
+            justify-content: center;
+            gap: 5px;
+            width: 40px;
+            height: 40px;
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            padding: 0;
+        }
+
+        .navbar-toggle span {
+            display: block;
+            width: 24px;
+            height: 2px;
+            background: var(--blue);
+            border-radius: 2px;
+            transition: transform .25s, opacity .25s;
+        }
+
+        .navbar-toggle.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+        .navbar-toggle.open span:nth-child(2) { opacity: 0; }
+        .navbar-toggle.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+
         /* ── HERO ────────────────────────────────────── */
         .hero {
             background: linear-gradient(135deg, var(--blue) 0%, var(--blue-dark) 100%);
@@ -679,7 +705,52 @@
         /* ── RESPONSIVE ──────────────────────────────── */
         @media (max-width: 768px) {
             .navbar { padding: 0 18px; }
-            .navbar-links { display: none; }
+
+            .navbar-toggle { display: flex; }
+
+            .navbar-links {
+                position: absolute;
+                top: 64px;
+                left: 0;
+                right: 0;
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 0;
+                background: var(--white);
+                border-bottom: 1px solid var(--gray-200);
+                box-shadow: 0 12px 24px rgba(0,0,0,.08);
+                max-height: 0;
+                overflow: hidden;
+                opacity: 0;
+                transition: max-height .3s ease, opacity .25s ease;
+            }
+
+            .navbar-links.open {
+                max-height: 400px;
+                opacity: 1;
+            }
+
+            .navbar-links li {
+                width: 100%;
+                padding: 0 18px;
+            }
+
+            .navbar-links li a {
+                display: block;
+                padding: 14px 0;
+                width: 100%;
+                border-bottom: 1px solid var(--gray-100);
+            }
+
+            .navbar-links li:last-child a {
+                border-bottom: none;
+            }
+
+            .navbar-links .nav-cta {
+                margin: 12px 0;
+                text-align: center;
+            }
+
             .hero { padding: 80px 16px 50px; }
             .footer-inner { grid-template-columns: 1fr; gap: 28px; }
             .pricing-card.featured { transform: none; }
@@ -693,24 +764,29 @@
     <a href="#inicio" class="navbar-brand">
         MyHealth<span class="dot"></span>
     </a>
-    <ul class="navbar-links">
+    <ul class="navbar-links" id="navbarLinks">
         <li><a href="#problema">O Problema</a></li>
         <li><a href="#solucao">Solução</a></li>
         <li><a href="#demo">Demonstração</a></li>
         <li><a href="#planos">Planos</a></li>
         <li><a href="#contato" class="nav-cta">Falar Conosco</a></li>
     </ul>
+    <button type="button" class="navbar-toggle" id="navbarToggle" aria-label="Abrir menu de navegação" aria-expanded="false" aria-controls="navbarLinks">
+        <span></span>
+        <span></span>
+        <span></span>
+    </button>
 </nav>
 
 <!-- ── HERO ───────────────────────────────────────────── -->
 <section class="hero" id="inicio">
     <div class="hero-content">
-        <div class="hero-badge">🏥 Prontuário Eletrônico Unificado</div>
+        <div class="hero-badge">🏥 Prontuário Eletrônico Unificado · Em Desenvolvimento</div>
         <h1>Prontuário completo.<br><span>Na hora que importa.</span></h1>
-        <p>MyHealth conecta pacientes e profissionais de saúde em um histórico médico centralizado, acessível de qualquer ponto de atendimento, em tempo real.</p>
+        <p>MyHealth conecta pacientes e profissionais de saúde em um histórico médico centralizado, acessível de qualquer ponto de atendimento, em tempo real. O projeto nasceu como TCC e segue em desenvolvimento e validação antes do uso em produção por hospitais e clínicas.</p>
         <div class="hero-buttons">
             <a href="#demo" class="btn-primary-hero">Ver Demonstração</a>
-            <a href="#contato" class="btn-outline-hero">Agendar Reunião</a>
+            <a href="#contato" class="btn-outline-hero">Quero ser Avisado do Lançamento</a>
         </div>
         <div class="hero-tags">
             <span class="hero-tag">✅ Conforme LGPD</span>
@@ -1032,7 +1108,7 @@
     <div class="section-inner" style="text-align:center;">
         <span class="section-label">Planos</span>
         <h2 class="section-title">Planos que <span class="accent">crescem com você</span></h2>
-        <p class="section-sub" style="margin:0 auto;">Todos os planos incluem atualizações, onboarding e suporte técnico. Sem taxa de adesão.</p>
+        <p class="section-sub" style="margin:0 auto;">Estrutura de planos prevista para o lançamento. O MyHealth ainda está em desenvolvimento — os valores abaixo são uma referência e podem ser ajustados.</p>
 
         <div class="pricing-grid" style="grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));">
             <div class="pricing-card">
@@ -1046,7 +1122,7 @@
                     <li>Agendamento incluso</li>
                     <li>Relatórios básicos</li>
                 </ul>
-                <a href="#contato" class="pricing-btn outline">Começar</a>
+                <a href="#contato" class="pricing-btn outline">Quero ser Avisado</a>
             </div>
 
             <div class="pricing-card">
@@ -1060,7 +1136,7 @@
                     <li>Relatórios avançados</li>
                     <li>Agendamento incluso</li>
                 </ul>
-                <a href="#contato" class="pricing-btn outline">Solicitar Demo</a>
+                <a href="#contato" class="pricing-btn outline">Quero ser Avisado</a>
             </div>
 
             <div class="pricing-card featured">
@@ -1076,7 +1152,7 @@
                     <li>Relatórios avançados</li>
                     <li>Todas as 11 especialidades</li>
                 </ul>
-                <a href="#contato" class="pricing-btn">Plano Recomendado</a>
+                <a href="#contato" class="pricing-btn">Quero ser Avisado</a>
             </div>
 
             <div class="pricing-card">
@@ -1091,7 +1167,7 @@
                     <li>Relatórios completos</li>
                     <li>Suporte prioritário</li>
                 </ul>
-                <a href="#contato" class="pricing-btn outline">Falar com Consultor</a>
+                <a href="#contato" class="pricing-btn outline">Falar com a Equipe</a>
             </div>
         </div>
     </div>
@@ -1100,9 +1176,9 @@
 <!-- ── CTA FINAL ──────────────────────────────────────── -->
 <section class="cta-section" id="contato">
     <h2>Transforme o atendimento<br>da sua instituição</h2>
-    <p>Agende uma demonstração personalizada e veja o MyHealth funcionando com os dados da sua clínica.</p>
+    <p>O MyHealth está em desenvolvimento e validação. Entre em contato para acompanhar o andamento e ser avisado assim que estiver disponível.</p>
     <div class="cta-buttons">
-        <a href="mailto:contato@netonerd.com.br" class="btn-white">📧 Agendar Demonstração</a>
+        <a href="mailto:contato@netonerd.com.br" class="btn-white">📧 Quero ser Avisado</a>
         <a href="https://wa.me/5521977395867" class="btn-whatsapp" target="_blank" rel="noopener">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
             WhatsApp
@@ -1148,6 +1224,28 @@
         document.getElementById('demo-' + id).classList.add('active');
         if (e && e.target) e.target.classList.add('active');
     }
+
+    // Menu hambúrguer (mobile)
+    const navbarToggle = document.getElementById('navbarToggle');
+    const navbarLinks = document.getElementById('navbarLinks');
+
+    function closeMenu() {
+        navbarToggle.classList.remove('open');
+        navbarLinks.classList.remove('open');
+        navbarToggle.setAttribute('aria-expanded', 'false');
+    }
+
+    function toggleMenu() {
+        const isOpen = navbarLinks.classList.toggle('open');
+        navbarToggle.classList.toggle('open', isOpen);
+        navbarToggle.setAttribute('aria-expanded', String(isOpen));
+    }
+
+    navbarToggle.addEventListener('click', toggleMenu);
+    navbarLinks.querySelectorAll('a').forEach(a => a.addEventListener('click', closeMenu));
+    window.addEventListener('resize', () => {
+        if (window.innerWidth > 768) closeMenu();
+    });
 
     // Smooth scroll para links âncora
     document.querySelectorAll('a[href^="#"]').forEach(a => {

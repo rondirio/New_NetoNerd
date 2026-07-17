@@ -66,8 +66,8 @@ $_footerBase    = $_footerProto . '://' . $_SERVER['HTTP_HOST'] . $_footerRoot;
                     <div class="footer-section">
                         <h5 class="footer-title">Produtos</h5>
                         <ul class="footer-links">
-                            <li><a href="<?= $_footerBase ?>/publics/produtos.php?id=myhealth">MyHealth</a></li>
-                            <li><a href="<?= $_footerBase ?>/publics/produtos.php?id=escritorius">Escritorius</a></li>
+                            <li><a href="<?= $_footerBase ?>/apresenta_myhealth/apresenta_myhealth.php">MyHealth</a></li>
+                            <li><a href="<?= $_footerBase ?>/apresenta_escritorius/apresenta_escritorius.php">Escritorius</a></li>
                             <li><a href="<?= $_footerBase ?>/publics/produtos.php?id=stylemanager">Style Manager</a></li>
                             <li><a href="<?= $_footerBase ?>/publics/produtos.php?id=pj">NetoNerd PJ</a></li>
                         </ul>
@@ -88,9 +88,7 @@ $_footerBase    = $_footerProto . '://' . $_SERVER['HTTP_HOST'] . $_footerRoot;
                     <div class="footer-section">
                         <h5 class="footer-title">Contato</h5>
                         <ul class="footer-links" style="list-style: none; padding: 0;">
-                            <li><i class="fas fa-map-marker-alt"></i> Teresópolis</li>
-                            <li><i class="fas fa-map-marker-alt"></i> Araruama</li>
-                            <li><i class="fas fa-map-marker-alt"></i> Saquarema</li>
+                            <li><i class="fas fa-map-marker-alt"></i> Teresópolis - RJ</li>
                             <li><i class="fas fa-phone"></i> (21) 97739-5867</li>
                             <li><i class="fas fa-envelope"></i> netonerdinterno@gmail.com</li>
                             <li><i class="fas fa-clock"></i> Seg-Sex: 9h-18h</li>
@@ -100,7 +98,7 @@ $_footerBase    = $_footerProto . '://' . $_SERVER['HTTP_HOST'] . $_footerRoot;
                 </div>
             </div>
             <div class="footer-bottom">
-                <p>&copy; 2025 Neto Nerd Soluções Digitais LTDA. &mdash; CNPJ: 65.663.425/0001-26. Todos os direitos reservados.</p>
+                <p>&copy; 2026 NetoNerd &mdash; CNPJ: 65.663.425/0001-26. Todos os direitos reservados.</p>
                 <p class="mb-0">
                     <a href="<?= $_footerBase ?>/publics/termos.php" style="color: rgba(255,255,255,0.6); margin: 0 10px;">Termos de Uso</a> |
                     <a href="<?= $_footerBase ?>/publics/privacidade.php" style="color: rgba(255,255,255,0.6); margin: 0 10px;">Política de Privacidade</a>

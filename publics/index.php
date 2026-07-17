@@ -11,7 +11,7 @@ $_indexBase    = str_replace($_indexDocRoot, '', $_indexProjDir);
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>NetoNerd - Soluções Tecnológicas Profissionais</title>
-    <meta name="description" content="NetoNerd - Suporte técnico especializado, desenvolvimento de software e soluções digitais em Teresópolis-RJ, Araruama-RJ, Saquarema-RJ">
+    <meta name="description" content="NetoNerd - Suporte técnico especializado em Teresópolis-RJ e desenvolvimento de software para todo o Rio de Janeiro.">
     
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -436,7 +436,7 @@ $_indexBase    = str_replace($_indexDocRoot, '', $_indexProjDir);
                 <img class="logo" src="<?= $_indexBase ?>/src/imagens/logoNetoNerd.jpg" alt="Logo NetoNerd">
             </a>
             <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav">
-                <span class="navbar-toggler-icon" style="color: dark;">☰</span>
+                <span style="color: #007bff; font-size: 1.5rem;">☰</span>
             </button>
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav ml-auto">
@@ -472,7 +472,7 @@ $_indexBase    = str_replace($_indexDocRoot, '', $_indexProjDir);
                 <div class="col-lg-6 hero-content">
                     <h1 class="hero-title">Tecnologia que Transforma seu Negócio</h1>
                     <p class="hero-subtitle">
-                        Soluções completas em TI: suporte técnico especializado, desenvolvimento de software e consultoria tecnológica em Teresópolis, Araruama e Saquarema
+                        Suporte técnico especializado em Teresópolis e sistemas de gestão para empresas de todo o Rio de Janeiro
                     </p>
                     <div class="hero-buttons">
                         <a href="<?= $_indexBase ?>/publics/contato.php" class="btn btn-hero btn-hero-primary">
@@ -496,7 +496,7 @@ $_indexBase    = str_replace($_indexDocRoot, '', $_indexProjDir);
             <div class="row">
                 <div class="col-md-3 col-6">
                     <div class="stat-card">
-                        <div class="stat-number">300+</div>
+                        <div class="stat-number">500+</div>
                         <div class="stat-label">Clientes Atendidos</div>
                     </div>
                 </div>
@@ -508,16 +508,10 @@ $_indexBase    = str_replace($_indexDocRoot, '', $_indexProjDir);
                 </div>
                 <div class="col-md-3 col-6">
                     <div class="stat-card">
-                        <div class="stat-number">5 Anos</div>
+                        <div class="stat-number">4 Anos</div>
                         <div class="stat-label">de Experiência</div>
                     </div>
                 </div>
-                <!-- <div class="col-md-3 col-6">
-                    <div class="stat-card">
-                        <div class="stat-number">24/7</div>
-                        <div class="stat-label">Suporte Disponível</div>
-                    </div>
-                </div> -->
             </div>
         </div>
     </section>
@@ -565,27 +559,27 @@ $_indexBase    = str_replace($_indexDocRoot, '', $_indexProjDir);
                             <div class="produto-icon">
                                 <img src="<?= $_indexBase ?>/src/imagens/Logo_MyHealth.png" alt="MyHealth">
                             </div>
-                            <div class="produto-tagline">Prontuário Eletrônico Nacional</div>
+                            <div class="produto-tagline">Prontuário Eletrônico Unificado <span class="badge badge-warning">Em Desenvolvimento</span></div>
                         </div>
                         <div class="produto-body">
                             <p class="produto-descricao">
-                                <strong>Sistema completo de gestão hospitalar</strong> com prontuário eletrônico unificado. Hospitais, clínicas e médicos acessam o histórico completo do paciente instantaneamente, garantindo atendimento mais seguro.
+                                <strong>Sistema de gestão hospitalar</strong> com prontuário eletrônico unificado, em desenvolvimento e validação contínua antes do uso em produção por hospitais e clínicas.
                             </p>
                             <ul class="list-unstyled mb-3">
-                                <li><i class="fas fa-check text-success"></i> Acesso nacional ao histórico</li>
-                                <li><i class="fas fa-check text-success"></i> 100% compatível com LGPD</li>
-                                <li><i class="fas fa-check text-success"></i> Integração com CFM</li>
+                                <li><i class="fas fa-check text-success"></i> Histórico do paciente centralizado</li>
+                                <li><i class="fas fa-check text-success"></i> Desenvolvido com foco em LGPD</li>
+                                <li><i class="fas fa-check text-success"></i> Validação de CRM via API do CFM</li>
                                 <li><i class="fas fa-check text-success"></i> App para médicos e pacientes</li>
                             </ul>
                             <div class="produto-preco">
-                                <div class="preco-destaque">Sob Consulta</div>
-                                <small class="text-muted">Planos personalizados para sua instituição</small>
+                                <div class="preco-destaque">Em Breve</div>
+                                <small class="text-muted">Ainda em fase de desenvolvimento e testes</small>
                             </div>
                             <a href="<?= $_indexBase ?>/apresenta_myhealth/apresenta_myhealth.php" class="btn btn-primary btn-block">
                                 <i class="fas fa-info-circle"></i> Ver Detalhes
                             </a>
-                            <a href="contato.php?produto=myhealth" class="btn btn-outline-primary btn-block">
-                                <i class="fas fa-phone"></i> Solicitar Demonstração
+                            <a href="<?= $_indexBase ?>/publics/contato.php?produto=myhealth" class="btn btn-outline-primary btn-block">
+                                <i class="fas fa-envelope"></i> Quero ser Avisado do Lançamento
                             </a>
                         </div>
                     </div>
@@ -597,35 +591,31 @@ $_indexBase    = str_replace($_indexDocRoot, '', $_indexProjDir);
                             <div class="produto-icon">
                                 <img src="<?= $_indexBase ?>/src/imagens/Logo_Escritorius.png" alt="Escritorius" height="500">
                             </div>
-                            <div class="produto-tagline">Gestão para Escritórios de Advocacia</div>
+                            <div class="produto-tagline">Gestão para Escritórios de Advocacia <span class="badge badge-warning">Em Breve</span></div>
                         </div>
                         <div class="produto-body">
                             <p class="produto-descricao">
-                                <strong>Plataforma completa para advogados</strong> que gerencia processos, prazos, clientes, documentos e financeiro. Tudo integrado em uma interface intuitiva.
+                                <strong>Plataforma completa para advogados</strong> que gerencia processos, prazos, clientes, documentos e financeiro. Atualmente em fase piloto com um escritório parceiro, antes do lançamento oficial.
                             </p>
                             <ul class="list-unstyled mb-3">
                                 <li><i class="fas fa-check text-success"></i> Gestão de processos</li>
                                 <li><i class="fas fa-check text-success"></i> Geração automática de documentos</li>
                                 <li><i class="fas fa-check text-success"></i> Controle financeiro integrado</li>
-                                <li><i class="fas fa-check text-success"></i> Geração de Peças processuais com IA</li>
-                                <li><i class="fas fa-check text-success"></i> Acesse Legislação com a nossa IA Thaina </li>
+                                <li><i class="fas fa-check text-success"></i> Geração de peças processuais com IA</li>
+                                <li><i class="fas fa-check text-success"></i> Consulta de legislação com a IA Thaina</li>
                                 <li><i class="fas fa-check text-success"></i> Gestão completa do escritório</li>
                                 <li><i class="fas fa-check text-success"></i> Site institucional incluso</li>
-                                <!--<li><i class="fas fa-check text-success"></i> App mobile incluso</li>-->
                             </ul>
                             <div class="produto-preco">
                                 <div class="preco-destaque">
-                                    Confira nossos planos<span class="preco-periodo"></span>
+                                    Em Breve<span class="preco-periodo"></span>
                                 </div>
-                                <!--<small>-->
-                                <!--    <strong>Anual:</strong> R$ 3.240 <span class="desconto-badge">-10%</span><br>-->
-                                <!--    <strong>Semestral:</strong> R$ 1.710 <span class="desconto-badge">-5%</span>-->
-                                <!--</small>-->
+                                <small class="text-muted">Entre na lista de espera do lançamento</small>
                             </div>
-                            <a href="<?= $_indexBase ?>/publics/produtos.php?id=escritorius" class="btn btn-primary btn-block">Saiba mais</a>
-                            <!--<a href="<?= $_indexBase ?>/publics/produtos.php?id=escritorius#demo" class="btn btn-outline-primary btn-block">-->
-                            <!--    <i class="fas fa-play"></i> Testar Grátis (7 dias)-->
-                            <!--</a>-->
+                            <a href="<?= $_indexBase ?>/apresenta_escritorius/apresenta_escritorius.php" class="btn btn-primary btn-block">Saiba mais</a>
+                            <a href="<?= $_indexBase ?>/publics/contato.php?produto=escritorius" class="btn btn-outline-primary btn-block">
+                                <i class="fas fa-envelope"></i> Entrar na Lista de Espera
+                            </a>
                         </div>
                     </div>
                 </div>
@@ -733,8 +723,8 @@ $_indexBase    = str_replace($_indexDocRoot, '', $_indexProjDir);
                     GRÁTIS<span class="preco-periodo">/Open Source</span>
                 </div>
             </div>
-            <a href="<?= $_indexBase ?>/despesas" class="btn btn-outline-success btn-block">
-                <i class="fas fa-external-link-alt"></i> Usar Agora Gratuitamente
+            <a href="<?= $_indexBase ?>/despesas/landing.php" class="btn btn-outline-success btn-block">
+                <i class="fas fa-external-link-alt"></i> Conhecer o Despesas
             </a>
         </div>
     </div>

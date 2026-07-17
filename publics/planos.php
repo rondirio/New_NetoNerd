@@ -336,7 +336,7 @@
                 <img class="logo" src="../src/imagens/logoNetoNerd.jpg" alt="Logo NetoNerd">
             </a>
             <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav">
-                <span style="color: white;">☰</span>
+                <span style="color: #007bff; font-size: 1.5rem;">☰</span>
             </button>
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav ml-auto">
@@ -482,7 +482,7 @@
                                 </li>
                                 <li>
                                     <i class="fas fa-check-circle"></i>
-                                    <span>Suporte <strong>24/7</strong> via WhatsApp</span>
+                                    <span>Suporte <strong>prioritário</strong> via WhatsApp</span>
                                 </li>
                                 <li>
                                     <i class="fas fa-check-circle"></i>
@@ -499,10 +499,6 @@
                                 <li>
                                     <i class="fas fa-check-circle"></i>
                                     <span><strong>Consultoria</strong> personalizada</span>
-                                </li>
-                                <li>
-                                    <i class="fas fa-check-circle"></i>
-                                    <span><strong>Atendimento emergencial</strong></span>
                                 </li>
                             </ul>
                             <a href="contato.php?plano=avancado" class="btn btn-plano btn-plano-outline">
@@ -555,7 +551,7 @@
                             <td class="text-center"><i class="fas fa-check icon-sim"></i></td>
                         </tr>
                         <tr>
-                            <td><strong>Suporte 24/7</strong></td>
+                            <td><strong>Suporte Prioritário via WhatsApp</strong></td>
                             <td class="text-center"><i class="fas fa-times icon-nao"></i></td>
                             <td class="text-center"><i class="fas fa-times icon-nao"></i></td>
                             <td class="text-center"><i class="fas fa-check icon-sim"></i></td>
@@ -570,12 +566,6 @@
                             <td><strong>Treinamento</strong></td>
                             <td class="text-center"><i class="fas fa-times icon-nao"></i></td>
                             <td class="text-center"><i class="fas fa-check icon-sim"></i></td>
-                            <td class="text-center"><i class="fas fa-check icon-sim"></i></td>
-                        </tr>
-                        <tr>
-                            <td><strong>Atendimento Emergencial</strong></td>
-                            <td class="text-center"><i class="fas fa-times icon-nao"></i></td>
-                            <td class="text-center"><i class="fas fa-times icon-nao"></i></td>
                             <td class="text-center"><i class="fas fa-check icon-sim"></i></td>
                         </tr>
                     </tbody>
@@ -625,7 +615,7 @@
                         <i class="fas fa-chevron-down"></i>
                     </div>
                     <div class="faq-answer">
-                        <p>Atendemos Teresópolis e toda região serrana do Rio de Janeiro. Para outras localidades, consulte-nos.</p>
+                        <p>As visitas presenciais destes planos atendem Teresópolis-RJ. Se você é de outra cidade, entre em contato para saber sobre suporte remoto.</p>
                     </div>
                 </div>
 
@@ -654,16 +644,12 @@
     </section>
 
     <!-- Footer -->
-    <footer class="footer bg-dark text-white py-5">
-        <div class="container text-center">
-            <p>&copy; 2025 NetoNerd Soluções Digitais. Todos os direitos reservados.</p>
-        </div>
-    </footer>
+    <?php include '../routes/footer.php'; ?>
 
     <!-- Scripts -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
-    
+
     <script>
         // Toggle FAQ
         function toggleFAQ(element) {
