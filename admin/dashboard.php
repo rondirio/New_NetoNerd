@@ -4,13 +4,8 @@
  * Página principal do administrador com estatísticas e gestão de técnicos
  */
 
-session_start();
-
-// Verificar se é admin
-if (!isset($_SESSION['tipo_usuario']) || $_SESSION['tipo_usuario'] !== 'admin') {
-    header('Location: ../index.php');
-    exit;
-}
+require_once '../controller/auth_middleware.php';
+requireAdmin();
 
 include_once '../config/bandoDeDados/conexao.php';
 
@@ -23,7 +18,7 @@ require_once '../includes/header.php';
 // ========== QUERIES PARA DASHBOARD STATS ==========
 
 // Total de Chamados Abertos
-$sql = "SELECT COUNT(*) AS total_chamados FROM chamados WHERE status = 'Aberto'";
+$sql = "SELECT COUNT(*) AS total_chamados FROM chamados WHERE status = 'aberto'";
 $result = $conn->query($sql);
 $totalChamados = ($result && $row = $result->fetch_assoc()) ? $row['total_chamados'] : 0;
 
@@ -147,6 +142,10 @@ if ($result && $result->num_rows > 0) {
                     <button class="nn-btn nn-btn-primary" data-bs-toggle="modal" data-bs-target="#addTecnicoModal">
                         <i class="fas fa-user-plus"></i>
                         Adicionar Técnico
+                    </button>
+                    <button class="nn-btn nn-btn-secondary" data-bs-toggle="modal" data-bs-target="#addAdminModal">
+                        <i class="fas fa-user-shield"></i>
+                        Adicionar Admin
                     </button>
                 </div>
             </div>
@@ -286,7 +285,8 @@ if ($result && $result->num_rows > 0) {
                             $result = $conn->query($sql);
 
                             if ($result === false) {
-                                echo "<tr><td colspan='8' class='text-center'>Erro na consulta: " . htmlspecialchars($conn->error) . "</td></tr>";
+                                error_log("Erro ao listar técnicos em admin/dashboard.php: " . $conn->error);
+                                echo "<tr><td colspan='8' class='text-center'>Não foi possível carregar a lista de técnicos. Tente novamente mais tarde.</td></tr>";
                             } elseif ($result->num_rows > 0) {
                                 while ($row = $result->fetch_assoc()) {
                                     $id = (int)$row['id'];
@@ -306,9 +306,13 @@ if ($result && $result->num_rows > 0) {
                                     echo "<i class='fas fa-edit'></i> Editar</a> ";
                                     echo "<a href='relatorio_tecnico.php?id=$id' class='nn-btn nn-btn-success nn-btn-sm'>";
                                     echo "<i class='fas fa-file-alt'></i> Relatório</a> ";
-                                    echo "<a href='excluir_tecnico.php?id=$id' class='nn-btn nn-btn-danger nn-btn-sm' ";
-                                    echo "onclick=\"return confirm('Deseja realmente excluir este técnico?');\">";
-                                    echo "<i class='fas fa-trash'></i> Excluir</a>";
+                                    echo "<form method='POST' action='excluir_tecnico.php' style='display:inline' ";
+                                    echo "onsubmit=\"return confirm('Deseja realmente excluir este técnico?');\">";
+                                    echo csrfField();
+                                    echo "<input type='hidden' name='id' value='$id'>";
+                                    echo "<button type='submit' class='nn-btn nn-btn-danger nn-btn-sm'>";
+                                    echo "<i class='fas fa-trash'></i> Excluir</button>";
+                                    echo "</form>";
                                     echo "</td>";
                                     echo "</tr>";
                                 }
@@ -338,34 +342,35 @@ if ($result && $result->num_rows > 0) {
             </div>
             <div class="modal-body">
                 <form action="processa_adicionar_tecnico.php" method="POST">
+                    <?php echo csrfField(); ?>
                     <div class="row">
                         <div class="col-md-6">
                             <div class="nn-form-group">
-                                <label class="nn-form-label">
+                                <label class="nn-form-label" for="tecnico_nome">
                                     <i class="fas fa-user"></i>
                                     Nome Completo
                                 </label>
-                                <input type="text" class="nn-form-control" name="nome" required placeholder="Digite o nome completo">
+                                <input type="text" class="nn-form-control" name="nome" id="tecnico_nome" required placeholder="Digite o nome completo">
                             </div>
                         </div>
 
                         <div class="col-md-6">
                             <div class="nn-form-group">
-                                <label class="nn-form-label">
+                                <label class="nn-form-label" for="tecnico_email">
                                     <i class="fas fa-envelope"></i>
                                     Email
                                 </label>
-                                <input type="email" class="nn-form-control" name="email" required placeholder="email@exemplo.com">
+                                <input type="email" class="nn-form-control" name="email" id="tecnico_email" required placeholder="email@exemplo.com">
                             </div>
                         </div>
 
                         <div class="col-md-6">
                             <div class="nn-form-group">
-                                <label class="nn-form-label">
+                                <label class="nn-form-label" for="tecnico_registration">
                                     <i class="fas fa-id-card"></i>
                                     Matrícula
                                 </label>
-                                <input type="text" class="nn-form-control" name="registration" required
+                                <input type="text" class="nn-form-control" name="registration" id="tecnico_registration" required
                                        placeholder="<?php echo htmlspecialchars($newMatricula); ?>"
                                        value="<?php echo htmlspecialchars($newMatricula); ?>">
                                 <small class="text-muted">Próxima matrícula disponível</small>
@@ -374,22 +379,22 @@ if ($result && $result->num_rows > 0) {
 
                         <div class="col-md-6">
                             <div class="nn-form-group">
-                                <label class="nn-form-label">
+                                <label class="nn-form-label" for="tecnico_vehicle_of_the_day">
                                     <i class="fas fa-car"></i>
                                     Veículo
                                 </label>
-                                <input type="text" class="nn-form-control" name="vehicle_of_the_day" required
-                                       placeholder="Ex: Fiat Uno - ABC-1234">
+                                <input type="text" class="nn-form-control" name="vehicle_of_the_day" id="tecnico_vehicle_of_the_day"
+                                       placeholder="Ex: Fiat Uno - ABC-1234 (deixe em branco se técnico interno)">
                             </div>
                         </div>
 
                         <div class="col-md-6">
                             <div class="nn-form-group">
-                                <label class="nn-form-label">
+                                <label class="nn-form-label" for="tecnico_status_technician">
                                     <i class="fas fa-toggle-on"></i>
                                     Status
                                 </label>
-                                <select class="nn-form-control" name="status_technician" required>
+                                <select class="nn-form-control" name="status_technician" id="tecnico_status_technician" required>
                                     <option value="Active">Ativo</option>
                                     <option value="Inactive">Inativo</option>
                                 </select>
@@ -398,11 +403,11 @@ if ($result && $result->num_rows > 0) {
 
                         <div class="col-md-6">
                             <div class="nn-form-group">
-                                <label class="nn-form-label">
+                                <label class="nn-form-label" for="tecnico_password">
                                     <i class="fas fa-lock"></i>
                                     Senha
                                 </label>
-                                <input type="password" class="nn-form-control" name="password" required
+                                <input type="password" class="nn-form-control" name="password" id="tecnico_password" required
                                        placeholder="Digite a senha" minlength="6">
                                 <small class="text-muted">Mínimo 6 caracteres</small>
                             </div>
@@ -417,6 +422,81 @@ if ($result && $result->num_rows > 0) {
                         <button type="submit" class="nn-btn nn-btn-primary">
                             <i class="fas fa-save"></i>
                             Salvar Técnico
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal para Adicionar Admin -->
+<div class="modal fade" id="addAdminModal" tabindex="-1" aria-labelledby="addAdminModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header" style="background: var(--gradient-primary); color: white;">
+                <h5 class="modal-title" id="addAdminModalLabel">
+                    <i class="fas fa-user-shield"></i>
+                    Adicionar Novo Admin
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form action="processa_adicionar_admin.php" method="POST">
+                    <?php echo csrfField(); ?>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="nn-form-group">
+                                <label class="nn-form-label" for="admin_nome">
+                                    <i class="fas fa-user"></i>
+                                    Nome Completo
+                                </label>
+                                <input type="text" class="nn-form-control" name="nome" id="admin_nome" required placeholder="Digite o nome completo">
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="nn-form-group">
+                                <label class="nn-form-label" for="admin_email">
+                                    <i class="fas fa-envelope"></i>
+                                    Email
+                                </label>
+                                <input type="email" class="nn-form-control" name="email" id="admin_email" required placeholder="email@exemplo.com">
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="nn-form-group">
+                                <label class="nn-form-label" for="admin_matricula">
+                                    <i class="fas fa-id-card"></i>
+                                    Matrícula
+                                </label>
+                                <input type="text" class="nn-form-control" name="matricula" id="admin_matricula" required
+                                       placeholder="Ex: 2026A003">
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="nn-form-group">
+                                <label class="nn-form-label" for="admin_password">
+                                    <i class="fas fa-lock"></i>
+                                    Senha
+                                </label>
+                                <input type="password" class="nn-form-control" name="password" id="admin_password" required
+                                       placeholder="Digite a senha" minlength="6">
+                                <small class="text-muted">Mínimo 6 caracteres</small>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mt-4 text-end">
+                        <button type="button" class="nn-btn nn-btn-secondary" data-bs-dismiss="modal">
+                            <i class="fas fa-times"></i>
+                            Cancelar
+                        </button>
+                        <button type="submit" class="nn-btn nn-btn-primary">
+                            <i class="fas fa-save"></i>
+                            Salvar Admin
                         </button>
                     </div>
                 </form>

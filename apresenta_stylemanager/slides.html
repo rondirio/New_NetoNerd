@@ -1,0 +1,534 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>StyleManager — Apresentação</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --preto: #111111;
+      --dourado: #d4af37;
+      --dourado-bg: rgba(212,175,55,0.12);
+      --cinza: #1e1e1e;
+      --cinza2: #2a2a2a;
+      --muted: #888;
+      --branco: #fff;
+    }
+
+    html, body {
+      width: 100%; height: 100%;
+      font-family: 'Poppins', sans-serif;
+      background: #000;
+      overflow: hidden;
+    }
+
+    /* ── DECK ─────────────────────────────────────────── */
+    .deck {
+      width: 100%; height: 100vh;
+      position: relative;
+    }
+
+    .slide {
+      position: absolute; inset: 0;
+      display: none;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      padding: 60px 80px;
+      background: var(--preto);
+      color: var(--branco);
+      text-align: center;
+      animation: fadeIn .35s ease;
+    }
+    .slide.active { display: flex; }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(12px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ── CONTROLES ────────────────────────────────────── */
+    .controls {
+      position: fixed;
+      bottom: 24px; left: 50%; transform: translateX(-50%);
+      display: flex; align-items: center; gap: 16px;
+      z-index: 100;
+      background: rgba(0,0,0,0.6);
+      backdrop-filter: blur(8px);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 50px;
+      padding: 10px 20px;
+    }
+    .btn-nav {
+      background: none; border: none; cursor: pointer;
+      color: var(--branco); font-size: 1.1rem; padding: 4px 8px;
+      opacity: .7; transition: opacity .2s;
+    }
+    .btn-nav:hover { opacity: 1; }
+    .btn-nav:disabled { opacity: .2; cursor: default; }
+    .counter { font-size: 0.78rem; color: var(--muted); min-width: 52px; text-align: center; }
+
+    /* ── UTILITÁRIOS ──────────────────────────────────── */
+    .tag {
+      display: inline-block;
+      background: var(--dourado-bg);
+      color: var(--dourado);
+      border: 1px solid rgba(212,175,55,0.35);
+      font-size: 0.68rem; font-weight: 700;
+      letter-spacing: 2.5px; text-transform: uppercase;
+      padding: 5px 16px; border-radius: 50px;
+      margin-bottom: 20px;
+    }
+    h1 { font-size: clamp(2rem, 4.5vw, 3.4rem); font-weight: 800; line-height: 1.1; }
+    h2 { font-size: clamp(1.6rem, 3.5vw, 2.6rem); font-weight: 800; line-height: 1.15; }
+    .gold { color: var(--dourado); }
+    .muted { color: var(--muted); }
+    .lead { font-size: clamp(0.9rem, 1.6vw, 1.1rem); color: var(--muted); margin-top: 16px; max-width: 640px; line-height: 1.7; }
+    .divider {
+      width: 48px; height: 3px;
+      background: var(--dourado);
+      border-radius: 2px;
+      margin: 20px auto;
+    }
+
+    /* ── GRADE GENÉRICA ───────────────────────────────── */
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; width: 100%; max-width: 900px; margin-top: 32px; }
+    .grid-3 { display: grid; grid-template-columns: repeat(3,1fr); gap: 18px; width: 100%; max-width: 960px; margin-top: 32px; }
+    .grid-4 { display: grid; grid-template-columns: repeat(4,1fr); gap: 16px; width: 100%; max-width: 960px; margin-top: 32px; }
+
+    .card {
+      background: var(--cinza);
+      border: 1px solid rgba(255,255,255,0.07);
+      border-radius: 16px;
+      padding: 24px 20px;
+      text-align: left;
+    }
+    .card.gold-border { border-color: rgba(212,175,55,0.35); }
+    .card-icon { font-size: 1.8rem; margin-bottom: 10px; }
+    .card h3 { font-size: 0.92rem; font-weight: 700; margin-bottom: 6px; }
+    .card p { font-size: 0.78rem; color: var(--muted); line-height: 1.55; }
+
+    /* ── LISTA CHECK ──────────────────────────────────── */
+    .check-list { list-style: none; text-align: left; margin-top: 8px; }
+    .check-list li {
+      font-size: 0.85rem; color: rgba(255,255,255,0.85);
+      padding: 6px 0; display: flex; gap: 10px; align-items: flex-start;
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+    }
+    .check-list li:last-child { border: none; }
+    .check-list li::before { content: "✓"; color: var(--dourado); font-weight: 700; flex-shrink: 0; }
+
+    /* ── SLIDE CAPA ───────────────────────────────────── */
+    #s1 {
+      background: radial-gradient(ellipse 80% 60% at 50% 0%, rgba(212,175,55,0.14) 0%, transparent 65%), var(--preto);
+    }
+    .logo-text { font-size: clamp(1rem, 2vw, 1.4rem); font-weight: 800; letter-spacing: -0.5px; margin-bottom: 32px; }
+    .logo-text span { color: var(--dourado); }
+    .hero-badges { display: flex; gap: 20px; justify-content: center; flex-wrap: wrap; margin-top: 32px; }
+    .hb { font-size: 0.8rem; color: var(--muted); display: flex; gap: 6px; }
+    .hb b { color: var(--dourado); }
+
+    /* ── SLIDE PROBLEMA ───────────────────────────────── */
+    .problema-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 16px; width: 100%; max-width: 800px; margin-top: 28px; }
+    .problema-item {
+      background: var(--cinza);
+      border-radius: 14px; padding: 24px 18px;
+      border: 1px solid rgba(255,255,255,0.06);
+    }
+    .problema-item .emoji { font-size: 2rem; margin-bottom: 10px; }
+    .problema-item p { font-size: 0.82rem; color: var(--muted); }
+
+    /* ── SLIDE PLANOS ─────────────────────────────────── */
+    .plano {
+      background: var(--cinza);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 18px;
+      padding: 28px 22px;
+      text-align: left;
+      position: relative;
+    }
+    .plano.destaque {
+      border-color: var(--dourado);
+      background: linear-gradient(135deg, rgba(212,175,55,0.1) 0%, var(--cinza) 60%);
+    }
+    .popular-badge {
+      position: absolute; top: -11px; left: 50%; transform: translateX(-50%);
+      background: var(--dourado); color: var(--preto);
+      font-size: 0.65rem; font-weight: 800; letter-spacing: 1px;
+      padding: 3px 14px; border-radius: 50px; text-transform: uppercase;
+    }
+    .plano-nome { font-size: 0.7rem; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: var(--dourado); }
+    .plano-preco { font-size: 2rem; font-weight: 800; line-height: 1; margin: 8px 0 4px; }
+    .plano-preco sup { font-size: 0.85rem; vertical-align: super; }
+    .plano-preco small { font-size: 0.75rem; font-weight: 400; color: var(--muted); }
+    .plano-desc { font-size: 0.75rem; color: var(--muted); margin-bottom: 16px; min-height: 36px; }
+    .plano ul { list-style: none; }
+    .plano li {
+      font-size: 0.75rem; padding: 5px 0;
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+      display: flex; gap: 8px;
+    }
+    .plano li:last-child { border: none; }
+    .plano li::before { content: "✓"; color: var(--dourado); font-weight: 700; flex-shrink: 0; }
+
+    /* ── SLIDE MÉTRICAS ───────────────────────────────── */
+    .metrica {
+      background: var(--cinza2);
+      border: 1px solid rgba(212,175,55,0.18);
+      border-radius: 16px; padding: 32px 20px; text-align: center;
+    }
+    .metrica-num { font-size: 2.6rem; font-weight: 800; color: var(--dourado); line-height: 1; }
+    .metrica-label { font-size: 0.78rem; color: var(--muted); margin-top: 8px; line-height: 1.4; }
+
+    /* ── SLIDE CTA ────────────────────────────────────── */
+    #s-cta {
+      background: radial-gradient(ellipse 80% 60% at 50% 100%, rgba(212,175,55,0.12) 0%, transparent 70%), var(--preto);
+    }
+    .contact-box {
+      background: var(--cinza);
+      border: 1px solid rgba(212,175,55,0.25);
+      border-radius: 20px;
+      padding: 40px 48px;
+      margin-top: 28px;
+      max-width: 560px;
+    }
+    .contact-item { display: flex; align-items: center; gap: 14px; margin: 14px 0; font-size: 0.95rem; }
+    .contact-item .ci { font-size: 1.3rem; }
+
+    /* ── PRINT ────────────────────────────────────────── */
+    @media print {
+      html, body { overflow: visible; height: auto; }
+      .controls { display: none !important; }
+      .deck { height: auto; }
+      .slide {
+        display: flex !important;
+        position: relative;
+        page-break-after: always;
+        height: 100vh;
+        min-height: 540px;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .slide { padding: 40px 24px; }
+      .grid-2, .grid-3, .grid-4 { grid-template-columns: 1fr 1fr; }
+      .problema-grid { grid-template-columns: 1fr 1fr; }
+    }
+    @media (max-width: 500px) {
+      .grid-2, .grid-3, .grid-4, .problema-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="deck" id="deck">
+
+  <!-- ① CAPA -->
+  <div class="slide active" id="s1">
+    <div class="logo-text">Style<span>Manager</span></div>
+    <div class="tag">Sistema de Gestão para Beleza</div>
+    <h1>Seu salão organizado.<br /><span class="gold">Sua agenda cheia.</span></h1>
+    <div class="divider"></div>
+    <p class="lead">Agendamento online, comissões automáticas, controle de estoque e app mobile — tudo em um só sistema.</p>
+    <div class="hero-badges">
+      <div class="hb"><b>✓</b> Sem instalar nada</div>
+      <div class="hb"><b>✓</b> Acessa pelo celular</div>
+      <div class="hb"><b>✓</b> Suporte incluso</div>
+      <div class="hb"><b>✓</b> Cancela quando quiser</div>
+    </div>
+  </div>
+
+  <!-- ② PROBLEMA -->
+  <div class="slide" id="s2">
+    <div class="tag">O problema de hoje</div>
+    <h2>Como você controla<br /><span class="gold">seu salão agora?</span></h2>
+    <div class="problema-grid">
+      <div class="problema-item">
+        <div class="emoji">📓</div>
+        <h3>Caderno ou planilha</h3>
+        <p>Difícil de atualizar, fácil de perder, impossível de acessar pelo celular</p>
+      </div>
+      <div class="problema-item">
+        <div class="emoji">💬</div>
+        <h3>Agendamento por WhatsApp</h3>
+        <p>Mensagem que se perde, cliente que esquece, você que fica respondendo à noite</p>
+      </div>
+      <div class="problema-item">
+        <div class="emoji">🤯</div>
+        <h3>Comissão na cabeça</h3>
+        <p>Calcula na mão, erra, gera conflito com o profissional na hora do acerto</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ③ SOLUÇÃO -->
+  <div class="slide" id="s3">
+    <div class="tag">A solução</div>
+    <h2>StyleManager resolve<br /><span class="gold">tudo isso por você</span></h2>
+    <div class="grid-3" style="max-width:860px">
+      <div class="card gold-border">
+        <div class="card-icon">📅</div>
+        <h3>Agenda Online 24h</h3>
+        <p>Cliente agenda pelo celular. Você confirma com um clique.</p>
+      </div>
+      <div class="card gold-border">
+        <div class="card-icon">💰</div>
+        <h3>Comissões Automáticas</h3>
+        <p>Define uma vez. O sistema calcula e separa por profissional.</p>
+      </div>
+      <div class="card gold-border">
+        <div class="card-icon">📦</div>
+        <h3>Estoque em Tempo Real</h3>
+        <p>Cada venda desconta automaticamente. Alerta quando acabar.</p>
+      </div>
+      <div class="card">
+        <div class="card-icon">💳</div>
+        <h3>Fechamento de Caixa</h3>
+        <p>Relatório PDF por profissional e período. Pague com precisão.</p>
+      </div>
+      <div class="card">
+        <div class="card-icon">🔔</div>
+        <h3>Lembretes por E-mail</h3>
+        <p>Cliente recebe aviso automático. Menos faltas, mais faturamento.</p>
+      </div>
+      <div class="card">
+        <div class="card-icon">🎨</div>
+        <h3>Identidade Visual Própria</h3>
+        <p>Logo e cores do seu salão. O sistema parece feito só para você.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ④ PERFIS -->
+  <div class="slide" id="s4">
+    <div class="tag">Perfis de acesso</div>
+    <h2>Cada um acessa<br /><span class="gold">só o que precisa</span></h2>
+    <div class="grid-4">
+      <div class="card">
+        <div class="card-icon">👑</div>
+        <h3>Dono / Admin</h3>
+        <ul class="check-list" style="margin-top:10px">
+          <li>Dashboard com métricas</li>
+          <li>Gerencia tudo</li>
+          <li>Fecha caixa (PDF)</li>
+          <li>Controla estoque</li>
+        </ul>
+      </div>
+      <div class="card gold-border">
+        <div class="card-icon">✂️</div>
+        <h3>Profissional</h3>
+        <ul class="check-list" style="margin-top:10px">
+          <li>Registra atendimentos</li>
+          <li>Vende produtos</li>
+          <li>Vê agenda do dia</li>
+          <li>App mobile</li>
+        </ul>
+      </div>
+      <div class="card">
+        <div class="card-icon">🗓️</div>
+        <h3>Recepcionista</h3>
+        <ul class="check-list" style="margin-top:10px">
+          <li>Agenda clientes</li>
+          <li>Vê agenda geral</li>
+          <li>Confirma horários</li>
+          <li>Aniversariantes</li>
+        </ul>
+      </div>
+      <div class="card">
+        <div class="card-icon">👤</div>
+        <h3>Cliente</h3>
+        <ul class="check-list" style="margin-top:10px">
+          <li>Agenda online 24h</li>
+          <li>Histórico de visitas</li>
+          <li>Lembrete por e-mail</li>
+          <li>App mobile</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- ⑤ APP MOBILE -->
+  <div class="slide" id="s5">
+    <div class="tag">App Mobile</div>
+    <h2>Na palma da mão<br /><span class="gold">do seu profissional</span></h2>
+    <div class="grid-2" style="max-width:780px; align-items:center">
+      <div style="text-align:left">
+        <p style="color:var(--muted); font-size:0.9rem; line-height:1.7; margin-bottom:24px">
+          Além do painel web, o StyleManager tem um app mobile. Seu profissional registra o atendimento direto do celular — sem precisar do computador.
+        </p>
+        <ul class="check-list">
+          <li>Registra atendimentos em segundos</li>
+          <li>Vê a agenda do dia no celular</li>
+          <li>Vende produtos com controle de estoque</li>
+          <li>Funciona em Android e iPhone</li>
+          <li>Acessa com o código do seu salão</li>
+        </ul>
+      </div>
+      <div style="background:var(--cinza2); border:1px solid rgba(212,175,55,0.25); border-radius:24px; padding:36px 28px; text-align:center">
+        <div style="font-size:3rem; margin-bottom:12px">📱</div>
+        <p style="font-size:1rem; font-weight:700; margin-bottom:8px">App StyleManager</p>
+        <p style="font-size:0.78rem; color:var(--muted)">Para profissionais e clientes</p>
+        <div style="margin-top:20px; padding:14px; background:rgba(212,175,55,0.08); border-radius:10px; border:1px solid rgba(212,175,55,0.2)">
+          <p style="font-size:0.75rem; color:var(--dourado); line-height:1.8">
+            ✓ Android &amp; iPhone<br />
+            ✓ Tema com a cor do seu salão<br />
+            ✓ Multi-salão para profissionais
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ⑥ NÚMEROS -->
+  <div class="slide" id="s6">
+    <div class="tag">Por que escolher?</div>
+    <h2>Números que<br /><span class="gold">falam por si</span></h2>
+    <div class="grid-4" style="margin-top:36px">
+      <div class="metrica">
+        <div class="metrica-num">100%</div>
+        <div class="metrica-label">Online — sem instalar nada no computador</div>
+      </div>
+      <div class="metrica">
+        <div class="metrica-num">4</div>
+        <div class="metrica-label">Perfis de acesso com painéis dedicados</div>
+      </div>
+      <div class="metrica">
+        <div class="metrica-num">0</div>
+        <div class="metrica-label">Planilhas ou cadernos necessários</div>
+      </div>
+      <div class="metrica">
+        <div class="metrica-num">24h</div>
+        <div class="metrica-label">Agenda disponível para seus clientes</div>
+      </div>
+    </div>
+    <p class="lead" style="margin-top:28px; font-size:0.85rem">
+      "Economizei pelo menos 3 horas por semana. O sistema calcula a comissão, avisa o cliente e ainda gera o PDF de fechamento." — Bruno, cliente NetoNerd
+    </p>
+  </div>
+
+  <!-- ⑦ PLANOS -->
+  <div class="slide" id="s7">
+    <div class="tag">Planos e Preços</div>
+    <h2>Simples, sem surpresa,<br /><span class="gold">sem fidelidade</span></h2>
+    <div class="grid-3" style="max-width:900px; margin-top:28px; align-items:start">
+
+      <div class="plano">
+        <div class="plano-nome">Starter</div>
+        <div class="plano-preco"><sup>R$</sup>49<small>,90/mês</small></div>
+        <p class="plano-desc">Até 2 profissionais. Ideal para autônomos.</p>
+        <ul>
+          <li>Até 2 profissionais</li>
+          <li>Agenda online</li>
+          <li>Comissões automáticas</li>
+          <li>Controle de estoque</li>
+          <li>Fechamento PDF</li>
+          <li>App mobile</li>
+          <li>Suporte WhatsApp</li>
+        </ul>
+      </div>
+
+      <div class="plano destaque">
+        <div class="popular-badge">Mais popular</div>
+        <div class="plano-nome">Pro</div>
+        <div class="plano-preco"><sup>R$</sup>79<small>,90/mês</small></div>
+        <p class="plano-desc">Até 5 profissionais + site com domínio.</p>
+        <ul>
+          <li>Até 5 profissionais</li>
+          <li>Tudo do Starter</li>
+          <li><strong>Site com domínio próprio</strong></li>
+          <li>Perfil de recepcionista</li>
+          <li>Relatórios avançados</li>
+          <li>E-mails automáticos</li>
+          <li>Suporte prioritário</li>
+        </ul>
+      </div>
+
+      <div class="plano">
+        <div class="plano-nome">Premium</div>
+        <div class="plano-preco"><sup>R$</sup>129<small>,90/mês</small></div>
+        <p class="plano-desc">Profissionais ilimitados + suporte dedicado.</p>
+        <ul>
+          <li>Profissionais ilimitados</li>
+          <li>Tudo do Pro</li>
+          <li>Múltiplas unidades</li>
+          <li>Onboarding personalizado</li>
+          <li>Backup mensal dos dados</li>
+          <li>Suporte dedicado</li>
+        </ul>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ⑧ CTA -->
+  <div class="slide" id="s-cta">
+    <div class="tag">Próximos passos</div>
+    <h2>Pronto para organizar<br /><span class="gold">o seu salão?</span></h2>
+    <p class="lead">Configuro o sistema com o nome e as cores do seu salão no mesmo dia. Sem taxa de setup.</p>
+    <div class="contact-box">
+      <div class="contact-item">
+        <span class="ci">💬</span>
+        <div>
+          <div style="font-size:0.75rem; color:var(--muted)">WhatsApp</div>
+          <div style="font-weight:700">(21) 97739-5867</div>
+        </div>
+      </div>
+      <div class="contact-item">
+        <span class="ci">📧</span>
+        <div>
+          <div style="font-size:0.75rem; color:var(--muted)">E-mail</div>
+          <div style="font-weight:700">netonerd.com.br</div>
+        </div>
+      </div>
+      <div style="margin-top:20px; padding-top:20px; border-top:1px solid rgba(255,255,255,0.07)">
+        <p style="font-size:0.75rem; color:var(--muted)">✓ Sem fidelidade mínima &nbsp;·&nbsp; ✓ Cancela quando quiser &nbsp;·&nbsp; ✓ Começa hoje</p>
+      </div>
+    </div>
+    <div style="margin-top:20px; background:var(--dourado-bg); border:1px solid rgba(212,175,55,0.25); border-radius:12px; padding:14px 28px">
+      <p style="font-size:0.82rem; color:var(--dourado); font-weight:600">
+        🎁 &nbsp;Primeiro mês grátis para novos clientes
+      </p>
+    </div>
+  </div>
+
+</div><!-- /deck -->
+
+<!-- CONTROLES -->
+<div class="controls">
+  <button class="btn-nav" id="btn-prev" onclick="navigate(-1)" disabled>&#8592;</button>
+  <span class="counter" id="counter">1 / 8</span>
+  <button class="btn-nav" id="btn-next" onclick="navigate(1)">&#8594;</button>
+</div>
+
+<script>
+  const slides = document.querySelectorAll('.slide');
+  let cur = 0;
+
+  function navigate(dir) {
+    slides[cur].classList.remove('active');
+    cur = Math.max(0, Math.min(slides.length - 1, cur + dir));
+    slides[cur].classList.add('active');
+    document.getElementById('counter').textContent = (cur + 1) + ' / ' + slides.length;
+    document.getElementById('btn-prev').disabled = cur === 0;
+    document.getElementById('btn-next').disabled = cur === slides.length - 1;
+  }
+
+  document.addEventListener('keydown', e => {
+    if (e.key === 'ArrowRight' || e.key === 'ArrowDown' || e.key === ' ') navigate(1);
+    if (e.key === 'ArrowLeft'  || e.key === 'ArrowUp')                     navigate(-1);
+  });
+
+  // Swipe touch
+  let tx = 0;
+  document.addEventListener('touchstart', e => tx = e.touches[0].clientX);
+  document.addEventListener('touchend',   e => {
+    const dx = tx - e.changedTouches[0].clientX;
+    if (Math.abs(dx) > 50) navigate(dx > 0 ? 1 : -1);
+  });
+</script>
+
+</body>
+</html>

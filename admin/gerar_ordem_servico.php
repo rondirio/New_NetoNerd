@@ -3,7 +3,6 @@
  * Gerar Ordem de Serviço - NetoNerd ITSM v2.0
  * Sistema inteligente: busca cliente existente ou permite novo
  */
-session_start();
 require_once '../controller/auth_middleware.php';
 require_once '../config/bandoDeDados/conexao.php';
 
@@ -23,11 +22,12 @@ if ($chamado_id) {
             cl.email as cliente_email,
             cl.telefone as cliente_telefone,
             cl.id as cliente_id,
-            t.nome as tecnico_nome,
-            t.id as tecnico_id
+            COALESCE(t.nome, ta.nome) as tecnico_nome,
+            COALESCE(t.id, ta.id) as tecnico_id
         FROM chamados c
         LEFT JOIN clientes cl ON c.cliente_id = cl.id
         LEFT JOIN tecnicos t ON c.tecnico_id = t.id
+        LEFT JOIN admins ta ON c.tecnico_id = ta.id
         WHERE c.id = ?
     ";
     $stmt = $conn->prepare($sql);
@@ -43,9 +43,9 @@ if ($chamado_id) {
 
 // Buscar técnicos ativos
 $tecnicos = $conn->query("
-    SELECT id, nome, matricula 
-    FROM tecnicos 
-    WHERE Ativo = 1 
+    SELECT id, nome, matricula
+    FROM tecnicos
+    WHERE status_tecnico = 'Active'
     ORDER BY nome
 ");
 
@@ -88,6 +88,7 @@ require_once '../includes/header.php';
 
         <!-- Formulário -->
         <form action="processar_ordem_servico.php" method="POST" id="formOS">
+            <?php echo csrfField(); ?>
             <div class="row">
                 <!-- Coluna Esquerda -->
                 <div class="col-lg-8">
@@ -104,16 +105,16 @@ require_once '../includes/header.php';
                             <div class="row">
                                 <div class="col-md-6">
                                     <div class="nn-form-group">
-                                        <label class="nn-form-label">Número da OS</label>
-                                        <input type="text" name="numero_os" class="nn-form-control" 
+                                        <label class="nn-form-label" for="numero_os">Número da OS</label>
+                                        <input type="text" id="numero_os" name="numero_os" class="nn-form-control"
                                                value="<?= $numero_os ?>" readonly 
                                                style="background: #e9ecef; font-weight: bold; font-size: 1.2em;">
                                     </div>
                                 </div>
                                 <div class="col-md-6">
                                     <div class="nn-form-group">
-                                        <label class="nn-form-label">Data</label>
-                                        <input type="text" class="nn-form-control" 
+                                        <label class="nn-form-label" for="data_os_exibicao">Data</label>
+                                        <input type="text" id="data_os_exibicao" class="nn-form-control"
                                                value="<?= date('d/m/Y H:i') ?>" readonly
                                                style="background: #e9ecef;">
                                     </div>
@@ -155,12 +156,12 @@ require_once '../includes/header.php';
                             <div class="row">
                                 <div class="col-md-6">
                                     <div class="nn-form-group">
-                                        <label class="nn-form-label">Nome Completo *</label>
-                                        <input type="text" 
-                                               name="cliente_nome" 
+                                        <label class="nn-form-label" for="cliente_nome">Nome Completo *</label>
+                                        <input type="text"
+                                               name="cliente_nome"
                                                id="cliente_nome" 
                                                class="nn-form-control" 
-                                               value="<?= $chamado_data['cliente_nome'] ?? '' ?>" 
+                                               value="<?= htmlspecialchars($chamado_data['cliente_nome'] ?? '') ?>"
                                                required
                                                onblur="buscarCliente()">
                                         <small class="text-muted">Digite o nome e telefone para buscar automaticamente</small>
@@ -168,12 +169,14 @@ require_once '../includes/header.php';
                                 </div>
                                 <div class="col-md-6">
                                     <div class="nn-form-group">
-                                        <label class="nn-form-label">Telefone *</label>
-                                        <input type="text" 
-                                               name="cliente_telefone" 
-                                               id="cliente_telefone" 
+                                        <label class="nn-form-label" for="cliente_telefone">Telefone *</label>
+                                        <input type="text"
+                                               name="cliente_telefone"
+                                               id="cliente_telefone"
                                                class="nn-form-control"
-                                               value="<?= $chamado_data['cliente_telefone'] ?? '' ?>"
+                                               data-mask="phone"
+                                               maxlength="15"
+                                               value="<?= htmlspecialchars($chamado_data['cliente_telefone'] ?? '') ?>"
                                                required
                                                onblur="buscarCliente()"
                                                placeholder="(00) 00000-0000">
@@ -185,31 +188,33 @@ require_once '../includes/header.php';
                             <div class="row">
                                 <div class="col-md-6">
                                     <div class="nn-form-group">
-                                        <label class="nn-form-label">Email</label>
-                                        <input type="email" 
-                                               name="cliente_email" 
+                                        <label class="nn-form-label" for="cliente_email">Email</label>
+                                        <input type="email"
+                                               name="cliente_email"
                                                id="cliente_email" 
                                                class="nn-form-control"
-                                               value="<?= $chamado_data['cliente_email'] ?? '' ?>"
+                                               value="<?= htmlspecialchars($chamado_data['cliente_email'] ?? '') ?>"
                                                placeholder="email@exemplo.com">
                                     </div>
                                 </div>
                                 <div class="col-md-6">
                                     <div class="nn-form-group">
-                                        <label class="nn-form-label">CPF</label>
-                                        <input type="text" 
-                                               name="cliente_cpf" 
-                                               id="cliente_cpf" 
+                                        <label class="nn-form-label" for="cliente_cpf">CPF</label>
+                                        <input type="text"
+                                               name="cliente_cpf"
+                                               id="cliente_cpf"
                                                class="nn-form-control"
+                                               data-mask="cpf"
+                                               maxlength="14"
                                                placeholder="000.000.000-00">
                                     </div>
                                 </div>
                             </div>
 
                             <div class="nn-form-group">
-                                <label class="nn-form-label">Endereço</label>
-                                <input type="text" 
-                                       name="cliente_endereco" 
+                                <label class="nn-form-label" for="cliente_endereco">Endereço</label>
+                                <input type="text"
+                                       name="cliente_endereco"
                                        id="cliente_endereco" 
                                        class="nn-form-control"
                                        placeholder="Rua, número, bairro, cidade">
@@ -241,15 +246,15 @@ require_once '../includes/header.php';
                             <div class="row">
                                 <div class="col-md-6">
                                     <div class="nn-form-group">
-                                        <label class="nn-form-label">Tipo</label>
-                                        <input type="text" name="equipamento_tipo" class="nn-form-control" 
+                                        <label class="nn-form-label" for="equipamento_tipo">Tipo</label>
+                                        <input type="text" id="equipamento_tipo" name="equipamento_tipo" class="nn-form-control"
                                                placeholder="Ex: Notebook, Desktop, Impressora">
                                     </div>
                                 </div>
                                 <div class="col-md-6">
                                     <div class="nn-form-group">
-                                        <label class="nn-form-label">Marca</label>
-                                        <input type="text" name="equipamento_marca" class="nn-form-control" 
+                                        <label class="nn-form-label" for="equipamento_marca">Marca</label>
+                                        <input type="text" id="equipamento_marca" name="equipamento_marca" class="nn-form-control"
                                                placeholder="Ex: Dell, HP, Lenovo">
                                     </div>
                                 </div>
@@ -258,14 +263,14 @@ require_once '../includes/header.php';
                             <div class="row">
                                 <div class="col-md-6">
                                     <div class="nn-form-group">
-                                        <label class="nn-form-label">Modelo</label>
-                                        <input type="text" name="equipamento_modelo" class="nn-form-control">
+                                        <label class="nn-form-label" for="equipamento_modelo">Modelo</label>
+                                        <input type="text" id="equipamento_modelo" name="equipamento_modelo" class="nn-form-control">
                                     </div>
                                 </div>
                                 <div class="col-md-6">
                                     <div class="nn-form-group">
-                                        <label class="nn-form-label">Número de Série</label>
-                                        <input type="text" name="equipamento_serial" class="nn-form-control">
+                                        <label class="nn-form-label" for="equipamento_serial">Número de Série</label>
+                                        <input type="text" id="equipamento_serial" name="equipamento_serial" class="nn-form-control">
                                     </div>
                                 </div>
                             </div>
@@ -282,26 +287,26 @@ require_once '../includes/header.php';
                         </div>
                         <div class="nn-card-body">
                             <div class="nn-form-group">
-                                <label class="nn-form-label">Problema Relatado *</label>
-                                <textarea name="problema_relatado" class="nn-form-control" rows="4" required 
-                                          placeholder="Descreva o problema relatado pelo cliente..."><?= $chamado_data['descricao'] ?? '' ?></textarea>
+                                <label class="nn-form-label" for="problema_relatado">Problema Relatado *</label>
+                                <textarea id="problema_relatado" name="problema_relatado" class="nn-form-control" rows="4" required
+                                          placeholder="Descreva o problema relatado pelo cliente..."><?= htmlspecialchars($chamado_data['descricao'] ?? '') ?></textarea>
                             </div>
 
                             <div class="nn-form-group">
-                                <label class="nn-form-label">Serviços Executados</label>
-                                <textarea name="servicos_executados" class="nn-form-control" rows="4" 
+                                <label class="nn-form-label" for="servicos_executados">Serviços Executados</label>
+                                <textarea id="servicos_executados" name="servicos_executados" class="nn-form-control" rows="4"
                                           placeholder="Descreva os serviços realizados..."></textarea>
                             </div>
 
                             <div class="nn-form-group">
-                                <label class="nn-form-label">Peças Utilizadas</label>
-                                <textarea name="pecas_utilizadas" class="nn-form-control" rows="3" 
+                                <label class="nn-form-label" for="pecas_utilizadas">Peças Utilizadas</label>
+                                <textarea id="pecas_utilizadas" name="pecas_utilizadas" class="nn-form-control" rows="3"
                                           placeholder="Liste as peças substituídas ou utilizadas..."></textarea>
                             </div>
 
                             <div class="nn-form-group">
-                                <label class="nn-form-label">Observações</label>
-                                <textarea name="observacoes" class="nn-form-control" rows="3" 
+                                <label class="nn-form-label" for="observacoes">Observações</label>
+                                <textarea id="observacoes" name="observacoes" class="nn-form-control" rows="3"
                                           placeholder="Observações adicionais..."></textarea>
                             </div>
                         </div>
@@ -322,8 +327,8 @@ require_once '../includes/header.php';
                         </div>
                         <div class="nn-card-body">
                             <div class="nn-form-group">
-                                <label class="nn-form-label">Técnico *</label>
-                                <select name="tecnico_id" class="nn-form-control" required>
+                                <label class="nn-form-label" for="tecnico_id">Técnico *</label>
+                                <select id="tecnico_id" name="tecnico_id" class="nn-form-control" required>
                                     <option value="">Selecione...</option>
                                     <?php 
                                     $tecnicos->data_seek(0);
@@ -349,20 +354,20 @@ require_once '../includes/header.php';
                         </div>
                         <div class="nn-card-body">
                             <div class="nn-form-group">
-                                <label class="nn-form-label">Mão de Obra (R$)</label>
-                                <input type="number" name="valor_mao_obra" id="valor_mao_obra" class="nn-form-control" 
+                                <label class="nn-form-label" for="valor_mao_obra">Mão de Obra (R$)</label>
+                                <input type="number" name="valor_mao_obra" id="valor_mao_obra" class="nn-form-control"
                                        step="0.01" min="0" value="0.00" onchange="calcularTotal()">
                             </div>
 
                             <div class="nn-form-group">
-                                <label class="nn-form-label">Peças (R$)</label>
-                                <input type="number" name="valor_pecas" id="valor_pecas" class="nn-form-control" 
+                                <label class="nn-form-label" for="valor_pecas">Peças (R$)</label>
+                                <input type="number" name="valor_pecas" id="valor_pecas" class="nn-form-control"
                                        step="0.01" min="0" value="0.00" onchange="calcularTotal()">
                             </div>
 
                             <div class="nn-form-group">
-                                <label class="nn-form-label" style="font-size: 1.2em; font-weight: bold;">Total (R$)</label>
-                                <input type="number" name="valor_total" id="valor_total" class="nn-form-control" 
+                                <label class="nn-form-label" style="font-size: 1.2em; font-weight: bold;" for="valor_total">Total (R$)</label>
+                                <input type="number" name="valor_total" id="valor_total" class="nn-form-control"
                                        step="0.01" min="0" value="0.00" readonly 
                                        style="background: #e9ecef; font-weight: bold; font-size: 1.3em; color: var(--success);">
                             </div>
@@ -379,8 +384,8 @@ require_once '../includes/header.php';
                         </div>
                         <div class="nn-card-body">
                             <div class="nn-form-group">
-                                <label class="nn-form-label">Status da OS *</label>
-                                <select name="status" class="nn-form-control" required>
+                                <label class="nn-form-label" for="status">Status da OS *</label>
+                                <select id="status" name="status" class="nn-form-control" required>
                                     <option value="aberta">Aberta</option>
                                     <option value="em_andamento">Em Andamento</option>
                                     <option value="concluida">Concluída</option>

@@ -43,6 +43,7 @@ require_once 'includes/header.php';
         <div class="btn-group">
             <a href="despesas.php" class="btn btn-primary">← Voltar</a>
             <a href="adicionar.php" class="btn btn-success">+ Nova Parcelada</a>
+            <a href="logout.php" class="btn btn-danger" onclick="return confirm('Deseja sair do sistema?')">⏻ Sair</a>
         </div>
     </header>
     
@@ -97,7 +98,7 @@ require_once 'includes/header.php';
             </div>
             
             <div style="display: flex; gap: 10px; margin-top: 15px;">
-                <a href="?ver=<?php echo $grupo['grupo_parcelamento']; ?>" 
+                <a href="?ver=<?php echo htmlspecialchars($grupo['grupo_parcelamento']); ?>" 
                    class="btn btn-primary btn-small" style="flex: 1;">
                     Ver Parcelas
                 </a>
@@ -111,8 +112,14 @@ require_once 'includes/header.php';
     </div>
     
     <!-- Detalhes do parcelamento selecionado -->
-    <?php if (isset($_GET['ver'])): 
-        $parcelas = $despesa->listarParcelamento($_GET['ver'], $usuarioId);
+    <?php
+    $verGrupo = isset($_GET['ver']) ? trim($_GET['ver']) : '';
+    // Aceita apenas formato UUID (hexadecimal com hífens)
+    if ($verGrupo && !preg_match('/^[0-9a-f\-]{36}$/i', $verGrupo)) {
+        $verGrupo = '';
+    }
+    if ($verGrupo):
+        $parcelas = $despesa->listarParcelamento($verGrupo, $usuarioId);
         if (count($parcelas) > 0):
     ?>
     <div style="margin-top: 40px;">

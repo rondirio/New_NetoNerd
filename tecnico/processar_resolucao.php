@@ -1,6 +1,6 @@
 <?php
-session_start();
 require_once '../controller/auth_middleware.php';
+require_once '../controller/historico_chamados.php';
 require_once '../config/bandoDeDados/conexao.php';
 
 // PROTEÇÃO: Apenas técnicos e admins
@@ -10,6 +10,8 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     header('Location: meus_chamados.php?erro=metodo_invalido');
     exit();
 }
+
+requireCsrfToken();
 
 $conn = getConnection();
 $tecnico_id = $_SESSION['usuario_id'];
@@ -187,14 +189,7 @@ try {
     $historico_comentario = "Chamado resolvido. ";
     $historico_comentario .= $stylemanager_software ? "StyleManager Software (sem cobrança)" : "Pago via $pagamento_forma";
 
-    $stmt = $conn->prepare("
-        INSERT INTO historico_chamados (chamado_id, usuario_id, status_anterior, status_novo, comentario)
-        VALUES (?, ?, ?, 'resolvido', ?)
-    ");
-    $status_anterior = $chamado['status'];
-    $stmt->bind_param("iiss", $chamado_id, $tecnico_id, $status_anterior, $historico_comentario);
-    $stmt->execute();
-    $stmt->close();
+    registrarHistoricoStatus($conn, $chamado_id, $tecnico_id, $chamado['status'], 'resolvido', $historico_comentario);
 
     // ============================================
     // LOG DO SISTEMA
@@ -204,10 +199,7 @@ try {
     $log_acao .= $stylemanager_software ? "StyleManager Software. " : "Pagamento: $pagamento_forma. ";
     $log_acao .= count($fotos_salvas) . " foto(s).";
 
-    $stmt = $conn->prepare("INSERT INTO logs_sistema (usuario_id, acao) VALUES (?, ?)");
-    $stmt->bind_param("is", $tecnico_id, $log_acao);
-    $stmt->execute();
-    $stmt->close();
+    registrarLogSistema($conn, $tecnico_id, $log_acao, 'chamado', $chamado_id);
 
     $conn->commit();
 

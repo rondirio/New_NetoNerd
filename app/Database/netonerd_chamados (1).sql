@@ -162,7 +162,7 @@ CREATE TABLE `tecnicos` (
 --
 
 INSERT INTO `tecnicos` (`id`, `nome`, `email`, `senha`, `status_tecnico`, `Ativo`, `matricula`, `carro_do_dia`, `senha_hash`, `created_at`) VALUES
-(1, 'Rondineli Da Silva Oliveira Moreira', 'rondi.rio@netonerd.com.br', 'Rcouto95', 'Ativo', 1, '2025F1ADM001', 'FordKA - PYR7H91', 'Rcouto95', '2025-04-01 15:08:20'),
+(1, 'Rondineli Da Silva Oliveira Moreira', 'rondi.rio@netonerd.com.br.br', 'Rcouto95', 'Ativo', 1, '2025F1ADM001', 'FordKA - PYR7H91', 'Rcouto95', '2025-04-01 15:08:20'),
 (2, 'Thaina Quintanilha Ramos', 'thainaqramos@gmail.com', '', 'Active', 1, '2025F1001', 'Fiat Uno LML5837', '$2y$10$D2Yufn2oz2QXmICzE/K5YOp1J7IqxrlFzlH9d1goljMCfiMY.V2cO', '2025-04-01 15:09:02');
 
 -- --------------------------------------------------------

@@ -16,10 +16,12 @@ class StyleManagerJWT {
         // Carrega configurações do arquivo clientes.php
         $config = StyleManagerDatabase::getGlobalConfig();
 
-        // Chave secreta do config ou fallback do ambiente
-        $this->secretKey = $config['jwt_secret']
-            ?? getenv('JWT_SECRET')
-            ?: 'stylemanager_jwt_secret_key_2026_change_in_production';
+        // Chave secreta obrigatória via .env — sem fallback hardcoded
+        $this->secretKey = $config['jwt_secret'] ?? getenv('STYLEMANAGER_JWT_SECRET') ?: null;
+
+        if (empty($this->secretKey)) {
+            throw new RuntimeException('STYLEMANAGER_JWT_SECRET não configurado no .env — obrigatório para emitir/validar tokens.');
+        }
 
         // Tempos de expiração
         $this->tokenExpiration = $config['token_expiration'] ?? 86400 * 30; // 30 dias

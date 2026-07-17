@@ -5,11 +5,12 @@
  * Inclui dados de conexão do banco de dados do cliente
  */
 
-session_start();
 require_once '../controller/auth_middleware.php';
 require_once '../config/bandoDeDados/conexao.php';
+require_once '../config/crypto.php';
 
 requireAdmin();
+requireCsrfToken();
 
 $conn = getConnection();
 
@@ -35,6 +36,7 @@ switch ($acao) {
         $db_usuario = trim($_POST['db_usuario'] ?? '');
         $db_senha = $_POST['db_senha'] ?? '';
         $db_porta = intval($_POST['db_porta'] ?? 3306);
+        $ip_permitido = trim($_POST['ip_permitido'] ?? '');
 
         // Gerar chave se não fornecida
         if (empty($chave)) {
@@ -52,12 +54,17 @@ switch ($acao) {
         }
         $stmt->close();
 
-        // Criptografar senha do banco (base64 simples - em produção usar algo mais seguro)
-        $db_senha_encrypted = base64_encode($db_senha);
+        if ($ip_permitido === '') {
+            header('Location: api_keys.php?msg=ip_obrigatorio');
+            exit;
+        }
+
+        // Criptografia real (AES-256-GCM) — ver config/crypto.php
+        $db_senha_encrypted = encryptSecret($db_senha);
 
         // Inserir nova chave
-        $stmt = $conn->prepare("INSERT INTO api_keys (chave, descricao, cliente_nome, db_host, db_nome, db_usuario, db_senha, db_porta, status, data_expiracao, criado_por) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
-        $stmt->bind_param("sssssssissi", $chave, $descricao, $cliente_nome, $db_host, $db_nome, $db_usuario, $db_senha_encrypted, $db_porta, $status, $data_expiracao, $criado_por);
+        $stmt = $conn->prepare("INSERT INTO api_keys (chave, descricao, cliente_nome, db_host, db_nome, db_usuario, db_senha, db_porta, status, data_expiracao, ip_permitido, criado_por) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+        $stmt->bind_param("sssssssisssi", $chave, $descricao, $cliente_nome, $db_host, $db_nome, $db_usuario, $db_senha_encrypted, $db_porta, $status, $data_expiracao, $ip_permitido, $criado_por);
 
         if ($stmt->execute()) {
             header('Location: api_keys.php?msg=criada');
@@ -135,7 +142,7 @@ switch ($acao) {
                 $stmt->close();
 
                 // Descriptografar senha
-                $senha = base64_decode($data['db_senha']);
+                $senha = decryptSecret($data['db_senha']);
 
                 // Tentar conexão
                 $test_conn = @new mysqli(

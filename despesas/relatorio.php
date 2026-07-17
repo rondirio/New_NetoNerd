@@ -1,16 +1,22 @@
 <?php
 session_start();
+require_once 'classes/Auth.php';
 require_once 'classes/Despesa.php';
+
+$auth = new Auth();
+$auth->protegerPagina();
+$usuarioId = $auth->getUsuarioId();
 
 $despesa = new Despesa();
 
-// Filtros
-$mesAtual = $_GET['mes'] ?? date('m');
-$anoAtual = $_GET['ano'] ?? date('Y');
+// Filtros — intval previne valores inválidos
+$mesAtual = isset($_GET['mes']) ? max(1, min(12, intval($_GET['mes']))) : intval(date('m'));
+$mesAtual = str_pad($mesAtual, 2, '0', STR_PAD_LEFT);
+$anoAtual = isset($_GET['ano']) ? max(2000, min(2100, intval($_GET['ano']))) : intval(date('Y'));
 
-// Buscar dados
-$despesas = $despesa->listar(['mes' => $mesAtual, 'ano' => $anoAtual]);
-$estatisticas = $despesa->estatisticasMes($mesAtual, $anoAtual);
+// Buscar dados filtrados pelo usuário autenticado
+$despesas    = $despesa->listar(['usuario_id' => $usuarioId, 'mes' => $mesAtual, 'ano' => $anoAtual]);
+$estatisticas = $despesa->estatisticasMes($mesAtual, $anoAtual, $usuarioId);
 
 $meses = [
     '01' => 'Janeiro', '02' => 'Fevereiro', '03' => 'Março',
@@ -53,10 +59,11 @@ require_once 'includes/header.php';
         <div class="btn-group">
             <a href="despesas.php" class="btn btn-primary">← Voltar</a>
             <button onclick="window.print()" class="btn btn-success">🖨️ Imprimir</button>
-            <button onclick="document.getElementById('modalEmail').classList.add('active')" 
+            <button onclick="document.getElementById('modalEmail').classList.add('active')"
                     class="btn btn-warning">
                 📧 Enviar por Email
             </button>
+            <a href="logout.php" class="btn btn-danger" onclick="return confirm('Deseja sair do sistema?')">⏻ Sair</a>
         </div>
     </header>
     

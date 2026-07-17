@@ -9,5 +9,5 @@ ini_set('error_log', dirname(__FILE__) . '/erros.log');
 error_reporting(E_ALL);
 
 // Impede que os erros apareçam na tela para o usuário
-ini_set('display_errors', 1);
+ini_set('display_errors', 0);
 ?>

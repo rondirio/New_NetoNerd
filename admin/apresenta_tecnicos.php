@@ -4,7 +4,6 @@
  * Lista completa de técnicos com estatísticas
  */
 
-session_start();
 require_once '../controller/auth_middleware.php';
 require_once '../config/bandoDeDados/conexao.php';
 

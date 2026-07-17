@@ -5,7 +5,6 @@
  */
  require_once '../controller/configurar_log.php';
 
-session_start();
 require_once '../controller/auth_middleware.php';
 require_once '../config/bandoDeDados/conexao.php';
 
@@ -34,8 +33,18 @@ if (!$tecnico) {
 }
 
 // Período para relatório (padrão: últimos 30 dias, mas permite customizar)
-$data_inicio = $_GET['data_inicio'] ?? date('Y-m-d', strtotime('-30 days'));
-$data_fim = $_GET['data_fim'] ?? date('Y-m-d');
+function validarDataFiltro($valor, $padrao) {
+    if (is_string($valor) && preg_match('/^\d{4}-\d{2}-\d{2}$/', $valor)) {
+        $partes = explode('-', $valor);
+        if (checkdate((int)$partes[1], (int)$partes[2], (int)$partes[0])) {
+            return $valor;
+        }
+    }
+    return $padrao;
+}
+
+$data_inicio = validarDataFiltro($_GET['data_inicio'] ?? null, date('Y-m-d', strtotime('-30 days')));
+$data_fim = validarDataFiltro($_GET['data_fim'] ?? null, date('Y-m-d'));
 $data_fim_com_horario = $data_fim . " 23:59:59";
 
 // Estatísticas gerais do técnico
@@ -175,14 +184,14 @@ require_once '../includes/header.php';
                     <div class="row g-3 align-items-end">
                         <div class="col-md-4">
                             <div class="nn-form-group">
-                                <label class="nn-form-label">Data Início</label>
-                                <input type="date" name="data_inicio" class="nn-form-control" value="<?php echo $data_inicio; ?>">
+                                <label class="nn-form-label" for="data_inicio">Data Início</label>
+                                <input type="date" id="data_inicio" name="data_inicio" class="nn-form-control" value="<?php echo htmlspecialchars($data_inicio); ?>">
                             </div>
                         </div>
                         <div class="col-md-4">
                             <div class="nn-form-group">
-                                <label class="nn-form-label">Data Fim</label>
-                                <input type="date" name="data_fim" class="nn-form-control" value="<?php echo $data_fim; ?>">
+                                <label class="nn-form-label" for="data_fim">Data Fim</label>
+                                <input type="date" id="data_fim" name="data_fim" class="nn-form-control" value="<?php echo htmlspecialchars($data_fim); ?>">
                             </div>
                         </div>
                         <div class="col-md-4">

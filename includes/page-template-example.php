@@ -1,8 +1,9 @@
 <?php
 /**
  * EXEMPLO DE TEMPLATE DE PÁGINA
- * NetoNerd ITSM v2.0
+ * NetoNerd ITSM v2.1 — layout em sidebar (drawer lateral)
  * Use este arquivo como base para criar/atualizar páginas
+ * O header já renderiza a sidebar; a página só precisa do wrapper abaixo
  */
 
 // Configurações da página

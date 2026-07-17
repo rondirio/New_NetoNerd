@@ -240,7 +240,7 @@ VALUES (
 INSERT INTO tecnicos (nome, email, matricula, senha_hash, status_tecnico, Ativo)
 VALUES (
     'Nome do Técnico',
-    'tecnico@netonerd.com.br',
+    'tecnico@netonerd.com.br.br',
     '2026F002',  -- Formato: ANOF###
     '$2y$10$...',  -- Hash da senha
     'Ativo',
@@ -256,7 +256,7 @@ VALUES (
 INSERT INTO tecnicos (nome, email, matricula, senha_hash, status_tecnico, Ativo)
 VALUES (
     'Nome do Admin',
-    'admin@netonerd.com.br',
+    'admin@netonerd.com.br.br',
     '2026ADM002',  -- Formato: ANOADM### ou ANOA###
     '$2y$10$...',  -- Hash da senha
     'Ativo',

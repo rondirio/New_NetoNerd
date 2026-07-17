@@ -142,17 +142,22 @@
 
         <h3 class="text-center other-products-title">Conheça outras soluções</h3>
         <div class="row mt-4">
-            <div class="col-md-4 mb-3">
+            <div class="col-md-3 mb-3">
                 <a href="?id=myhealth" class="card shadow-sm border-0 text-decoration-none text-dark h-100 p-3 text-center">
                     <h6>MyHealth</h6>
                 </a>
             </div>
-            <div class="col-md-4 mb-3">
+            <div class="col-md-3 mb-3">
+                <a href="?id=escritorius" class="card shadow-sm border-0 text-decoration-none text-dark h-100 p-3 text-center">
+                    <h6>Escritorius</h6>
+                </a>
+            </div>
+            <div class="col-md-3 mb-3">
                 <a href="?id=stylemanager" class="card shadow-sm border-0 text-decoration-none text-dark h-100 p-3 text-center">
                     <h6>Style Manager</h6>
                 </a>
             </div>
-            <div class="col-md-4 mb-3">
+            <div class="col-md-3 mb-3">
                 <a href="?id=pj" class="card shadow-sm border-0 text-decoration-none text-dark h-100 p-3 text-center">
                     <h6>NetoNerd PJ</h6>
                 </a>
@@ -179,6 +184,18 @@
                     { icon: 'fa-shield-halved', text: 'Segurança absoluta de dados seguindo normas da LGPD.' },
                     { icon: 'fa-user-doctor', text: 'Painel exclusivo para profissionais da saúde.' },
                     { icon: 'fa-mobile-screen', text: 'Aplicativo para acompanhamento do paciente.' }
+                ]
+            },
+            'escritorius': {
+                titulo: 'Escritorius',
+                tagline: 'Gestão Jurídica Inteligente',
+                preco: 'R$ 100,00/mês',
+                img: '../src/imagens/Logo_Escritorius.png',
+                features: [
+                    { icon: 'fa-scale-balanced', text: 'Controle completo de processos e prazos jurídicos.' },
+                    { icon: 'fa-folder-open', text: 'Gestão de clientes e contratos em um só lugar.' },
+                    { icon: 'fa-calendar-days', text: 'Agenda integrada com alertas de audiências e vencimentos.' },
+                    { icon: 'fa-file-invoice-dollar', text: 'Faturamento e controle financeiro do escritório.' }
                 ]
             },
             'stylemanager': {

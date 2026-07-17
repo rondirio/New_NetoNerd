@@ -1,5 +1,4 @@
 <?php
-session_start();
 require_once '../controller/auth_middleware.php';
 require_once '../config/bandoDeDados/conexao.php';
 
@@ -10,6 +9,10 @@ requireAdmin();
 if (!isset($_SESSION['id']) || $_SESSION['tipo'] !== 'admin') {
     header('Location: ../publics/login.php?erro=acesso_negado');
     exit();
+}
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    requireCsrfToken();
 }
 
 $conn = getConnection();

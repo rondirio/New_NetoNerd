@@ -4,7 +4,6 @@
  * Atribuir Chamados a Técnicos
  * NetoNerd ITSM v2.0
  */
-session_start();
 require_once '../controller/auth_middleware.php';
 require_once '../config/bandoDeDados/conexao.php';
 requireAdmin();
@@ -17,7 +16,10 @@ $conn = getConnection();
 // ========================================
 $filtro_status = $_GET['status'] ?? 'nao_atribuido';
 $filtro_prioridade = $_GET['prioridade'] ?? '';
-$busca = $_GET['busca'] ?? '';
+$busca = trim($_GET['busca'] ?? '');
+
+// Se vier de um chamado específico (ex: link "Atribuir Técnico" em outra tela), pré-seleciona no modal
+$chamado_preselecionado = isset($_GET['chamado']) ? intval($_GET['chamado']) : null;
 
 // ========================================
 // CONSTRUÇÃO DA QUERY - CHAMADOS
@@ -28,12 +30,13 @@ $sql = "
         IFNULL(cl.nome, c.nome_usuario) AS cliente_nome,
         cl.email AS cliente_email,
         cl.telefone AS cliente_telefone,
-        t.nome AS tecnico_nome,
-        t.matricula AS tecnico_matricula,
+        COALESCE(t.nome, ta.nome) AS tecnico_nome,
+        COALESCE(t.matricula, ta.matricula) AS tecnico_matricula,
         TIMESTAMPDIFF(HOUR, c.data_abertura, NOW()) AS horas_aguardando
     FROM chamados c
     LEFT JOIN clientes cl ON c.cliente_id = cl.id
     LEFT JOIN tecnicos t ON c.tecnico_id = t.id
+    LEFT JOIN admins ta ON c.tecnico_id = ta.id
     WHERE c.status != 'cancelado'
 ";
 
@@ -77,11 +80,12 @@ if ($busca !== '') {
 // Ordenação
 $sql .= " 
     ORDER BY 
-        CASE c.prioridade 
-            WHEN 'critica' THEN 1 
-            WHEN 'alta' THEN 2 
-            WHEN 'media' THEN 3 
-            WHEN 'baixa' THEN 4 
+        CASE c.prioridade
+            WHEN 'critica' THEN 1
+            WHEN 'alta' THEN 2
+            WHEN 'media' THEN 3
+            WHEN 'baixa' THEN 4
+            ELSE 5
         END,
         c.data_abertura ASC
 ";
@@ -104,10 +108,9 @@ while ($row = $result->fetch_assoc()) {
 // TÉCNICOS ATIVOS
 // ========================================
 $tecnicos = $conn->query("
-    SELECT id, nome, matricula 
-    FROM tecnicos 
-    WHERE Ativo = 1 
-    AND matricula LIKE '%F%' 
+    SELECT id, nome, matricula
+    FROM tecnicos
+    WHERE status_tecnico = 'Active'
     ORDER BY nome
 ");
 
@@ -121,10 +124,9 @@ $stats_result = $conn->query("
         COUNT(CASE WHEN c.status = 'em andamento' THEN 1 END) AS em_andamento,
         COUNT(CASE WHEN c.status = 'pendente' THEN 1 END) AS pendentes
     FROM tecnicos t
-    LEFT JOIN chamados c ON t.id = c.tecnico_id 
+    LEFT JOIN chamados c ON t.id = c.tecnico_id
         AND c.status IN ('aberto','em andamento','pendente')
-    WHERE t.Ativo = 1 
-    AND t.matricula LIKE '%F%'
+    WHERE t.status_tecnico = 'Active'
     GROUP BY t.id
 ");
 
@@ -191,10 +193,10 @@ require_once '../includes/header.php';
             <div class="nn-card-body">
                 <form method="GET" class="row g-3">
                     <div class="col-md-3">
-                        <label class="nn-form-label">
+                        <label class="nn-form-label" for="filtro_status">
                             <i class="fas fa-filter"></i> Status
                         </label>
-                        <select name="status" class="nn-form-control" onchange="this.form.submit()">
+                        <select name="status" id="filtro_status" class="nn-form-control" onchange="this.form.submit()">
                             <option value="nao_atribuido" <?= $filtro_status === 'nao_atribuido' ? 'selected' : '' ?>>Não Atribuídos</option>
                             <option value="atribuido" <?= $filtro_status === 'atribuido' ? 'selected' : '' ?>>Atribuídos</option>
                             <option value="todos" <?= $filtro_status === 'todos' ? 'selected' : '' ?>>Todos</option>
@@ -204,10 +206,10 @@ require_once '../includes/header.php';
                     </div>
 
                     <div class="col-md-3">
-                        <label class="nn-form-label">
+                        <label class="nn-form-label" for="filtro_prioridade">
                             <i class="fas fa-exclamation-triangle"></i> Prioridade
                         </label>
-                        <select name="prioridade" class="nn-form-control" onchange="this.form.submit()">
+                        <select name="prioridade" id="filtro_prioridade" class="nn-form-control" onchange="this.form.submit()">
                             <option value="">Todas</option>
                             <option value="critica" <?= $filtro_prioridade === 'critica' ? 'selected' : '' ?>>Crítica</option>
                             <option value="alta" <?= $filtro_prioridade === 'alta' ? 'selected' : '' ?>>Alta</option>
@@ -217,10 +219,10 @@ require_once '../includes/header.php';
                     </div>
 
                     <div class="col-md-4">
-                        <label class="nn-form-label">
+                        <label class="nn-form-label" for="filtro_busca">
                             <i class="fas fa-search"></i> Buscar
                         </label>
-                        <input type="text" name="busca" class="nn-form-control" placeholder="Protocolo, título, cliente..." value="<?= htmlspecialchars($busca) ?>">
+                        <input type="text" name="busca" id="filtro_busca" class="nn-form-control" placeholder="Protocolo, título, cliente..." value="<?= htmlspecialchars($busca) ?>">
                     </div>
 
                     <div class="col-md-2 d-flex align-items-end">
@@ -319,6 +321,7 @@ require_once '../includes/header.php';
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
             </div>
             <form action="processar_atribuicao.php" method="POST">
+                <?php echo csrfField(); ?>
                 <div class="modal-body">
                     <input type="hidden" name="chamado_id" id="chamado_id">
                     <input type="hidden" name="acao" value="atribuir">
@@ -360,8 +363,8 @@ require_once '../includes/header.php';
                     </div>
 
                     <div class="nn-form-group">
-                        <label class="nn-form-label">Comentário (opcional):</label>
-                        <textarea name="comentario" class="nn-form-control" rows="3" placeholder="Ex: Cliente relata urgência..."></textarea>
+                        <label class="nn-form-label" for="comentario">Comentário (opcional):</label>
+                        <textarea name="comentario" id="comentario" class="nn-form-control" rows="3" placeholder="Ex: Cliente relata urgência..."></textarea>
                     </div>
                 </div>
                 <div class="modal-footer">
@@ -405,6 +408,16 @@ function selecionarTecnico(tecnicoId) {
     card.style.borderColor = 'var(--success)';
     card.style.backgroundColor = '#d4edda';
 }
+
+<?php if ($chamado_preselecionado): ?>
+// Chamado veio pré-selecionado via ?chamado=<id> (ex: link "Atribuir Técnico" de outra tela)
+document.addEventListener('DOMContentLoaded', function () {
+    abrirModalAtribuir(
+        <?= json_encode($chamado_preselecionado) ?>,
+        <?= json_encode(current(array_filter($chamados, fn($c) => (int)$c['id'] === $chamado_preselecionado))['titulo'] ?? '') ?>
+    );
+});
+<?php endif; ?>
 </script>
 
 <?php require_once '../includes/footer.php'; ?>

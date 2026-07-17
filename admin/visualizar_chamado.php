@@ -2,7 +2,6 @@
 /**
  * Visualizar Detalhes do Chamado - Admin - NetoNerd ITSM v2.0
  */
-session_start();
 require_once '../controller/auth_middleware.php';
 require_once '../config/bandoDeDados/conexao.php';
 
@@ -25,12 +24,13 @@ $sql = "
         IFNULL(cl.nome, c.nome_usuario) as cliente_nome,
         cl.email as cliente_email,
         cl.telefone as cliente_telefone,
-        t.nome as tecnico_nome,
-        t.matricula as tecnico_matricula,
-        t.email as tecnico_email
+        COALESCE(t.nome, ta.nome) as tecnico_nome,
+        COALESCE(t.matricula, ta.matricula) as tecnico_matricula,
+        COALESCE(t.email, ta.email) as tecnico_email
     FROM chamados c
     LEFT JOIN clientes cl ON c.cliente_id = cl.id
     LEFT JOIN tecnicos t ON c.tecnico_id = t.id
+    LEFT JOIN admins ta ON c.tecnico_id = ta.id
     WHERE c.id = ?
 ";
 
@@ -45,6 +45,17 @@ if ($result->num_rows === 0) {
 }
 
 $chamado = $result->fetch_assoc();
+
+// Buscar anexos enviados na abertura do chamado (cliente, técnico ou admin)
+$stmt_anexos = $conn->prepare("
+    SELECT * FROM anexos_chamado
+    WHERE chamado_id = ?
+    ORDER BY data_upload DESC
+");
+$stmt_anexos->bind_param("i", $chamado_id);
+$stmt_anexos->execute();
+$anexos = $stmt_anexos->get_result();
+$stmt_anexos->close();
 
 // Buscar histórico se a tabela existir (comentado para não quebrar)
 $historico_items = [];
@@ -210,6 +221,39 @@ require_once '../includes/header.php';
                                         </div>
                                     </div>
                                 <?php endforeach; ?>
+                            </div>
+                        </div>
+                    </div>
+                <?php endif; ?>
+
+                <!-- Anexos enviados -->
+                <?php if ($anexos->num_rows > 0): ?>
+                    <div class="nn-card nn-animate-slide">
+                        <div class="nn-card-header">
+                            <h2 class="nn-card-title">
+                                <i class="fas fa-paperclip"></i>
+                                Anexos (<?= $anexos->num_rows ?>)
+                            </h2>
+                        </div>
+                        <div class="nn-card-body">
+                            <div class="row g-3">
+                                <?php while ($anexo = $anexos->fetch_assoc()): ?>
+                                    <div class="col-md-4">
+                                        <a href="<?= htmlspecialchars($anexo['caminho_arquivo']) ?>"
+                                           target="_blank" class="nn-card" style="text-align: center; margin-bottom: 0; text-decoration: none;">
+                                            <div style="font-size: 2.5rem; margin-bottom: 10px;">
+                                                <?php
+                                                $ext = pathinfo($anexo['nome_original'], PATHINFO_EXTENSION);
+                                                echo in_array(strtolower($ext), ['jpg', 'jpeg', 'png', 'gif', 'webp']) ? '<i class="fas fa-image"></i>' : '<i class="fas fa-file"></i>';
+                                                ?>
+                                            </div>
+                                            <div style="font-weight: 600; word-break: break-all; margin-bottom: 5px;"><?= htmlspecialchars($anexo['nome_original']) ?></div>
+                                            <div class="text-muted" style="font-size: 0.8rem;">
+                                                Enviado por <?= htmlspecialchars(ucfirst($anexo['tipo_usuario'])) ?> em <?= date('d/m/Y', strtotime($anexo['data_upload'])) ?>
+                                            </div>
+                                        </a>
+                                    </div>
+                                <?php endwhile; ?>
                             </div>
                         </div>
                     </div>

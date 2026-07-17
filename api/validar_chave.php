@@ -19,7 +19,6 @@
  */
 
 header('Content-Type: application/json; charset=utf-8');
-header('Access-Control-Allow-Origin: *');
 header('Access-Control-Allow-Methods: GET, POST, OPTIONS');
 header('Access-Control-Allow-Headers: Content-Type, Authorization, X-API-Key');
 
@@ -29,6 +28,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
 }
 
 require_once '../config/bandoDeDados/conexao.php';
+require_once '../config/crypto.php';
 
 $conn = getConnection();
 
@@ -125,20 +125,21 @@ if ($key_data['data_expiracao'] && strtotime($key_data['data_expiracao']) < time
     exit;
 }
 
-// Verificar IP permitido
+// Verificar IP permitido (obrigatório - chave sem IP cadastrado é recusada)
 $client_ip = $_SERVER['REMOTE_ADDR'];
-if (!empty($key_data['ip_permitido'])) {
-    $ips_permitidos = array_map('trim', explode(',', $key_data['ip_permitido']));
-    if (!in_array($client_ip, $ips_permitidos)) {
-        http_response_code(403);
-        echo json_encode([
-            'success' => false,
-            'error' => 'IP não autorizado',
-            'code' => 'IP_NOT_ALLOWED'
-        ]);
-        $conn->close();
-        exit;
-    }
+$ips_permitidos = empty($key_data['ip_permitido'])
+    ? []
+    : array_map('trim', explode(',', $key_data['ip_permitido']));
+
+if (empty($ips_permitidos) || !in_array($client_ip, $ips_permitidos, true)) {
+    http_response_code(403);
+    echo json_encode([
+        'success' => false,
+        'error' => 'IP não autorizado',
+        'code' => 'IP_NOT_ALLOWED'
+    ]);
+    $conn->close();
+    exit;
 }
 
 // Atualizar último uso e contador
@@ -147,8 +148,18 @@ $stmt->bind_param("i", $key_data['id']);
 $stmt->execute();
 $stmt->close();
 
-// Descriptografar senha do banco
-$db_senha = base64_decode($key_data['db_senha']);
+// Descriptografar senha do banco (AES-256-GCM - ver config/crypto.php)
+$db_senha = decryptSecret($key_data['db_senha']);
+if ($db_senha === false) {
+    http_response_code(500);
+    echo json_encode([
+        'success' => false,
+        'error' => 'Falha ao descriptografar credenciais',
+        'code' => 'DECRYPT_ERROR'
+    ]);
+    $conn->close();
+    exit;
+}
 
 // Chave válida - retornar dados de conexão do BD
 http_response_code(200);

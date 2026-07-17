@@ -1,21 +1,18 @@
 <?php
-session_start();
+/**
+ * ConfiguraÃ§Ãµes - NetoNerd ITSM v2.1
+ */
+
 require_once '../controller/auth_middleware.php';
 require_once '../config/bandoDeDados/conexao.php';
 
-// PROTEÃ‡ÃƒO: Apenas administradores podem acessar
 requireAdmin();
-
-// Verificar autenticação de admin
-if (!isset($_SESSION['id']) || $_SESSION['tipo'] !== 'admin') {
-    header('Location: ../publics/login.php?erro=acesso_negado');
-    exit();
-}
 
 $conn = getConnection();
 
-// Processar atualização de configurações
+// Processar atualizaÃ§Ã£o de configuraÃ§Ãµes
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['acao']) && $_POST['acao'] === 'atualizar') {
+    requireCsrfToken();
     try {
         foreach ($_POST['config'] as $chave => $valor) {
             $chave_safe = htmlspecialchars($chave);
@@ -33,12 +30,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['acao']) && $_POST['ac
 
         $sucesso = true;
     } catch (Exception $e) {
-        error_log("Erro ao atualizar configurações: " . $e->getMessage());
+        error_log("Erro ao atualizar configuraÃ§Ãµes: " . $e->getMessage());
         $erro = true;
     }
 }
 
-// Buscar configurações atuais
+// Buscar configuraÃ§Ãµes atuais
 $configs = [];
 $result = $conn->query("SELECT * FROM configuracoes_sistema ORDER BY grupo, chave");
 if ($result) {
@@ -46,234 +43,244 @@ if ($result) {
         $configs[$row['grupo']][] = $row;
     }
 }
+
+$page_title = "ConfiguraÃ§Ãµes - NetoNerd ITSM";
+require_once '../includes/header.php';
 ?>
-<!DOCTYPE html>
-<html lang="pt-BR">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Configurações - NetoNerd Admin</title>
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <style>
-        body {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-        }
-        .main-container {
-            padding: 30px 0;
-        }
-        .card {
-            border-radius: 15px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
-            margin-bottom: 20px;
-        }
-        .card-header {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            border-radius: 15px 15px 0 0 !important;
-            padding: 20px;
-        }
-        .config-group {
-            background: #f8f9fa;
-            padding: 20px;
-            border-radius: 10px;
-            margin-bottom: 20px;
-        }
-        .config-group h4 {
-            color: #667eea;
-            margin-bottom: 20px;
-            border-bottom: 2px solid #667eea;
-            padding-bottom: 10px;
-        }
-    </style>
-</head>
-<body>
-    <?php if(file_exists('../routes/header_admin.php')) include '../routes/header_admin.php'; ?>
 
-    <div class="container main-container">
-        <div class="row">
-            <div class="col-12">
-                <div class="card">
-                    <div class="card-header">
-                        <h2 class="mb-0">
-                            <i class="fas fa-cog"></i> Configurações do Sistema
-                        </h2>
+<div class="nn-main-wrapper">
+    <div class="nn-content nn-content-full">
+
+        <div class="nn-card nn-animate-fade">
+            <div class="nn-card-header">
+                <h1 class="nn-card-title">
+                    <i class="fas fa-cog"></i>
+                    ConfiguraÃ§Ãµes do Sistema
+                </h1>
+            </div>
+        </div>
+
+        <?php if (isset($sucesso)): ?>
+            <div class="nn-alert nn-alert-success nn-animate-fade">
+                <i class="fas fa-check-circle"></i>
+                ConfiguraÃ§Ãµes atualizadas com sucesso!
+            </div>
+        <?php endif; ?>
+
+        <?php if (isset($erro)): ?>
+            <div class="nn-alert nn-alert-danger nn-animate-fade">
+                <i class="fas fa-exclamation-triangle"></i>
+                Erro ao atualizar configuraÃ§Ãµes. Tente novamente.
+            </div>
+        <?php endif; ?>
+
+        <form method="POST">
+            <?php echo csrfField(); ?>
+            <input type="hidden" name="acao" value="atualizar">
+
+            <!-- ConfiguraÃ§Ãµes Gerais -->
+            <div class="nn-card">
+                <div class="nn-card-header">
+                    <h2 class="nn-card-title">
+                        <i class="fas fa-info-circle"></i>
+                        Geral
+                    </h2>
+                </div>
+                <div class="nn-card-body">
+                    <?php foreach ($configs['geral'] ?? [] as $config): ?>
+                        <div class="nn-form-group">
+                            <label class="nn-form-label" for="<?php echo htmlspecialchars($config['chave']); ?>">
+                                <?php echo htmlspecialchars(ucfirst(str_replace('_', ' ', str_replace('sistema_', '', $config['chave'])))); ?>
+                            </label>
+                            <?php if ($config['descricao']): ?>
+                                <small class="nn-text-light" style="display: block; margin-bottom: 5px;"><?php echo htmlspecialchars($config['descricao']); ?></small>
+                            <?php endif; ?>
+                            <input type="text"
+                                   id="<?php echo htmlspecialchars($config['chave']); ?>"
+                                   name="config[<?php echo htmlspecialchars($config['chave']); ?>]"
+                                   class="nn-form-control"
+                                   value="<?php echo htmlspecialchars($config['valor']); ?>">
+                        </div>
+                    <?php endforeach; ?>
+                </div>
+            </div>
+
+            <!-- ConfiguraÃ§Ãµes de Email -->
+            <div class="nn-card">
+                <div class="nn-card-header">
+                    <h2 class="nn-card-title">
+                        <i class="fas fa-envelope"></i>
+                        Email
+                    </h2>
+                </div>
+                <div class="nn-card-body">
+                    <div class="nn-alert nn-alert-info">
+                        <i class="fas fa-info-circle"></i>
+                        Para configurar as credenciais SMTP, edite o arquivo <code>.env</code> na raiz do projeto.
                     </div>
-                    <div class="card-body">
-                        <?php if (isset($sucesso)): ?>
-                            <div class="alert alert-success alert-dismissible fade show">
-                                <i class="fas fa-check-circle"></i> Configurações atualizadas com sucesso!
-                                <button type="button" class="close" data-dismiss="alert">&times;</button>
-                            </div>
-                        <?php endif; ?>
-
-                        <?php if (isset($erro)): ?>
-                            <div class="alert alert-danger alert-dismissible fade show">
-                                <i class="fas fa-exclamation-triangle"></i> Erro ao atualizar configurações. Tente novamente.
-                                <button type="button" class="close" data-dismiss="alert">&times;</button>
-                            </div>
-                        <?php endif; ?>
-
-                        <form method="POST">
-                            <input type="hidden" name="acao" value="atualizar">
-
-                            <!-- Configurações Gerais -->
-                            <div class="config-group">
-                                <h4><i class="fas fa-info-circle"></i> Geral</h4>
-                                <?php foreach ($configs['geral'] ?? [] as $config): ?>
-                                    <div class="form-group">
-                                        <label for="<?php echo $config['chave']; ?>">
-                                            <strong><?php echo ucfirst(str_replace('_', ' ', str_replace('sistema_', '', $config['chave']))); ?></strong>
-                                        </label>
-                                        <?php if ($config['descricao']): ?>
-                                            <small class="form-text text-muted"><?php echo htmlspecialchars($config['descricao']); ?></small>
-                                        <?php endif; ?>
-                                        <input type="text"
-                                               id="<?php echo $config['chave']; ?>"
-                                               name="config[<?php echo $config['chave']; ?>]"
-                                               class="form-control"
-                                               value="<?php echo htmlspecialchars($config['valor']); ?>">
-                                    </div>
-                                <?php endforeach; ?>
-                            </div>
-
-                            <!-- Configurações de Email -->
-                            <div class="config-group">
-                                <h4><i class="fas fa-envelope"></i> Email</h4>
-                                <div class="alert alert-info">
-                                    <i class="fas fa-info-circle"></i> Para configurar as credenciais SMTP, edite o arquivo <code>.env</code> na raiz do projeto.
+                    <?php foreach ($configs['email'] ?? [] as $config): ?>
+                        <div class="nn-form-group">
+                            <label class="nn-form-label" for="<?php echo htmlspecialchars($config['chave']); ?>">
+                                <?php echo htmlspecialchars(ucfirst(str_replace('_', ' ', $config['chave']))); ?>
+                            </label>
+                            <?php if ($config['descricao']): ?>
+                                <small class="nn-text-light" style="display: block; margin-bottom: 5px;"><?php echo htmlspecialchars($config['descricao']); ?></small>
+                            <?php endif; ?>
+                            <?php if ($config['tipo'] === 'boolean'): ?>
+                                <div class="nn-d-flex nn-align-center nn-gap-1">
+                                    <input type="checkbox"
+                                           id="<?php echo htmlspecialchars($config['chave']); ?>"
+                                           name="config[<?php echo htmlspecialchars($config['chave']); ?>]"
+                                           value="1"
+                                           <?php echo $config['valor'] == '1' ? 'checked' : ''; ?>>
+                                    <label for="<?php echo htmlspecialchars($config['chave']); ?>">Ativado</label>
                                 </div>
-                                <?php foreach ($configs['email'] ?? [] as $config): ?>
-                                    <div class="form-group">
-                                        <label for="<?php echo $config['chave']; ?>">
-                                            <strong><?php echo ucfirst(str_replace('_', ' ', $config['chave'])); ?></strong>
-                                        </label>
-                                        <?php if ($config['descricao']): ?>
-                                            <small class="form-text text-muted"><?php echo htmlspecialchars($config['descricao']); ?></small>
-                                        <?php endif; ?>
-                                        <?php if ($config['tipo'] === 'boolean'): ?>
-                                            <div class="custom-control custom-switch">
-                                                <input type="checkbox"
-                                                       class="custom-control-input"
-                                                       id="<?php echo $config['chave']; ?>"
-                                                       name="config[<?php echo $config['chave']; ?>]"
-                                                       value="1"
-                                                       <?php echo $config['valor'] == '1' ? 'checked' : ''; ?>>
-                                                <label class="custom-control-label" for="<?php echo $config['chave']; ?>">
-                                                    Ativado
-                                                </label>
-                                            </div>
-                                        <?php else: ?>
-                                            <input type="text"
-                                                   id="<?php echo $config['chave']; ?>"
-                                                   name="config[<?php echo $config['chave']; ?>]"
-                                                   class="form-control"
-                                                   value="<?php echo htmlspecialchars($config['valor']); ?>">
-                                        <?php endif; ?>
-                                    </div>
-                                <?php endforeach; ?>
-                            </div>
+                            <?php else: ?>
+                                <input type="text"
+                                       id="<?php echo htmlspecialchars($config['chave']); ?>"
+                                       name="config[<?php echo htmlspecialchars($config['chave']); ?>]"
+                                       class="nn-form-control"
+                                       value="<?php echo htmlspecialchars($config['valor']); ?>">
+                            <?php endif; ?>
+                        </div>
+                    <?php endforeach; ?>
+                </div>
+            </div>
 
-                            <!-- Configurações de Chamados -->
-                            <div class="config-group">
-                                <h4><i class="fas fa-ticket-alt"></i> Chamados</h4>
-                                <?php foreach ($configs['chamados'] ?? [] as $config): ?>
-                                    <div class="form-group">
-                                        <label for="<?php echo $config['chave']; ?>">
-                                            <strong><?php echo ucfirst(str_replace('_', ' ', $config['chave'])); ?></strong>
-                                        </label>
-                                        <?php if ($config['descricao']): ?>
-                                            <small class="form-text text-muted"><?php echo htmlspecialchars($config['descricao']); ?></small>
-                                        <?php endif; ?>
-                                        <input type="text"
-                                               id="<?php echo $config['chave']; ?>"
-                                               name="config[<?php echo $config['chave']; ?>]"
-                                               class="form-control"
-                                               value="<?php echo htmlspecialchars($config['valor']); ?>">
-                                    </div>
-                                <?php endforeach; ?>
-                            </div>
+            <!-- ConfiguraÃ§Ãµes de Chamados -->
+            <div class="nn-card">
+                <div class="nn-card-header">
+                    <h2 class="nn-card-title">
+                        <i class="fas fa-ticket-alt"></i>
+                        Chamados
+                    </h2>
+                </div>
+                <div class="nn-card-body">
+                    <?php foreach ($configs['chamados'] ?? [] as $config): ?>
+                        <div class="nn-form-group">
+                            <label class="nn-form-label" for="<?php echo htmlspecialchars($config['chave']); ?>">
+                                <?php echo htmlspecialchars(ucfirst(str_replace('_', ' ', $config['chave']))); ?>
+                            </label>
+                            <?php if ($config['descricao']): ?>
+                                <small class="nn-text-light" style="display: block; margin-bottom: 5px;"><?php echo htmlspecialchars($config['descricao']); ?></small>
+                            <?php endif; ?>
+                            <input type="text"
+                                   id="<?php echo htmlspecialchars($config['chave']); ?>"
+                                   name="config[<?php echo htmlspecialchars($config['chave']); ?>]"
+                                   class="nn-form-control"
+                                   value="<?php echo htmlspecialchars($config['valor']); ?>">
+                        </div>
+                    <?php endforeach; ?>
+                </div>
+            </div>
 
-                            <!-- Configurações de Segurança -->
-                            <div class="config-group">
-                                <h4><i class="fas fa-shield-alt"></i> Segurança</h4>
-                                <?php foreach ($configs['seguranca'] ?? [] as $config): ?>
-                                    <div class="form-group">
-                                        <label for="<?php echo $config['chave']; ?>">
-                                            <strong><?php echo ucfirst(str_replace('_', ' ', $config['chave'])); ?></strong>
-                                        </label>
-                                        <?php if ($config['descricao']): ?>
-                                            <small class="form-text text-muted"><?php echo htmlspecialchars($config['descricao']); ?></small>
-                                        <?php endif; ?>
-                                        <input type="number"
-                                               id="<?php echo $config['chave']; ?>"
-                                               name="config[<?php echo $config['chave']; ?>]"
-                                               class="form-control"
-                                               value="<?php echo htmlspecialchars($config['valor']); ?>">
-                                    </div>
-                                <?php endforeach; ?>
-                            </div>
+            <!-- ConfiguraÃ§Ãµes de SeguranÃ§a -->
+            <div class="nn-card">
+                <div class="nn-card-header">
+                    <h2 class="nn-card-title">
+                        <i class="fas fa-shield-alt"></i>
+                        SeguranÃ§a
+                    </h2>
+                </div>
+                <div class="nn-card-body">
+                    <?php foreach ($configs['seguranca'] ?? [] as $config): ?>
+                        <div class="nn-form-group">
+                            <label class="nn-form-label" for="<?php echo htmlspecialchars($config['chave']); ?>">
+                                <?php echo htmlspecialchars(ucfirst(str_replace('_', ' ', $config['chave']))); ?>
+                            </label>
+                            <?php if ($config['descricao']): ?>
+                                <small class="nn-text-light" style="display: block; margin-bottom: 5px;"><?php echo htmlspecialchars($config['descricao']); ?></small>
+                            <?php endif; ?>
+                            <input type="number"
+                                   id="<?php echo htmlspecialchars($config['chave']); ?>"
+                                   name="config[<?php echo htmlspecialchars($config['chave']); ?>]"
+                                   class="nn-form-control"
+                                   value="<?php echo htmlspecialchars($config['valor']); ?>">
+                        </div>
+                    <?php endforeach; ?>
+                </div>
+            </div>
 
-                            <!-- Configurações de Uploads -->
-                            <div class="config-group">
-                                <h4><i class="fas fa-upload"></i> Uploads</h4>
-                                <?php foreach ($configs['uploads'] ?? [] as $config): ?>
-                                    <div class="form-group">
-                                        <label for="<?php echo $config['chave']; ?>">
-                                            <strong><?php echo ucfirst(str_replace('_', ' ', $config['chave'])); ?></strong>
-                                        </label>
-                                        <?php if ($config['descricao']): ?>
-                                            <small class="form-text text-muted"><?php echo htmlspecialchars($config['descricao']); ?></small>
-                                        <?php endif; ?>
-                                        <?php if ($config['tipo'] === 'json'): ?>
-                                            <textarea id="<?php echo $config['chave']; ?>"
-                                                      name="config[<?php echo $config['chave']; ?>]"
-                                                      class="form-control"
-                                                      rows="3"><?php echo htmlspecialchars($config['valor']); ?></textarea>
-                                        <?php else: ?>
-                                            <input type="number"
-                                                   id="<?php echo $config['chave']; ?>"
-                                                   name="config[<?php echo $config['chave']; ?>]"
-                                                   class="form-control"
-                                                   value="<?php echo htmlspecialchars($config['valor']); ?>">
-                                        <?php endif; ?>
-                                    </div>
-                                <?php endforeach; ?>
-                            </div>
+            <!-- ConfiguraÃ§Ãµes de Uploads -->
+            <div class="nn-card">
+                <div class="nn-card-header">
+                    <h2 class="nn-card-title">
+                        <i class="fas fa-upload"></i>
+                        Uploads
+                    </h2>
+                </div>
+                <div class="nn-card-body">
+                    <?php foreach ($configs['uploads'] ?? [] as $config): ?>
+                        <div class="nn-form-group">
+                            <label class="nn-form-label" for="<?php echo htmlspecialchars($config['chave']); ?>">
+                                <?php echo htmlspecialchars(ucfirst(str_replace('_', ' ', $config['chave']))); ?>
+                            </label>
+                            <?php if ($config['descricao']): ?>
+                                <small class="nn-text-light" style="display: block; margin-bottom: 5px;"><?php echo htmlspecialchars($config['descricao']); ?></small>
+                            <?php endif; ?>
+                            <?php if ($config['tipo'] === 'json'): ?>
+                                <textarea id="<?php echo htmlspecialchars($config['chave']); ?>"
+                                          name="config[<?php echo htmlspecialchars($config['chave']); ?>]"
+                                          class="nn-form-control"
+                                          rows="3"><?php echo htmlspecialchars($config['valor']); ?></textarea>
+                            <?php else: ?>
+                                <input type="number"
+                                       id="<?php echo htmlspecialchars($config['chave']); ?>"
+                                       name="config[<?php echo htmlspecialchars($config['chave']); ?>]"
+                                       class="nn-form-control"
+                                       value="<?php echo htmlspecialchars($config['valor']); ?>">
+                            <?php endif; ?>
+                        </div>
+                    <?php endforeach; ?>
+                </div>
+            </div>
 
-                            <!-- Informações do Sistema -->
-                            <div class="config-group">
-                                <h4><i class="fas fa-server"></i> Informações do Sistema</h4>
-                                <div class="row">
-                                    <div class="col-md-6">
-                                        <p><strong>Versão PHP:</strong> <?php echo PHP_VERSION; ?></p>
-                                        <p><strong>Servidor Web:</strong> <?php echo $_SERVER['SERVER_SOFTWARE'] ?? 'Desconhecido'; ?></p>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <p><strong>Banco de Dados:</strong> MySQL <?php echo $conn->server_info; ?></p>
-                                        <p><strong>Ambiente:</strong> <?php echo getenv('APP_ENV') ?: 'development'; ?></p>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="text-center mt-4">
-                                <button type="submit" class="btn btn-primary btn-lg">
-                                    <i class="fas fa-save"></i> Salvar Configurações
-                                </button>
-                                <a href="dashboard.php" class="btn btn-secondary btn-lg ml-2">
-                                    <i class="fas fa-times"></i> Cancelar
-                                </a>
-                            </div>
-                        </form>
+            <!-- InformaÃ§Ãµes do Sistema -->
+            <div class="nn-card">
+                <div class="nn-card-header">
+                    <h2 class="nn-card-title">
+                        <i class="fas fa-server"></i>
+                        InformaÃ§Ãµes do Sistema
+                    </h2>
+                </div>
+                <div class="nn-card-body">
+                    <div class="nn-stats-grid">
+                        <div class="nn-stat-card">
+                            <div class="nn-stat-label">VersÃ£o PHP</div>
+                            <div class="nn-stat-value" style="font-size: 1.2rem;"><?php echo PHP_VERSION; ?></div>
+                        </div>
+                        <div class="nn-stat-card">
+                            <div class="nn-stat-label">Servidor Web</div>
+                            <div class="nn-stat-value" style="font-size: 1.2rem;"><?php echo htmlspecialchars($_SERVER['SERVER_SOFTWARE'] ?? 'Desconhecido'); ?></div>
+                        </div>
+                        <div class="nn-stat-card">
+                            <div class="nn-stat-label">Banco de Dados</div>
+                            <div class="nn-stat-value" style="font-size: 1.2rem;">MySQL <?php echo htmlspecialchars($conn->server_info); ?></div>
+                        </div>
+                        <div class="nn-stat-card">
+                            <div class="nn-stat-label">Ambiente</div>
+                            <div class="nn-stat-value" style="font-size: 1.2rem;"><?php echo htmlspecialchars(getenv('APP_ENV') ?: 'development'); ?></div>
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
-    </div>
 
-    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.2/dist/js/bootstrap.bundle.min.js"></script>
-</body>
-</html>
-<?php $conn->close(); ?>
+            <div class="nn-text-center nn-mt-3">
+                <button type="submit" class="nn-btn nn-btn-primary nn-btn-lg">
+                    <i class="fas fa-save"></i>
+                    Salvar ConfiguraÃ§Ãµes
+                </button>
+                <a href="dashboard.php" class="nn-btn nn-btn-secondary nn-btn-lg">
+                    <i class="fas fa-times"></i>
+                    Cancelar
+                </a>
+            </div>
+        </form>
+
+    </div>
+</div>
+
+<?php
+require_once '../includes/footer.php';
+$conn->close();
+?>

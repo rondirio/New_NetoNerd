@@ -1,3 +1,4 @@
+<?php require_once __DIR__ . '/../controller/auth_middleware.php'; ?>
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -325,6 +326,7 @@
             <?php endif; ?>
 
             <form action="processa_contato.php" method="POST" id="formContato">
+              <?php echo csrfField(); ?>
               <div class="row">
                 <div class="col-md-6">
                   <div class="form-group">

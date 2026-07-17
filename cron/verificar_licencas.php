@@ -15,6 +15,20 @@ require_once __DIR__ . '/../config/EmailService.php';
 echo "[" . date('Y-m-d H:i:s') . "] Iniciando verificação de licenças...\n";
 
 $conn = getConnection();
+
+// Lock para evitar execução concorrente (crontab + disparo manual, ou
+// timeout de uma execução anterior ainda rodando) — evita emails
+// duplicados de vencimento/suspensão de licença.
+$lockName = 'cron_verificar_licencas';
+$lockResult = $conn->query("SELECT GET_LOCK('$lockName', 0) AS obtido")->fetch_assoc();
+if (!$lockResult['obtido']) {
+    echo "Outra execução deste cron já está em andamento. Abortando.\n";
+    exit(0);
+}
+register_shutdown_function(function () use ($conn, $lockName) {
+    $conn->query("SELECT RELEASE_LOCK('$lockName')");
+});
+
 $licenseManager = new LicenseManager();
 $emailService = new EmailService();
 
@@ -194,7 +208,7 @@ function enviarEmailTrialExpirado($emailService, $licenca) {
             <p>O período de trial de 30 dias do <strong>{$licenca['produto_nome']}</strong> expirou.</p>
             <p>Para continuar usando o sistema, entre em contato conosco para contratar um plano:</p>
             <ul>
-                <li>📧 Email: suporte@netonerd.com.br</li>
+                <li>📧 Email: suporte@netonerd.com.br.br</li>
                 <li>📱 WhatsApp: (21) 97739-5867</li>
             </ul>
             <p>Estamos à disposição para te ajudar!</p>
@@ -223,7 +237,7 @@ function enviarEmailAvisoVencimento($emailService, $licenca, $dias_atraso, $tole
             <p><strong>Valor:</strong> R$ " . number_format($licenca['valor_licenca'], 2, ',', '.') . "</p>
             <p>Para regularizar, entre em contato:</p>
             <ul>
-                <li>📧 Email: financeiro@netonerd.com.br</li>
+                <li>📧 Email: financeiro@netonerd.com.br.br</li>
                 <li>📱 WhatsApp: (21) 97739-5867</li>
             </ul>
         </div>
@@ -249,7 +263,7 @@ function enviarEmailLicencaSuspensa($emailService, $licenca, $dias_atraso) {
             <p><strong>Valor em atraso:</strong> R$ " . number_format($licenca['valor_licenca'], 2, ',', '.') . "</p>
             <p>Para reativar sua licença, regularize o pagamento entrando em contato:</p>
             <ul>
-                <li>📧 Email: financeiro@netonerd.com.br</li>
+                <li>📧 Email: financeiro@netonerd.com.br.br</li>
                 <li>📱 WhatsApp: (21) 97739-5867</li>
             </ul>
             <p>Após a confirmação do pagamento, reativaremos sua licença imediatamente.</p>
@@ -278,7 +292,7 @@ function enviarEmailLembreteVencimento($emailService, $licenca) {
             <p>Para evitar a suspensão do serviço, efetue o pagamento até a data de vencimento.</p>
             <p>Dúvidas? Entre em contato:</p>
             <ul>
-                <li>📧 Email: financeiro@netonerd.com.br</li>
+                <li>📧 Email: financeiro@netonerd.com.br.br</li>
                 <li>📱 WhatsApp: (21) 97739-5867</li>
             </ul>
         </div>

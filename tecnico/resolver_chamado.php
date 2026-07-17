@@ -4,7 +4,6 @@
  * Formulário completo de resolução com campos obrigatórios
  */
 
-session_start();
 require_once '../controller/auth_middleware.php';
 require_once '../config/bandoDeDados/conexao.php';
 
@@ -56,6 +55,53 @@ $stmt = $conn->prepare("
 $stmt->bind_param("i", $chamado_id);
 $stmt->execute();
 $atualizacoes = $stmt->get_result();
+
+// Elegibilidade para "encerrar sem resolução": passaram 48h desde a última
+// mensagem do técnico (comentário interno ou resposta) sem o cliente ter
+// respondido depois disso.
+$stmt = $conn->prepare("
+    SELECT MAX(data_atualizacao) as ultima
+    FROM chamado_atualizacoes
+    WHERE chamado_id = ? AND tipo_atualizacao = 'comentario'
+");
+$stmt->bind_param("i", $chamado_id);
+$stmt->execute();
+$ultima_msg_tecnico_atualizacao = $stmt->get_result()->fetch_assoc()['ultima'];
+$stmt->close();
+
+$stmt = $conn->prepare("
+    SELECT MAX(data_resposta) as ultima
+    FROM respostas_chamado
+    WHERE chamado_id = ? AND tipo_usuario IN ('tecnico', 'admin')
+");
+$stmt->bind_param("i", $chamado_id);
+$stmt->execute();
+$ultima_msg_tecnico_resposta = $stmt->get_result()->fetch_assoc()['ultima'];
+$stmt->close();
+
+$stmt = $conn->prepare("
+    SELECT MAX(data_resposta) as ultima
+    FROM respostas_chamado
+    WHERE chamado_id = ? AND tipo_usuario = 'cliente'
+");
+$stmt->bind_param("i", $chamado_id);
+$stmt->execute();
+$ultima_resposta_cliente = $stmt->get_result()->fetch_assoc()['ultima'];
+$stmt->close();
+
+$candidatos_ultima_msg_tecnico = array_filter([$ultima_msg_tecnico_atualizacao, $ultima_msg_tecnico_resposta]);
+$ultima_msg_tecnico = $candidatos_ultima_msg_tecnico ? max($candidatos_ultima_msg_tecnico) : null;
+
+$elegivel_sem_resolucao = false;
+$horas_sem_resposta = 0;
+if ($ultima_msg_tecnico) {
+    // Cliente só "respondeu" se a resposta dele veio depois da última mensagem do técnico.
+    $cliente_respondeu_depois = $ultima_resposta_cliente && strtotime($ultima_resposta_cliente) > strtotime($ultima_msg_tecnico);
+    if (!$cliente_respondeu_depois) {
+        $horas_sem_resposta = (time() - strtotime($ultima_msg_tecnico)) / 3600;
+        $elegivel_sem_resolucao = $horas_sem_resposta >= 48;
+    }
+}
 
 // Configuração da página
 $page_title = "Resolver Chamado #" . $chamado['protocolo'] . " - NetoNerd ITSM";
@@ -186,8 +232,51 @@ require_once '../includes/header.php';
             </div>
         </div>
 
+        <!-- Encerrar sem resolução (cliente não respondeu) -->
+        <div class="nn-card nn-animate-fade">
+            <div class="nn-card-header">
+                <h2 class="nn-card-title">
+                    <i class="fas fa-user-clock"></i>
+                    Encerrar sem Resolução
+                </h2>
+            </div>
+            <div class="nn-card-body">
+                <?php if ($elegivel_sem_resolucao): ?>
+                    <div class="nn-alert nn-alert-warning">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        O cliente não responde há <?php echo floor($horas_sem_resposta / 24); ?> dia(s)
+                        (<?php echo floor($horas_sem_resposta); ?>h). Você pode encerrar este chamado sem resolução.
+                    </div>
+                    <form action="processar_encerramento_sem_resolucao.php" method="POST" id="form_sem_resolucao">
+                        <?php echo csrfField(); ?>
+                        <input type="hidden" name="chamado_id" value="<?php echo $chamado['id']; ?>">
+                        <div class="nn-form-group">
+                            <label class="nn-form-label" for="justificativa">Justificativa <span class="text-danger">*</span></label>
+                            <textarea id="justificativa" name="justificativa" class="nn-form-control" rows="3" required minlength="20"
+                                      placeholder="Ex: Cliente não respondeu às mensagens enviadas em [data]. Tentativas de contato via chamado sem retorno."></textarea>
+                        </div>
+                        <button type="submit" class="nn-btn nn-btn-danger" id="btn_sem_resolucao">
+                            <i class="fas fa-user-clock"></i>
+                            Encerrar sem Resolução
+                        </button>
+                    </form>
+                <?php else: ?>
+                    <div class="nn-alert nn-alert-info">
+                        <i class="fas fa-info-circle"></i>
+                        Esta opção só fica disponível 48h depois da sua última mensagem no chamado, se o cliente não responder.
+                        <?php if ($ultima_msg_tecnico): ?>
+                            Faltam <?php echo max(0, ceil(48 - $horas_sem_resposta)); ?>h.
+                        <?php else: ?>
+                            Envie uma mensagem/comentário ao cliente para iniciar a contagem.
+                        <?php endif; ?>
+                    </div>
+                <?php endif; ?>
+            </div>
+        </div>
+
         <!-- Formulário de Resolução -->
         <form action="processar_resolucao.php" method="POST" enctype="multipart/form-data" id="form_resolucao">
+            <?php echo csrfField(); ?>
             <input type="hidden" name="chamado_id" value="<?php echo $chamado['id']; ?>">
 
             <!-- 1. Histórico do Atendimento -->
@@ -195,7 +284,7 @@ require_once '../includes/header.php';
                 <div class="nn-card-header">
                     <h2 class="nn-card-title">
                         <i class="fas fa-file-alt"></i>
-                        Histórico Detalhado do Atendimento
+                        <label class="nn-form-label" for="historico_atendimento" style="display:inline; margin:0; font:inherit; color:inherit;">Histórico Detalhado do Atendimento</label>
                         <span class="text-danger">*</span>
                     </h2>
                 </div>
@@ -204,7 +293,7 @@ require_once '../includes/header.php';
                         Descreva detalhadamente o que foi realizado, problemas encontrados e soluções aplicadas.
                         <strong>Mínimo 50 caracteres.</strong>
                     </p>
-                    <textarea name="historico_atendimento" class="nn-form-control" rows="8" required placeholder="Exemplo:
+                    <textarea id="historico_atendimento" name="historico_atendimento" class="nn-form-control" rows="8" required placeholder="Exemplo:
 - Chegada ao local às 14:30
 - Identificado problema na fonte do computador
 - Substituída fonte de 500W por nova fonte de 600W
@@ -324,7 +413,7 @@ require_once '../includes/header.php';
             <div class="nn-card nn-animate-fade">
                 <div class="nn-card-body">
                     <div class="d-grid gap-2">
-                        <button type="submit" class="nn-btn nn-btn-success nn-btn-lg">
+                        <button type="submit" class="nn-btn nn-btn-success nn-btn-lg" id="btn_resolver">
                             <i class="fas fa-check-circle"></i>
                             Resolver e Finalizar Chamado
                         </button>
@@ -461,8 +550,25 @@ document.getElementById('form_resolucao').addEventListener('submit', function(e)
         return false;
     }
 
+    // Proteção contra duplo-submit: só desabilita depois de passar em todas
+    // as validações acima (senão um preventDefault() por validação deixaria
+    // o botão travado sem o form ser reenviado).
+    const btnResolver = document.getElementById('btn_resolver');
+    btnResolver.disabled = true;
+    btnResolver.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Enviando...';
+
     return true;
 });
+
+// Proteção contra duplo-submit no form de encerrar sem resolução
+const formSemResolucao = document.getElementById('form_sem_resolucao');
+if (formSemResolucao) {
+    formSemResolucao.addEventListener('submit', function() {
+        const btn = document.getElementById('btn_sem_resolucao');
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Enviando...';
+    });
+}
 </script>
 
 <?php

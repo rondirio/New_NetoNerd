@@ -19,6 +19,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
     exit;
 }
 
+// Autenticação mínima obrigatória: API key mestra via header X-Api-Key (S6, docs/AUDITORIA_SEGURANCA.md).
+require_once __DIR__ . '/../../../config/config.php';
+$masterApiKey = Config::get('SUPERADMIN_API_MASTER_KEY');
+if (empty($masterApiKey)) {
+    http_response_code(503);
+    echo json_encode(['error' => 'SUPERADMIN_API_MASTER_KEY não configurado no .env — API desabilitada por segurança.']);
+    exit;
+}
+$providedKey = $_SERVER['HTTP_X_API_KEY'] ?? '';
+if (!hash_equals($masterApiKey, $providedKey)) {
+    http_response_code(401);
+    echo json_encode(['error' => 'Não autorizado.']);
+    exit;
+}
+
 // Incluir configuração do banco
 require_once __DIR__ . '/config/database.php';
 require_once __DIR__ . '/core/JWTHandler.php';

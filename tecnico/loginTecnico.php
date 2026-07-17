@@ -7,11 +7,11 @@
 
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" type="text/css" href="css/main.css">
+    <link rel="stylesheet" type="text/css" href="../css/main.css">
     
     <style>
         body {
-            background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+            background: linear-gradient(135deg, #0B3D91 0%, #082b68 100%);
             min-height: 100vh;
             display: flex;
             align-items: center;
@@ -65,7 +65,7 @@
         }
         
         .login-header {
-            background: linear-gradient(135deg, #007bff, #0056b3);
+            background: linear-gradient(135deg, #0B3D91, #082b68);
             color: white;
             padding: 40px 30px;
             text-align: center;
@@ -128,7 +128,7 @@
         }
         
         .form-control:focus {
-            border-color: #007bff;
+            border-color: #0B3D91;
             box-shadow: 0 0 0 3px rgba(0,123,255,0.1);
         }
         
@@ -146,7 +146,7 @@
         }
         
         .toggle-password:hover {
-            color: #007bff;
+            color: #0B3D91;
         }
         
         .form-check {
@@ -164,7 +164,7 @@
             font-size: 1.1rem;
             font-weight: 600;
             border-radius: 10px;
-            background: linear-gradient(135deg, #007bff, #0056b3);
+            background: linear-gradient(135deg, #0B3D91, #082b68);
             border: none;
             color: white;
             transition: all 0.3s ease;
@@ -213,13 +213,13 @@
             font-weight: 600;
             border-radius: 10px;
             background: white;
-            border: 2px solid #007bff;
-            color: #007bff;
+            border: 2px solid #0B3D91;
+            color: #0B3D91;
             transition: all 0.3s ease;
         }
         
         .btn-cadastro:hover {
-            background: #007bff;
+            background: #0B3D91;
             color: white;
         }
         
@@ -274,7 +274,7 @@
         }
         
         .forgot-password a {
-            color: #007bff;
+            color: #0B3D91;
             text-decoration: none;
             font-size: 0.9rem;
             font-weight: 600;
@@ -374,7 +374,7 @@
                 <!-- Formulário de Login -->
                 <form action="../controller/valida_loginTecnico.php" method="POST" id="loginForm">
                     <div class="form-group">
-                        <label for="email">
+                        <label for="matricula">
                             <i class="fas fa-registered"></i> Matrícula
                         </label>
                         <div class="input-group">
@@ -425,12 +425,6 @@
                     </button>
                 </form>
 
-                <div class="forgot-password">
-                    <a href="recuperar_senha.php">
-                        <i class="fas fa-key"></i> Esqueceu sua senha?
-                    </a>
-                </div>
-
                 <!-- <div class="divider">
                     <span>OU</span>
                 </div>
@@ -444,7 +438,7 @@
             <!-- <div class="login-footer">
                 <p>
                     <i class="fas fa-briefcase"></i> Acesso para técnicos? 
-                    <a href="loginTecnico.php" style="color: #007bff; font-weight: 600;">Clique aqui</a>
+                    <a href="loginTecnico.php" style="color: #0B3D91; font-weight: 600;">Clique aqui</a>
                 </p>
             </div> -->
         </div>
@@ -470,20 +464,20 @@
 
         // Validação do formulário
         document.getElementById('loginForm').addEventListener('submit', function(e) {
-            const email = document.getElementById('email').value.trim();
+            const matricula = document.getElementById('matricula').value.trim();
             const senha = document.getElementById('senha').value;
 
-            // if (!email || !senha) {
+            // if (!matricula || !senha) {
             //     e.preventDefault();
             //     alert('Por favor, preencha todos os campos.');
             //     return false;
             // }
 
-            // Validação de email
-            const matriculaRegex = /^(\d{4}[A-Z]\d{4}|[A-Z]{3}\d{6})$/;
-            if (!matriculaRegex.test(email)) {
+            // Validação de matrícula (aceita 3 ou 4 dígitos finais, ex: 2026A001 ou 2026F1000)
+            const matriculaRegex = /^(\d{4}[A-Z]\d{3,4}|[A-Z]{3}\d{6})$/;
+            if (!matriculaRegex.test(matricula)) {
                 e.preventDefault();
-                alert('Por favor, insira uma matrícula válida (ex: 2026F1000 ou ADM202502).');
+                alert('Por favor, insira uma matrícula válida (ex: 2026A001, 2026F1000 ou ADM202502).');
                 return false;
             }
 
@@ -506,7 +500,7 @@
 
         // Adiciona foco ao primeiro campo ao carregar
         window.addEventListener('load', () => {
-            document.getElementById('email').focus();
+            document.getElementById('matricula').focus();
         });
     </script>
 </body>

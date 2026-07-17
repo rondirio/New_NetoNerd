@@ -4,7 +4,6 @@
  * Página de relatórios e estatísticas detalhadas
  */
 
-session_start();
 require_once '../controller/auth_middleware.php';
 require_once '../config/bandoDeDados/conexao.php';
 
@@ -13,11 +12,21 @@ requireAdmin();
 $conn = getConnection();
 
 // Período para relatório (padrão: últimos 30 dias)
-$data_inicio = $_GET['data_inicio'] ?? date('Y-m-d', strtotime('-30 days'));
-$data_fim = $_GET['data_fim'] ?? date('Y-m-d');
+function validarDataFiltro($valor, $padrao) {
+    if (is_string($valor) && preg_match('/^\d{4}-\d{2}-\d{2}$/', $valor)) {
+        $partes = explode('-', $valor);
+        if (checkdate((int)$partes[1], (int)$partes[2], (int)$partes[0])) {
+            return $valor;
+        }
+    }
+    return $padrao;
+}
+
+$data_inicio = validarDataFiltro($_GET['data_inicio'] ?? null, date('Y-m-d', strtotime('-30 days')));
+$data_fim = validarDataFiltro($_GET['data_fim'] ?? null, date('Y-m-d'));
 
 // Estatísticas gerais
-$stats_gerais = $conn->query("
+$stmt_stats = $conn->prepare("
     SELECT
         COUNT(*) as total_chamados,
         COUNT(CASE WHEN status = 'aberto' THEN 1 END) as abertos,
@@ -26,11 +35,15 @@ $stats_gerais = $conn->query("
         COUNT(CASE WHEN status = 'cancelado' THEN 1 END) as cancelados,
         AVG(TIMESTAMPDIFF(HOUR, data_abertura, COALESCE(data_resolucao, NOW()))) as tempo_medio_horas
     FROM chamados
-    WHERE data_abertura BETWEEN '$data_inicio' AND '$data_fim 23:59:59'
-")->fetch_assoc();
+    WHERE data_abertura BETWEEN ? AND CONCAT(?, ' 23:59:59')
+");
+$stmt_stats->bind_param('ss', $data_inicio, $data_fim);
+$stmt_stats->execute();
+$stats_gerais = $stmt_stats->get_result()->fetch_assoc();
+$stmt_stats->close();
 
 // Desempenho dos técnicos
-$desempenho_tecnicos = $conn->query("
+$stmt_desempenho = $conn->prepare("
     SELECT
         t.nome,
         COUNT(c.id) as total,
@@ -38,11 +51,15 @@ $desempenho_tecnicos = $conn->query("
         AVG(CASE WHEN c.tempo_atendimento_minutos IS NOT NULL THEN c.tempo_atendimento_minutos END) as tempo_medio
     FROM tecnicos t
     LEFT JOIN chamados c ON t.id = c.tecnico_id
-        AND c.data_abertura BETWEEN '$data_inicio' AND '$data_fim 23:59:59'
+        AND c.data_abertura BETWEEN ? AND CONCAT(?, ' 23:59:59')
     GROUP BY t.id, t.nome
     ORDER BY resolvidos DESC
     LIMIT 10
 ");
+$stmt_desempenho->bind_param('ss', $data_inicio, $data_fim);
+$stmt_desempenho->execute();
+$desempenho_tecnicos = $stmt_desempenho->get_result();
+$stmt_desempenho->close();
 
 $page_title = "Relatórios - NetoNerd ITSM";
 require_once '../includes/header.php';
@@ -67,14 +84,14 @@ require_once '../includes/header.php';
                     <div class="row g-3">
                         <div class="col-md-4">
                             <div class="nn-form-group">
-                                <label class="nn-form-label">Data Início</label>
-                                <input type="date" name="data_inicio" class="nn-form-control" value="<?php echo $data_inicio; ?>">
+                                <label class="nn-form-label" for="data_inicio">Data Início</label>
+                                <input type="date" id="data_inicio" name="data_inicio" class="nn-form-control" value="<?php echo htmlspecialchars($data_inicio); ?>">
                             </div>
                         </div>
                         <div class="col-md-4">
                             <div class="nn-form-group">
-                                <label class="nn-form-label">Data Fim</label>
-                                <input type="date" name="data_fim" class="nn-form-control" value="<?php echo $data_fim; ?>">
+                                <label class="nn-form-label" for="data_fim">Data Fim</label>
+                                <input type="date" id="data_fim" name="data_fim" class="nn-form-control" value="<?php echo htmlspecialchars($data_fim); ?>">
                             </div>
                         </div>
                         <div class="col-md-4 d-flex align-items-end">

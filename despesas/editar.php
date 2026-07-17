@@ -25,8 +25,21 @@ if (!$d) {
     exit;
 }
 
+// Gerar CSRF token
+if (empty($_SESSION['csrf_token'])) {
+    $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+}
+
 // Processar atualização
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    // Validar CSRF
+    if (!hash_equals($_SESSION['csrf_token'], $_POST['csrf_token'] ?? '')) {
+        $_SESSION['mensagem'] = 'Requisição inválida. Recarregue a página e tente novamente.';
+        $_SESSION['tipo_mensagem'] = 'error';
+        header('Location: editar.php?id=' . intval($_GET['id']));
+        exit;
+    }
+
     try {
         // Extrair dia do vencimento
         $dataVencimento = $_POST['data_vencimento'];
@@ -35,7 +48,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $dados = [
             'nome_conta' => $_POST['nome_conta'],
             'descricao' => $_POST['descricao'],
-            'valor' => str_replace(['.', ','], ['', '.'], $_POST['valor']),
+            'valor' => (function($v) {
+                $v = str_replace(['.', ','], ['', '.'], $v);
+                if (!is_numeric($v) || floatval($v) <= 0) throw new Exception("Valor inválido.");
+                return floatval($v);
+            })($_POST['valor']),
             'data_vencimento' => $dataVencimento,
             'modo_pagamento' => $_POST['modo_pagamento'],
             'debito_automatico' => isset($_POST['debito_automatico']) ? 1 : 0,
@@ -46,7 +63,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             'status' => $_POST['status']
         ];
         
-        $despesaObj->atualizar($_GET['id'], $dados);
+        $despesaObj->atualizar($_GET['id'], $dados, $usuarioId);
         
         $_SESSION['mensagem'] = 'Despesa atualizada com sucesso!';
         $_SESSION['tipo_mensagem'] = 'success';
@@ -67,7 +84,10 @@ require_once 'includes/header.php';
 <div class="container fade-in">
     <header>
         <h1>✏️ Editar Despesa</h1>
-        <a href="despesas.php" class="btn btn-primary">← Voltar</a>
+        <div class="btn-group">
+            <a href="despesas.php" class="btn btn-primary">← Voltar</a>
+            <a href="logout.php" class="btn btn-danger" onclick="return confirm('Deseja sair do sistema?')">⏻ Sair</a>
+        </div>
     </header>
     
     <?php if (isset($_SESSION['mensagem'])): ?>
@@ -81,6 +101,7 @@ require_once 'includes/header.php';
     <?php endif; ?>
     
     <form method="POST" id="formDespesa">
+        <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($_SESSION['csrf_token']); ?>">
         <div class="form-row">
             <div class="form-group">
                 <label for="nome_conta">Nome da Conta *</label>

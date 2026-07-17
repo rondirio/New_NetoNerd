@@ -1,9 +1,11 @@
-<?php 
+<?php
 
-$host = "localhost";
-$dbname = "netonerd_chamados";
-$username = "root";
-$password = "";
+require_once __DIR__ . '/../../config/config.php';
+
+$host = Config::get('APP_LEGACY_DB_HOST', 'localhost');
+$dbname = Config::get('APP_LEGACY_DB_NAME', 'netonerd_chamados');
+$username = Config::get('APP_LEGACY_DB_USERNAME', '');
+$password = Config::get('APP_LEGACY_DB_PASSWORD', '');
 
 $conn = new mysqli($host, $username, $password, $dbname);
 

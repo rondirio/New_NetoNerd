@@ -1,3 +1,10 @@
+<?php
+// Base absoluta do projeto (funciona acessando via "/" com index.php implícito
+// ou via "/publics/index.php" direto) — mesmo padrão usado em routes/footer.php
+$_indexDocRoot = rtrim(str_replace('\\', '/', $_SERVER['DOCUMENT_ROOT']), '/');
+$_indexProjDir = str_replace('\\', '/', dirname(__DIR__));
+$_indexBase    = str_replace($_indexDocRoot, '', $_indexProjDir);
+?>
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -8,7 +15,7 @@
     
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" type="text/css" href="../css/main.css">
+    <link rel="stylesheet" type="text/css" href="<?= $_indexBase ?>/css/main.css">
     
     <style>
         /* Hero Section Aprimorado */
@@ -425,8 +432,8 @@
     <!-- Navbar Melhorada -->
     <nav class="navbar navbar-expand-lg navbar-custom bg-white sticky-top">
         <div class="container">
-            <a class="navbar-brand" href="index.php">
-                <img class="logo" src="../src/imagens/logoNetoNerd.jpg" alt="Logo NetoNerd">
+            <a class="navbar-brand" href="<?= $_indexBase ?>/">
+                <img class="logo" src="<?= $_indexBase ?>/src/imagens/logoNetoNerd.jpg" alt="Logo NetoNerd">
             </a>
             <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav">
                 <span class="navbar-toggler-icon" style="color: dark;">☰</span>
@@ -437,19 +444,19 @@
                         <a class="nav-link" href="#produtos">Produtos</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="publics/atendimento.php">Atendimento</a>
+                        <a class="nav-link" href="<?= $_indexBase ?>/publics/atendimento.php">Atendimento</a>
                     </li>
                     <!--<li class="nav-item">-->
-                    <!--    <a class="nav-link" href="publics/planos.php">Planos</a>-->
+                    <!--    <a class="nav-link" href="<?= $_indexBase ?>/publics/planos.php">Planos</a>-->
                     <!--</li>-->
                     <li class="nav-item">
-                        <a class="nav-link" href="publics/contato.php">Contato</a>
+                        <a class="nav-link" href="<?= $_indexBase ?>/publics/contato.php">Contato</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="publics/quemsomo.php">Sobre</a>
+                        <a class="nav-link" href="<?= $_indexBase ?>/publics/quemsomo.php">Sobre</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link btn btn-light text-primary ml-2" href="publics/login.php">
+                        <a class="nav-link btn btn-light text-primary ml-2" href="<?= $_indexBase ?>/publics/login.php">
                             <i class="fas fa-user"></i> Entrar
                         </a>
                     </li>
@@ -468,7 +475,7 @@
                         Soluções completas em TI: suporte técnico especializado, desenvolvimento de software e consultoria tecnológica em Teresópolis, Araruama e Saquarema
                     </p>
                     <div class="hero-buttons">
-                        <a href="publics/contato.php" class="btn btn-hero btn-hero-primary">
+                        <a href="<?= $_indexBase ?>/publics/contato.php" class="btn btn-hero btn-hero-primary">
                             <i class="fas fa-rocket"></i> Solicitar Orçamento
                         </a>
                         <a href="#produtos" class="btn btn-hero btn-hero-outline">
@@ -477,7 +484,7 @@
                     </div>
                 </div>
                 <div class="col-lg-6 text-center d-none d-lg-block">
-                    <img src="../src/imagens/logoNetoNerd.jpg" alt="NetoNerd" style="max-width: 300px; border-radius: 20px; box-shadow: 0 20px 60px rgba(0,0,0,0.3);">
+                    <img src="<?= $_indexBase ?>/src/imagens/logoNetoNerd.jpg" alt="NetoNerd" style="max-width: 300px; border-radius: 20px; box-shadow: 0 20px 60px rgba(0,0,0,0.3);">
                 </div>
             </div>
         </div>
@@ -522,14 +529,14 @@
             <div class="row">
                 <div class="col-lg-4 mb-4">
                     <div class="historia-card text-center">
-                        <img src="../src/imagens/logoNetoNerd.jpg" alt="NetoNerd" class="logo-empresa">
+                        <img src="<?= $_indexBase ?>/src/imagens/logoNetoNerd.jpg" alt="NetoNerd" class="logo-empresa">
                         <h4>NetoNerd</h4>
                         <p class="text-muted">Marca Principal</p>
                     </div>
                 </div>
                 <div class="col-lg-4 mb-4">
                     <div class="historia-card text-center">
-                        <img src="../src/imagens/foto_CEO.jpeg" alt="Rondineli Oliveira" class="profile-img">
+                        <img src="<?= $_indexBase ?>/src/imagens/foto_CEO.jpeg" alt="Rondineli Oliveira" class="profile-img">
                         <h4>Rondineli Oliveira</h4>
                         <p class="text-muted">CEO & Fundador</p>
                         <p class="small">Cientista da Computação<br>Especialista em Data Science</p>
@@ -556,7 +563,7 @@
                     <div class="produto-card">
                         <div class="produto-header">
                             <div class="produto-icon">
-                                <img src="../src/imagens/Logo_MyHealth.png" alt="MyHealth">
+                                <img src="<?= $_indexBase ?>/src/imagens/Logo_MyHealth.png" alt="MyHealth">
                             </div>
                             <div class="produto-tagline">Prontuário Eletrônico Nacional</div>
                         </div>
@@ -574,7 +581,7 @@
                                 <div class="preco-destaque">Sob Consulta</div>
                                 <small class="text-muted">Planos personalizados para sua instituição</small>
                             </div>
-                            <a href="../apresenta_myhealth/apresenta_myhealth.php" class="btn btn-primary btn-block">
+                            <a href="<?= $_indexBase ?>/apresenta_myhealth/apresenta_myhealth.php" class="btn btn-primary btn-block">
                                 <i class="fas fa-info-circle"></i> Ver Detalhes
                             </a>
                             <a href="contato.php?produto=myhealth" class="btn btn-outline-primary btn-block">
@@ -588,7 +595,7 @@
                     <div class="produto-card">
                         <div class="produto-header">
                             <div class="produto-icon">
-                                <img src="../src/imagens/Logo_Escritorius.png" alt="Escritorius" height="500">
+                                <img src="<?= $_indexBase ?>/src/imagens/Logo_Escritorius.png" alt="Escritorius" height="500">
                             </div>
                             <div class="produto-tagline">Gestão para Escritórios de Advocacia</div>
                         </div>
@@ -615,8 +622,8 @@
                                 <!--    <strong>Semestral:</strong> R$ 1.710 <span class="desconto-badge">-5%</span>-->
                                 <!--</small>-->
                             </div>
-                            <a href="produtos.php?id=escritorius" class="btn btn-primary btn-block">Saiba mais</a>
-                            <!--<a href="produtos.php?id=escritorius#demo" class="btn btn-outline-primary btn-block">-->
+                            <a href="<?= $_indexBase ?>/publics/produtos.php?id=escritorius" class="btn btn-primary btn-block">Saiba mais</a>
+                            <!--<a href="<?= $_indexBase ?>/publics/produtos.php?id=escritorius#demo" class="btn btn-outline-primary btn-block">-->
                             <!--    <i class="fas fa-play"></i> Testar Grátis (7 dias)-->
                             <!--</a>-->
                         </div>
@@ -624,49 +631,50 @@
                 </div>
 
                 <!-- Style Manager -->
-                <div class="col-lg-6 mb-4">
-                    <div class="produto-card">
-                        <div class="produto-header">
-                            <div class="produto-icon">
-                                <img src="../src/imagens/Logo_StyleManager.png" alt="Style Manager">
-                            </div>
-                            <div class="produto-tagline">Gestão para Salões e Barbearias</div>
-                        </div>
-                        <div class="produto-body">
-                            <p class="produto-descricao">
-                                <strong>Sistema completo para salões de beleza</strong> que gerencia agendamentos, estoque, comissões e programa de fidelidade. Integração com WhatsApp.
-                            </p>
-                            <ul class="list-unstyled mb-3">
-                                <li><i class="fas fa-check text-success"></i> Agendamento online automático</li>
-                                <li><i class="fas fa-check text-success"></i> Controle de estoque</li>
-                                <li><i class="fas fa-check text-success"></i> Gestão de comissões</li>
-                                <li><i class="fas fa-check text-success"></i> WhatsApp integrado</li>
-                            </ul>
-                            <div class="produto-preco">
-                                <div class="preco-destaque">
-                                    R$ 139,90<span class="preco-periodo">/mês</span>
-                                </div>
-                                <small>
-                                    <strong>Anual:</strong> R$ 1.594,86<br>
-                                    <strong>Semestral:</strong> R$ 822,62
-                                </small>
-                            </div>
-                            <a href="produtos.php?id=stylemanager" class="btn btn-primary btn-block">
-                                <i class="fas fa-shopping-cart"></i> Contratar Agora
-                            </a>
-                            <a href="publics/produtos.php?id=stylemanager#demo" class="btn btn-outline-primary btn-block">
-                                <i class="fas fa-play"></i> Testar Grátis (7 dias)
-                            </a>
-                        </div>
-                    </div>
+<div class="col-lg-6 mb-4">
+    <div class="produto-card">
+        <div class="produto-header">
+            <div class="produto-icon">
+                <img src="<?= $_indexBase ?>/src/imagens/Logo_StyleManager.png" alt="Style Manager">
+            </div>
+            <div class="produto-tagline">Gestão para Salões e Barbearias</div>
+        </div>
+        <div class="produto-body">
+            <p class="produto-descricao">
+                <strong>Sistema completo para salões de beleza</strong> que gerencia agendamentos, estoque, comissões e programa de fidelidade. Integração com WhatsApp.
+            </p>
+            <ul class="list-unstyled mb-3">
+                <li><i class="fas fa-check text-success"></i> Agendamento online automático</li>
+                <li><i class="fas fa-check text-success"></i> Controle de estoque</li>
+                <li><i class="fas fa-check text-success"></i> Gestão de comissões</li>
+                <li><i class="fas fa-check text-success"></i> WhatsApp integrado</li>
+            </ul>
+            <div class="produto-preco">
+                <div class="preco-destaque">
+                    R$ 49,90<span class="preco-periodo">/mês</span>
                 </div>
+                <small>
+                    <strong>Pro (até 5 prof.):</strong> R$ 79,90/mês<br>
+                    <strong>Premium (ilimitado):</strong> R$ 129,90/mês
+                </small>
+            </div>
+            <a href="<?= $_indexBase ?>/publics/produtos.php?id=stylemanager" class="btn btn-primary btn-block">
+                <i class="fas fa-shopping-cart"></i> Contratar Agora
+            </a>
+            <a href="<?= $_indexBase ?>/apresenta_stylemanager/pitch.html" class="btn btn-outline-primary btn-block" target="_blank">
+                <i class="fas fa-eye"></i> Ver Apresentação Completa
+            </a>
+        </div>
+    </div>
+</div>
+
 
                 <!-- NetoNerd PJ -->
                 <div class="col-lg-6 mb-4">
                     <div class="produto-card">
                         <div class="produto-header">
                             <div class="produto-icon">
-                                <img src="../src/imagens/logoNetoNerd.jpg" alt="NetoNerd PJ" style="border-radius: 50%;">
+                                <img src="<?= $_indexBase ?>/src/imagens/logoNetoNerd.jpg" alt="NetoNerd PJ" style="border-radius: 50%;">
                             </div>
                             <div class="produto-tagline">Suporte Tecnológico Empresarial</div>
                         </div>
@@ -689,10 +697,10 @@
                                 <!--    <strong>Semestral:</strong> R$ 3.984 <span class="desconto-badge">-5%</span>-->
                                 <!--</small>-->
                             </div>
-                            <a href="contato.php?produto=pj" class="btn btn-primary btn-block">
+                            <a href="<?= $_indexBase ?>/publics/contato.php?produto=pj" class="btn btn-primary btn-block">
                                 <i class="fas fa-phone"></i> Falar com Consultor
                             </a>
-                            <a href="publics/produtos.php?id=pj" class="btn btn-outline-primary btn-block">
+                            <a href="<?= $_indexBase ?>/publics/produtos.php?id=pj" class="btn btn-outline-primary btn-block">
                                 <i class="fas fa-file-alt"></i> Plano Personalizado
                             </a>
                         </div>
@@ -725,7 +733,7 @@
                     GRÁTIS<span class="preco-periodo">/Open Source</span>
                 </div>
             </div>
-            <a href="../despesas" class="btn btn-outline-success btn-block">
+            <a href="<?= $_indexBase ?>/despesas" class="btn btn-outline-success btn-block">
                 <i class="fas fa-external-link-alt"></i> Usar Agora Gratuitamente
             </a>
         </div>
@@ -785,10 +793,10 @@
         <div class="container">
             <h2 class="cta-title">Pronto para Transformar seu Negócio?</h2>
             <p class="cta-subtitle">Fale com nossa equipe e descubra a solução ideal para você</p>
-            <a href="publics/contato.php" class="btn btn-hero btn-hero-primary btn-lg">
+            <a href="<?= $_indexBase ?>/publics/contato.php" class="btn btn-hero btn-hero-primary btn-lg">
                 <i class="fas fa-comments"></i> Falar com Especialista
             </a>
-            <a href="publics/login.php" class="btn btn-hero btn-hero-outline btn-lg">
+            <a href="<?= $_indexBase ?>/publics/login.php" class="btn btn-hero btn-hero-outline btn-lg">
                 <i class="fas fa-tools"></i> Solicitar Atendimento
             </a>
         </div>

@@ -3,8 +3,6 @@
  * Processador de Formulário de Contato - NetoNerd
  * Versão Segura com PHPMailer (sem Composer)
  */
-ini_set('display_errors', 1);
-ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
 
 $base = dirname(__DIR__); // Sobe um nível de 'publics' para a raiz 'public_html'
@@ -13,6 +11,7 @@ if (!file_exists($base . "/config/bandoDeDados/conexao.php")) {
     die("Erro: Arquivo conexao.php não encontrado em: " . $base . "/config/bandoDeDados/conexao.php");
 }
 
+require_once $base . "/controller/auth_middleware.php";
 require_once $base . "/config/bandoDeDados/conexao.php";
 require_once $base . "/config/EmailService.php";
 
@@ -33,6 +32,8 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     header('Location: contato.php');
     exit();
 }
+
+requireCsrfToken();
 
 try {
     $conn = getConnection();
@@ -119,16 +120,24 @@ try {
     $mail->addReplyTo($email, $nome);
     $mail->addAddress($emailConfig['username']);
 
+    // Escapa dados de usuário antes de interpolar em corpo de e-mail HTML —
+    // sem isso, um payload como <img onerror=...> em "mensagem" ou "nome"
+    // executa no cliente de e-mail de quem abrir a mensagem.
+    $nome_html = htmlspecialchars($nome);
+    $email_html = htmlspecialchars($email);
+    $assunto_html = htmlspecialchars($assunto);
+    $mensagem_html = nl2br(htmlspecialchars($mensagem));
+
     $mensagem_email = "
     <html>
     <body style='font-family: Arial, sans-serif;'>
         <h2>Novo Contato do Site</h2>
-        <p><strong>Nome:</strong> {$nome}</p>
-        <p><strong>Email:</strong> {$email}</p>
+        <p><strong>Nome:</strong> {$nome_html}</p>
+        <p><strong>Email:</strong> {$email_html}</p>
         <p><strong>Telefone:</strong> " . formatarTelefone($telefone) . "</p>
-        <p><strong>Assunto:</strong> {$assunto}</p>
+        <p><strong>Assunto:</strong> {$assunto_html}</p>
         <p><strong>Mensagem:</strong></p>
-        <p style='background: #f8f9fa; padding: 15px; border-radius: 5px;'>{$mensagem}</p>
+        <p style='background: #f8f9fa; padding: 15px; border-radius: 5px;'>{$mensagem_html}</p>
         <p><strong>Protocolo:</strong> #{$contato_id}</p>
         <p><strong>Data:</strong> " . date('d/m/Y H:i') . "</p>
     </body>
@@ -166,8 +175,8 @@ try {
                 <h2 style='margin: 0;'>Obrigado pelo Contato!</h2>
             </div>
             <div style='padding: 30px; background: #f8f9fa; margin-top: 20px; border-radius: 10px;'>
-                <p>Olá <strong>{$nome}</strong>,</p>
-                <p>Recebemos sua mensagem sobre: <strong>{$assunto}</strong></p>
+                <p>Olá <strong>{$nome_html}</strong>,</p>
+                <p>Recebemos sua mensagem sobre: <strong>{$assunto_html}</strong></p>
                 <p>Nossa equipe analisará sua solicitação e retornará em breve.</p>
                 <p style='background: white; padding: 15px; border-left: 4px solid #007bff; border-radius: 5px;'>
                     <strong>Protocolo:</strong> #{$contato_id}<br>

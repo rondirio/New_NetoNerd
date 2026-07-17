@@ -1,7 +1,10 @@
 <?php
+require_once '../controller/auth_middleware.php';
 require '../config/bandoDeDados/conexao.php'; // Arquivo de configuração do banco de dados
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    requireCsrfToken();
+
     $nome = trim($_POST['nome']);
     $email = trim($_POST['email']);
     $senha = password_hash($_POST['senha'], PASSWORD_DEFAULT);

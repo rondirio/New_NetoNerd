@@ -9,8 +9,12 @@
  * Configure a senha em config/web_cron.php
  */
 
-// Verificar senha
-$senhaCorreta = 'mudar-esta-senha-123'; // MUDE ESTA SENHA!
+// Senha lida da variável de ambiente CRON_SECRET (defina no servidor, nunca no código)
+$senhaCorreta = getenv('CRON_SECRET') ?: null;
+if (!$senhaCorreta) {
+    http_response_code(500);
+    die('Configuração incompleta: variável CRON_SECRET não definida.');
+}
 
 if (!isset($_GET['senha']) || $_GET['senha'] !== $senhaCorreta) {
     http_response_code(403);

@@ -1,22 +1,8 @@
 <?php
-session_start();
+require_once __DIR__ . '/auth_middleware.php';
 
-// Destroy all session variables
-session_destroy();
-
-// Clear session cookie
-if (ini_get("session.use_cookies")) {
-    $params = session_get_cookie_params();
-    setcookie(
-        session_name(),
-        '',
-        time() - 42000,
-        $params["path"],
-        $params["domain"],
-        $params["secure"],
-        $params["httponly"]
-    );
-}
+// Destrói a sessão com redundância (dados + cookie + checagem final de vestígios)
+destruirSessaoComRedundancia();
 
 // Redirect to login page
 header("Location: ../publics/login.php");

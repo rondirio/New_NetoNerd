@@ -55,13 +55,13 @@ $mesAtual = date('m');
 $anoAtual = date('Y');
 
 if (isset($_GET['mes']) && $_GET['mes'] !== '') {
-    $filtros['mes'] = $_GET['mes'];
-    $mesAtual = $_GET['mes'];
+    $mesAtual = str_pad(max(1, min(12, intval($_GET['mes']))), 2, '0', STR_PAD_LEFT);
+    $filtros['mes'] = $mesAtual;
 }
 
 if (isset($_GET['ano']) && $_GET['ano'] !== '') {
-    $filtros['ano'] = $_GET['ano'];
-    $anoAtual = $_GET['ano'];
+    $anoAtual = max(2000, min(2100, intval($_GET['ano'])));
+    $filtros['ano'] = $anoAtual;
 }
 
 if (isset($_GET['status']) && $_GET['status'] !== '') {
@@ -83,7 +83,7 @@ if (!isset($filtros['ano'])) {
 // Buscar dados
 $despesas = $despesa->listar($filtros);
 $estatisticas = $despesa->estatisticasMes($filtros['mes'], $filtros['ano'], $usuarioId);
-$categorias = $despesa->obterCategorias();
+$categorias = $despesa->obterCategorias($usuarioId);
 $totalRecorrentes = $despesa->contarRecorrentes();
 
 $titulo = 'Dashboard - Despesas';
@@ -102,6 +102,7 @@ require_once 'includes/header.php';
                 🔁 Recorrentes (<?php echo $totalRecorrentes; ?>)
             </a>
             <a href="relatorio.php" class="btn btn-success">📊 Relatório</a>
+            <a href="logout.php" class="btn btn-danger" onclick="return confirm('Deseja sair do sistema?')">⏻ Sair</a>
         </div>
     </header>
     

@@ -17,10 +17,10 @@ return [
      */
     'config' => [
         // Ambiente: 'development' ou 'production'
-        'ambiente' => 'development',
+        'ambiente' => getenv('STYLEMANAGER_AMBIENTE') ?: 'development',
 
-        // Chave secreta para JWT (mude em produção!)
-        'jwt_secret' => 'stylemanager_dev_secret_2026_CHANGE_IN_PRODUCTION',
+        // Chave secreta para JWT — obrigatória via variável de ambiente, sem fallback hardcoded
+        'jwt_secret' => getenv('STYLEMANAGER_JWT_SECRET') ?: null,
 
         // Tempo de expiração do token (em segundos)
         'token_expiration' => 86400 * 30, // 30 dias

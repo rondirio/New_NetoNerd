@@ -312,7 +312,7 @@ CREATE TABLE IF NOT EXISTS `configuracoes_sistema` (
 -- Inserir configurações padrão
 INSERT INTO `configuracoes_sistema` (`chave`, `valor`, `tipo`, `descricao`, `grupo`) VALUES
 ('sistema_nome', 'NetoNerd ITSM', 'string', 'Nome do sistema exibido', 'geral'),
-('sistema_email', 'suporte@netonerd.com.br', 'string', 'Email principal do sistema', 'email'),
+('sistema_email', 'suporte@netonerd.com.br.br', 'string', 'Email principal do sistema', 'email'),
 ('email_notificacoes', '1', 'boolean', 'Ativar notificações por email', 'email'),
 ('chamado_protocolo_prefix', 'NN', 'string', 'Prefixo para protocolos de chamados', 'chamados'),
 ('tempo_sessao', '3600', 'integer', 'Tempo de sessão em segundos', 'seguranca'),

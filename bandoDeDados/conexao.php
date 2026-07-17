@@ -1,21 +1,5 @@
-<?php 
+<?php
 
-$host = "localhost";
-$dbname = "netonerd";
-$username = "root";
-$password = "";
+// Delega para a conexão que lê credenciais do .env (evita duplicar credenciais hardcoded aqui)
+require_once __DIR__ . '/../config/bandoDeDados/conexao.php';
 
-$conn = new mysqli($host, $username, $password, $dbname);
-
-if ($conn->connect_error) {
-    die("Erro na conexão: " . $conn->connect_error);
-}
-// Tornar a conexão disponível para outros arquivos
-if (!function_exists('getConnection')) {
-    function getConnection() {
-        global $conn;
-        return $conn;
-    }
-}
-// Agora você pode usar a variável $conn diretamente para interagir com o banco de dados.
-?>

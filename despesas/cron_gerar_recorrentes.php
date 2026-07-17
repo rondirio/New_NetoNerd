@@ -19,6 +19,21 @@ if (php_sapi_name() !== 'cli' && !defined('ALLOW_WEB_CRON')) {
 
 // Incluir classes necessárias
 require_once __DIR__ . '/classes/Despesa.php';
+require_once __DIR__ . '/classes/Database.php';
+
+// Lock para evitar execução concorrente (crontab + disparo manual via
+// web_cron.php, ou timeout de uma execução anterior ainda rodando) —
+// evita despesas recorrentes duplicadas no mesmo mês.
+$lockName = 'cron_gerar_recorrentes';
+$lockConn = (new Database())->getConnection();
+$lockObtido = $lockConn->query("SELECT GET_LOCK('$lockName', 0) AS obtido")->fetch(PDO::FETCH_ASSOC)['obtido'];
+if (!$lockObtido) {
+    echo "[" . date('Y-m-d H:i:s') . "] Outra execução deste cron já está em andamento. Abortando.\n";
+    exit(0);
+}
+register_shutdown_function(function () use ($lockConn, $lockName) {
+    $lockConn->query("SELECT RELEASE_LOCK('$lockName')");
+});
 
 // Criar arquivo de log
 $logFile = __DIR__ . '/logs/cron_recorrentes.log';

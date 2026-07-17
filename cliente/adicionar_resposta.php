@@ -1,18 +1,16 @@
 <?php
-session_start();
-require_once 'bandoDeDados/conexao.php';
+require_once '../controller/auth_middleware.php';
+require_once '../config/bandoDeDados/conexao.php';
 
-// Verificar autenticação
-if (!isset($_SESSION['id'])) {
-    header('Location: index.php?erro=nao_autenticado');
-    exit();
-}
+requireCliente();
 
 // Verificar se é POST
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     header('Location: home.php');
     exit();
 }
+
+requireCsrfToken();
 
 $conn = getConnection();
 $usuario_id = $_SESSION['id'];
@@ -28,17 +26,17 @@ $resposta = trim($_POST['resposta']);
 
 // Validações
 if (empty($resposta)) {
-    header('Location: detalhe_chamado.php?id=' . $chamado_id . '&erro=resposta_vazia');
+    header('Location: visualizar_chamado.php?id=' . $chamado_id . '&erro=resposta_vazia');
     exit();
 }
 
 if (strlen($resposta) < 10) {
-    header('Location: detalhe_chamado.php?id=' . $chamado_id . '&erro=resposta_curta');
+    header('Location: visualizar_chamado.php?id=' . $chamado_id . '&erro=resposta_curta');
     exit();
 }
 
 if (strlen($resposta) > 5000) {
-    header('Location: detalhe_chamado.php?id=' . $chamado_id . '&erro=resposta_longa');
+    header('Location: visualizar_chamado.php?id=' . $chamado_id . '&erro=resposta_longa');
     exit();
 }
 
@@ -61,35 +59,39 @@ $stmt->close();
 // Verificar se o chamado está fechado ou cancelado
 if (in_array($chamado['status'], ['fechado', 'cancelado'])) {
     $conn->close();
-    header('Location: detalhe_chamado.php?id=' . $chamado_id . '&erro=chamado_fechado');
+    header('Location: visualizar_chamado.php?id=' . $chamado_id . '&erro=chamado_fechado');
     exit();
 }
 
 // Inserir resposta
 try {
+    $conn->begin_transaction();
+
     $stmt = $conn->prepare("
         INSERT INTO respostas_chamado (chamado_id, usuario_id, tipo_usuario, resposta, tipo_resposta)
         VALUES (?, ?, 'cliente', ?, 'publica')
     ");
 
     $stmt->bind_param("iis", $chamado_id, $usuario_id, $resposta);
-    
+
     if (!$stmt->execute()) {
         throw new Exception("Erro ao inserir resposta: " . $stmt->error);
     }
-    
+
     $stmt->close();
-    
-    // Atualizar data de última atualização do chamado
-    $stmt = $conn->prepare("
-        UPDATE chamados 
-        SET data_ultima_atualizacao = CURRENT_TIMESTAMP 
-        WHERE id = ?
-    ");
-    
+
+    // Toca o chamado para refletir a nova resposta (data_atualizacao já tem
+    // ON UPDATE current_timestamp(), mas só dispara com um UPDATE na linha)
+    $stmt = $conn->prepare("UPDATE chamados SET data_atualizacao = CURRENT_TIMESTAMP WHERE id = ?");
     $stmt->bind_param("i", $chamado_id);
-    $stmt->execute();
+
+    if (!$stmt->execute()) {
+        throw new Exception("Erro ao atualizar chamado: " . $stmt->error);
+    }
+
     $stmt->close();
+
+    $conn->commit();
 
     // Enviar email para o técnico notificando nova resposta
     try {
@@ -132,13 +134,14 @@ try {
     $conn->close();
     
     // Redirecionar com sucesso
-    header('Location: detalhe_chamado.php?id=' . $chamado_id . '&sucesso=resposta_adicionada');
+    header('Location: visualizar_chamado.php?id=' . $chamado_id . '&sucesso=resposta_adicionada');
     exit();
     
 } catch (Exception $e) {
+    $conn->rollback();
     $conn->close();
     error_log("Erro ao adicionar resposta: " . $e->getMessage());
-    header('Location: detalhe_chamado.php?id=' . $chamado_id . '&erro=erro_servidor');
+    header('Location: visualizar_chamado.php?id=' . $chamado_id . '&erro=erro_servidor');
     exit();
 }
 ?>

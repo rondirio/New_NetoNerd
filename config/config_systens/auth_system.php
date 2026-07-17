@@ -203,40 +203,51 @@ class AuthSystem {
             ];
         }
         
-        // Busca técnico
+        // Busca admin primeiro, depois técnico — tabelas separadas desde
+        // a Fase 4 (admin não é mais decidido por padrão de matrícula)
+        $tipo_usuario = 'admin';
         $stmt = $this->conn->prepare(
-            "SELECT id, nome, email, matricula, senha_hash, status_tecnico, carro_do_dia 
-             FROM tecnicos 
-             WHERE matricula = ? AND Ativo = TRUE"
+            "SELECT id, nome, email, matricula, senha_hash, Ativo, NULL AS carro_do_dia
+             FROM admins
+             WHERE matricula = ? AND Ativo = 1"
         );
         $stmt->bind_param("s", $matricula);
         $stmt->execute();
         $result = $stmt->get_result();
-        
-        if ($result->num_rows === 0) {
+        $tecnico = $result->num_rows > 0 ? $result->fetch_assoc() : null;
+
+        if (!$tecnico) {
+            $tipo_usuario = 'tecnico';
+            $stmt = $this->conn->prepare(
+                "SELECT id, nome, email, matricula, senha_hash, status_tecnico, carro_do_dia
+                 FROM tecnicos
+                 WHERE matricula = ? AND Ativo = TRUE"
+            );
+            $stmt->bind_param("s", $matricula);
+            $stmt->execute();
+            $result = $stmt->get_result();
+            $tecnico = $result->num_rows > 0 ? $result->fetch_assoc() : null;
+        }
+
+        if (!$tecnico) {
             $this->logAttempt($matricula, 'tecnico', $ip, false);
             return ['sucesso' => false, 'erro' => 'Credenciais inválidas.'];
         }
-        
-        $tecnico = $result->fetch_assoc();
-        
-        // Verifica se está ativo
-        if ($tecnico['status_tecnico'] !== 'Ativo') {
+
+        // Verifica se está ativo (técnico usa status_tecnico; admin já filtrou Ativo=1 na query)
+        if ($tipo_usuario === 'tecnico' && $tecnico['status_tecnico'] !== 'Ativo') {
             return [
-                'sucesso' => false, 
+                'sucesso' => false,
                 'erro' => 'Sua conta está inativa. Contate a gerência.'
             ];
         }
-        
+
         // Verifica senha
         if (!password_verify($senha, $tecnico['senha_hash'])) {
             $this->logAttempt($matricula, 'tecnico', $ip, false);
             return ['sucesso' => false, 'erro' => 'Credenciais inválidas.'];
         }
-        
-        // Determina tipo (admin ou técnico)
-        $tipo_usuario = (strpos($matricula, 'ADM') !== false) ? 'admin' : 'tecnico';
-        
+
         // Login bem-sucedido
         $this->logAttempt($matricula, 'tecnico', $ip, true);
         $this->cleanOldAttempts($matricula);
@@ -271,15 +282,17 @@ class AuthSystem {
         $ip = $_SERVER['REMOTE_ADDR'];
         
         $stmt = $this->conn->prepare(
-            "SELECT s.*, 
-                    CASE 
+            "SELECT s.*,
+                    CASE
                         WHEN s.tipo_usuario = 'cliente' THEN c.nome
-                        WHEN s.tipo_usuario IN ('tecnico', 'admin') THEN t.nome
+                        WHEN s.tipo_usuario = 'tecnico' THEN t.nome
+                        WHEN s.tipo_usuario = 'admin' THEN a.nome
                     END as nome
              FROM sessoes_ativas s
              LEFT JOIN clientes c ON s.usuario_id = c.id AND s.tipo_usuario = 'cliente'
-             LEFT JOIN tecnicos t ON s.usuario_id = t.id AND s.tipo_usuario IN ('tecnico', 'admin')
-             WHERE s.session_token = ? 
+             LEFT JOIN tecnicos t ON s.usuario_id = t.id AND s.tipo_usuario = 'tecnico'
+             LEFT JOIN admins a ON s.usuario_id = a.id AND s.tipo_usuario = 'admin'
+             WHERE s.session_token = ?
              AND s.ip_address = ?
              AND s.expires_at > NOW()"
         );
