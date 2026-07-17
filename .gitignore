@@ -4,8 +4,12 @@
 .env.*.local
 .env.production
 
-# Dump de produção (contém dados reais)
+# Dumps de banco com dados reais — nunca versionar
 config/bandoDeDados/u478690921_netonerd.sql
+/u478690921_netonerd.sql
+/netonerd_migrado_*.sql
+/prod_dump_*.sql
+/*.sql
 
 # Dependências
 vendor/
