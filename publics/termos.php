@@ -67,10 +67,11 @@
             </button>
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav ml-auto">
-                    <li class="nav-item"><a class="nav-link" href="index.php">Início</a></li>
+                    <li class="nav-item"><a class="nav-link" href="../index.php">Início</a></li>
                     <li class="nav-item"><a class="nav-link" href="atendimento.php">Atendimento</a></li>
                     <li class="nav-item"><a class="nav-link" href="planos.php">Planos</a></li>
                     <li class="nav-item"><a class="nav-link" href="contato.php">Contato</a></li>
+                    <li class="nav-item"><a class="nav-link" href="quemsomo.php">Sobre</a></li>
                     <li class="nav-item"><a class="nav-link btn btn-primary text-white ml-2" href="login.php">Entrar</a></li>
                 </ul>
             </div>
@@ -92,8 +93,8 @@
             <span class="update-badge"><i class="fas fa-calendar-alt mr-1"></i> Última atualização: março de 2026</span>
 
             <p>
-                Bem-vindo à <strong>Neto Nerd Soluções Digitais LTDA</strong> (doravante "NetoNerd"), inscrita no CNPJ
-                65.663.425/0001-26, com sede em Araruama – RJ. Ao acessar ou utilizar qualquer produto, sistema ou
+                Bem-vindo à <strong>NetoNerd</strong>, inscrita no CNPJ
+                65.663.425/0001-26, com sede em Teresópolis – RJ. Ao acessar ou utilizar qualquer produto, sistema ou
                 serviço prestado pela NetoNerd, você declara ter lido, compreendido e concordado com os presentes
                 Termos de Uso. Caso não concorde, não utilize nossos serviços.
             </p>
@@ -194,14 +195,14 @@
             <h2>12. Disposições Gerais</h2>
             <ul>
                 <li>Estes Termos são regidos pelas leis da República Federativa do Brasil.</li>
-                <li>Fica eleito o foro da comarca de Araruama – RJ para dirimir quaisquer litígios, com renúncia a qualquer outro, por mais privilegiado que seja.</li>
+                <li>Fica eleito o foro da comarca de Teresópolis – RJ para dirimir quaisquer litígios, com renúncia a qualquer outro, por mais privilegiado que seja.</li>
                 <li>A invalidade de qualquer cláusula não afeta as demais disposições destes Termos.</li>
             </ul>
 
             <div class="mt-5 p-4" style="background:#f8f9fa; border-radius:10px;">
-                <p class="mb-1"><strong>Neto Nerd Soluções Digitais LTDA</strong></p>
+                <p class="mb-1"><strong>NetoNerd</strong></p>
                 <p class="mb-1 text-muted">CNPJ: 65.663.425/0001-26</p>
-                <p class="mb-0 text-muted">Araruama – RJ &nbsp;|&nbsp; <a href="mailto:contato@netonerd.com.br">contato@netonerd.com.br</a> &nbsp;|&nbsp; (21) 97739-5867</p>
+                <p class="mb-0 text-muted">Teresópolis – RJ &nbsp;|&nbsp; <a href="mailto:contato@netonerd.com.br">contato@netonerd.com.br</a> &nbsp;|&nbsp; (21) 97739-5867</p>
             </div>
 
         </div>

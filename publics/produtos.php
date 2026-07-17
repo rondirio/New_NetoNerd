@@ -142,22 +142,22 @@
 
         <h3 class="text-center other-products-title">Conheça outras soluções</h3>
         <div class="row mt-4">
-            <div class="col-md-3 mb-3">
-                <a href="?id=myhealth" class="card shadow-sm border-0 text-decoration-none text-dark h-100 p-3 text-center">
-                    <h6>MyHealth</h6>
+            <div class="col-md-4 mb-3">
+                <a href="../apresenta_myhealth/apresenta_myhealth.php" class="card shadow-sm border-0 text-decoration-none text-dark h-100 p-3 text-center">
+                    <h6>MyHealth <span class="badge badge-warning">Em Desenvolvimento</span></h6>
                 </a>
             </div>
-            <div class="col-md-3 mb-3">
-                <a href="?id=escritorius" class="card shadow-sm border-0 text-decoration-none text-dark h-100 p-3 text-center">
-                    <h6>Escritorius</h6>
+            <div class="col-md-4 mb-3">
+                <a href="../apresenta_escritorius/apresenta_escritorius.php" class="card shadow-sm border-0 text-decoration-none text-dark h-100 p-3 text-center">
+                    <h6>Escritorius <span class="badge badge-warning">Em Breve</span></h6>
                 </a>
             </div>
-            <div class="col-md-3 mb-3">
+            <div class="col-md-4 mb-3">
                 <a href="?id=stylemanager" class="card shadow-sm border-0 text-decoration-none text-dark h-100 p-3 text-center">
                     <h6>Style Manager</h6>
                 </a>
             </div>
-            <div class="col-md-3 mb-3">
+            <div class="col-md-4 mb-3 offset-md-2">
                 <a href="?id=pj" class="card shadow-sm border-0 text-decoration-none text-dark h-100 p-3 text-center">
                     <h6>NetoNerd PJ</h6>
                 </a>
@@ -167,44 +167,21 @@
 
     <footer class="footer text-center">
         <div class="container">
-            <p>&copy; 2026 Neto Nerd Soluções Digitais LTDA.</p>
+            <p>&copy; 2026 NetoNerd.</p>
         </div>
     </footer>
 
     <script>
         // Dados dos produtos (Simulando um banco de dados)
+        // MyHealth e Escritorius têm páginas de apresentação dedicadas e não usam mais este template
         const produtos = {
-            'myhealth': {
-                titulo: 'MyHealth',
-                tagline: 'Prontuário Eletrônico Nacional',
-                preco: 'Sob Consulta',
-                img: '../src/imagens/Logo_MyHealth.png',
-                features: [
-                    { icon: 'fa-file-medical', text: 'Histórico médico unificado e acessível em qualquer lugar.' },
-                    { icon: 'fa-shield-halved', text: 'Segurança absoluta de dados seguindo normas da LGPD.' },
-                    { icon: 'fa-user-doctor', text: 'Painel exclusivo para profissionais da saúde.' },
-                    { icon: 'fa-mobile-screen', text: 'Aplicativo para acompanhamento do paciente.' }
-                ]
-            },
-            'escritorius': {
-                titulo: 'Escritorius',
-                tagline: 'Gestão Jurídica Inteligente',
-                preco: 'R$ 100,00/mês',
-                img: '../src/imagens/Logo_Escritorius.png',
-                features: [
-                    { icon: 'fa-scale-balanced', text: 'Controle completo de processos e prazos jurídicos.' },
-                    { icon: 'fa-folder-open', text: 'Gestão de clientes e contratos em um só lugar.' },
-                    { icon: 'fa-calendar-days', text: 'Agenda integrada com alertas de audiências e vencimentos.' },
-                    { icon: 'fa-file-invoice-dollar', text: 'Faturamento e controle financeiro do escritório.' }
-                ]
-            },
             'stylemanager': {
                 titulo: 'Style Manager',
                 tagline: 'Gestão para Salões e Barbearias',
-                preco: 'R$ 139,90/mês',
+                preco: 'R$ 49,90/mês',
                 img: '../src/imagens/Logo_StyleManager.png',
                 features: [
-                    { icon: 'fa-calendar-check', text: 'Agendamento online 24h para seus clientes.' },
+                    { icon: 'fa-calendar-check', text: 'Agendamento online para seus clientes.' },
                     { icon: 'fa-boxes-stacked', text: 'Controle de estoque rigoroso e alertas de reposição.' },
                     { icon: 'fa-comments-dollar', text: 'Cálculo automático de comissões de profissionais.' },
                     { icon: 'fa-whatsapp', text: 'Lembretes automáticos via WhatsApp.' }
@@ -227,8 +204,8 @@
         // Função para carregar o produto da URL
         function carregarProduto() {
             const params = new URLSearchParams(window.location.search);
-            const id = params.get('id') || 'myhealth'; // Padrão
-            const p = produtos[id] || produtos['myhealth'];
+            const id = params.get('id') || 'stylemanager'; // Padrão
+            const p = produtos[id] || produtos['stylemanager'];
 
             document.getElementById('product-title').innerText = p.titulo;
             document.getElementById('product-tagline').innerText = p.tagline;
