@@ -221,7 +221,7 @@
         <img class="logo" src="../src/imagens/logoNetoNerd.jpg" alt="Logo NetoNerd">
       </a>
       <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav">
-        <span style="color: white;">☰</span>
+        <span style="color: #007bff; font-size: 1.5rem;">☰</span>
       </button>
       <div class="collapse navbar-collapse" id="navbarNav">
         <ul class="navbar-nav ml-auto">
@@ -295,9 +295,7 @@
             <h5 class="contact-title">Localização</h5>
             <div class="contact-info">
               <p>Teresópolis - RJ<br>Brasil</p>
-              <p>Araruama - RJ<br>Brasil</p>
-              <p>Saquarema - RJ<br>Brasil</p>
-              <p class="text-muted mb-0">Atendemos toda região</p>
+              <p class="text-muted mb-0">Suporte técnico presencial em Teresópolis.<br>Nossos sistemas atendem empresas de todo o Rio de Janeiro.</p>
             </div>
           </div>
         </div>
@@ -357,8 +355,8 @@
                       <option value="">Selecione...</option>
                       <option value="Orçamento">Solicitar Orçamento</option>
                       <option value="Suporte">Suporte Técnico</option>
-                      <option value="MyHealth">MyHealth - Demonstração</option>
-                      <option value="Escritorius">Escritorius - Informações</option>
+                      <option value="MyHealth">MyHealth - Quero ser avisado</option>
+                      <option value="Escritorius">Escritorius - Lista de espera</option>
                       <option value="StyleManager">Style Manager - Informações</option>
                       <option value="PJ">NetoNerd PJ - Empresas</option>
                       <option value="Outro">Outro Assunto</option>
@@ -366,17 +364,6 @@
                   </div>
                 </div>
 
-                <div class="col-md-6">
-                  <div class="form-group">
-                    <label>Localidade *</label>
-                    <select class="form-control" name="localidade" required>
-                      <option value="">Selecione...</option>
-                      <option value="Araruama">Araruama</option>
-                      <option value="Teresopolis">Teresópolis</option>
-                      <option value="Saquarema">Saquarema</option>
-                    </select>
-                  </div>
-                </div>
               </div>
 
               <div class="form-group">
@@ -435,10 +422,6 @@
                 <strong class="text-danger">Fechado</strong>
               </div>
             </div>
-            <div class="alert alert-info mt-3 mb-0">
-              <small><i class="fas fa-info-circle"></i> <strong>Emergências:</strong> 
-              Atendimento 24h via WhatsApp para clientes com plano ativo</small>
-            </div>
           </div>
 
           <!-- <div class="contact-card mt-4">
@@ -467,7 +450,7 @@
       <div class="mapa-container">
         <div class="p-4 text-center bg-light">
           <h4><i class="fas fa-map-marked-alt"></i> Nossa Região de Atuação</h4>
-          <p class="text-muted mb-0">Atendemos Teresópolis, Araruama e Saquarema.</p>
+          <p class="text-muted mb-0">Suporte técnico presencial em Teresópolis. Nossos sistemas (MyHealth, Escritorius, Style Manager) atendem empresas de todo o estado do Rio de Janeiro.</p>
         </div>
         <!-- Adicione aqui o iframe do Google Maps se necessário -->
       </div>

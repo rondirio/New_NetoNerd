@@ -244,7 +244,7 @@
             padding: 5rem 2rem;
             background: var(--light);
         }
-        
+
         .tech-grid {
             max-width: 1000px;
             margin: 3rem auto 0;
@@ -253,7 +253,7 @@
             gap: 2rem;
             text-align: center;
         }
-        
+
         .tech-item {
             padding: 1.5rem;
             background: var(--white);
@@ -262,7 +262,85 @@
             color: var(--secondary);
             box-shadow: 0 2px 8px rgba(0,0,0,0.05);
         }
-        
+
+        /* Demo */
+        .demo {
+            padding: 5rem 2rem;
+            background: var(--white);
+        }
+
+        .demo-container {
+            max-width: 1000px;
+            margin: 3rem auto 0;
+            background: var(--light);
+            border-radius: 1.25rem;
+            padding: 2.5rem;
+            box-shadow: 0 16px 48px rgba(0,0,0,0.08);
+        }
+
+        .demo-tabs {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .demo-tab {
+            padding: 0.6rem 1.4rem;
+            background: var(--white);
+            border: 1px solid #e2e8f0;
+            border-radius: 0.6rem;
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: var(--gray);
+            transition: all 0.2s ease;
+        }
+
+        .demo-tab:hover { border-color: var(--primary); color: var(--primary); }
+        .demo-tab.active { background: var(--primary); color: var(--white); border-color: var(--primary); }
+
+        .demo-content { display: none; }
+        .demo-content.active { display: block; animation: fadeIn 0.4s ease; }
+
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+        .demo-screen {
+            background: var(--white);
+            border-radius: 0.75rem;
+            border: 1px solid #e2e8f0;
+            min-height: 280px;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .screen-chrome {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 12px 16px;
+            background: #eef2f7;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .chrome-dot { width: 10px; height: 10px; border-radius: 50%; }
+
+        .screen-body {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 40px 24px;
+            text-align: center;
+        }
+
+        .screen-icon { font-size: 2.8rem; margin-bottom: 4px; }
+        .screen-title { font-size: 1.15rem; font-weight: 700; color: var(--secondary); }
+        .screen-desc { font-size: 0.9rem; color: var(--gray); max-width: 420px; }
+
         /* CTA */
         .cta {
             background: linear-gradient(135deg, #2563eb 0%, #1e40af 100%);
@@ -345,6 +423,19 @@
                 width: 100%;
                 text-align: center;
             }
+
+            .demo-container {
+                padding: 1.5rem;
+            }
+
+            .demo-tabs {
+                justify-content: center;
+            }
+
+            .demo-tab {
+                flex: 1 1 calc(50% - 0.5rem);
+                text-align: center;
+            }
         }
     </style>
 </head>
@@ -417,6 +508,82 @@
         </div>
     </section>
 
+    <!-- Demo -->
+    <section class="demo">
+        <div class="section-title">
+            <h2>Veja o sistema em ação</h2>
+            <p>Navegue pelas principais telas antes de criar sua conta</p>
+        </div>
+        <div class="demo-container">
+            <div class="demo-tabs">
+                <button class="demo-tab active" onclick="showDemo('dashboard', event)">Dashboard</button>
+                <button class="demo-tab" onclick="showDemo('recorrentes', event)">Recorrentes</button>
+                <button class="demo-tab" onclick="showDemo('parcelamentos', event)">Parcelamentos</button>
+                <button class="demo-tab" onclick="showDemo('relatorio', event)">Relatórios</button>
+            </div>
+
+            <div id="demo-dashboard" class="demo-content active">
+                <div class="demo-screen">
+                    <div class="screen-chrome">
+                        <div class="chrome-dot" style="background:#ff5f57;"></div>
+                        <div class="chrome-dot" style="background:#febc2e;"></div>
+                        <div class="chrome-dot" style="background:#28c840;"></div>
+                    </div>
+                    <div class="screen-body">
+                        <div class="screen-icon">📊</div>
+                        <div class="screen-title">Dashboard financeiro</div>
+                        <div class="screen-desc">Resumo de despesas do mês, status de vencimento e categorias, tudo em um único painel.</div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="demo-recorrentes" class="demo-content">
+                <div class="demo-screen">
+                    <div class="screen-chrome">
+                        <div class="chrome-dot" style="background:#ff5f57;"></div>
+                        <div class="chrome-dot" style="background:#febc2e;"></div>
+                        <div class="chrome-dot" style="background:#28c840;"></div>
+                    </div>
+                    <div class="screen-body">
+                        <div class="screen-icon">🔁</div>
+                        <div class="screen-title">Despesas recorrentes</div>
+                        <div class="screen-desc">Configure uma conta fixa uma única vez. O sistema gera automaticamente os lançamentos dos meses seguintes.</div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="demo-parcelamentos" class="demo-content">
+                <div class="demo-screen">
+                    <div class="screen-chrome">
+                        <div class="chrome-dot" style="background:#ff5f57;"></div>
+                        <div class="chrome-dot" style="background:#febc2e;"></div>
+                        <div class="chrome-dot" style="background:#28c840;"></div>
+                    </div>
+                    <div class="screen-body">
+                        <div class="screen-icon">💳</div>
+                        <div class="screen-title">Controle de parcelamentos</div>
+                        <div class="screen-desc">Cadastre uma compra parcelada e acompanhe cada parcela individualmente, sem planilhas.</div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="demo-relatorio" class="demo-content">
+                <div class="demo-screen">
+                    <div class="screen-chrome">
+                        <div class="chrome-dot" style="background:#ff5f57;"></div>
+                        <div class="chrome-dot" style="background:#febc2e;"></div>
+                        <div class="chrome-dot" style="background:#28c840;"></div>
+                    </div>
+                    <div class="screen-body">
+                        <div class="screen-icon">📈</div>
+                        <div class="screen-title">Relatórios por período</div>
+                        <div class="screen-desc">Filtre por mês, ano, status ou categoria e receba o resumo diretamente no seu e-mail.</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
     <!-- Stats -->
     <section class="stats">
         <div class="stats-grid">
@@ -433,8 +600,8 @@
                 <p>Moderno</p>
             </div>
             <div class="stat-item">
-                <h3>24/7</h3>
-                <p>Disponível</p>
+                <h3>0</h3>
+                <p>Custo</p>
             </div>
         </div>
     </section>
@@ -457,8 +624,8 @@
 
     <!-- CTA -->
     <section class="cta">
-        <h2>Pronto para assumir o controle?</h2>
-        <p>Junte-se a milhares de usuários que já organizam suas finanças de forma profissional</p>
+        <h2>Pronto para assumir o controle das suas finanças?</h2>
+        <p>Um sistema completo de controle financeiro, sem custo e sem letras miúdas</p>
         <a href="registro.php" class="btn btn-white btn-large">Criar Conta Gratuita</a>
     </section>
 
@@ -467,16 +634,23 @@
         <div class="footer-content">
             <div class="footer-brand">NetoNerd</div>
             <p>Sistema de Gerenciamento de Despesas</p>
-            <p>Projeto de código aberto e gratuito</p>
+            <p>Projeto de código aberto, mantido pela NetoNerd</p>
             <div class="footer-divider"></div>
             <div class="footer-bottom">
                 <p>&copy; 2026 NetoNerd. Todos os direitos reservados.</p>
-                <p>Desenvolvido com excelência para a comunidade</p>
             </div>
         </div>
     </footer>
 
     <script>
+        // Alterna entre as abas de demonstração
+        function showDemo(id, e) {
+            document.querySelectorAll('.demo-content').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.demo-tab').forEach(el => el.classList.remove('active'));
+            document.getElementById('demo-' + id).classList.add('active');
+            if (e && e.target) e.target.classList.add('active');
+        }
+
         // Smooth scroll para links internos
         document.querySelectorAll('a[href^="#"]').forEach(anchor => {
             anchor.addEventListener('click', function (e) {
