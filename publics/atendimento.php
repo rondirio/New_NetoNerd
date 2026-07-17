@@ -647,7 +647,7 @@
               <i class="fas fa-server"></i>
             </div>
             <h4 class="empresa-titulo">Gestão de Infraestrutura</h4>
-            <p>Gerenciamento completo da sua infraestrutura de TI com monitoramento 24/7</p>
+            <p>Gerenciamento completo da sua infraestrutura de TI, com monitoramento contínuo</p>
           </div>
         </div>
         <div class="col-md-4 mb-4">
@@ -691,11 +691,7 @@
   </section>
 
   <!-- Footer -->
-  <footer class="footer bg-dark text-white py-5">
-    <div class="container text-center">
-      <p>&copy; 2025 NetoNerd Soluções Digitais. Todos os direitos reservados.</p>
-    </div>
-  </footer>
+  <?php include '../routes/footer.php'; ?>
 
   <!-- Scripts -->
   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>

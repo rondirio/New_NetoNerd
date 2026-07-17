@@ -331,11 +331,30 @@
     footer strong { color: var(--dourado); }
 
     /* ── RESPONSIVO ──────────────────────────────────────── */
+    @media (max-width: 768px) {
+      .nav-inner { height: auto; padding-top: 10px; padding-bottom: 10px; flex-wrap: wrap; gap: 10px; justify-content: center; }
+      .nav-cta { padding: 8px 16px; font-size: 0.8rem; }
+      #hero { padding: 128px 0 72px; }
+      .hero-badges { gap: 14px 20px; }
+    }
     @media (max-width: 600px) {
       section { padding: 64px 0; }
       .hero-btns { flex-direction: column; align-items: center; }
+      .hero-btns .btn-primary, .hero-btns .btn-outline { width: 100%; max-width: 280px; text-align: center; }
       .plano-card { padding: 28px 20px; }
       .quote-box { padding: 32px 24px; }
+    }
+    @media (max-width: 480px) {
+      .container { padding: 0 16px; }
+      .nav-logo { font-size: 1.1rem; }
+      .nav-cta { padding: 8px 12px; font-size: 0.75rem; }
+      #hero { padding: 120px 0 64px; }
+      .hero-badges { flex-direction: column; align-items: center; gap: 12px; }
+      .section-sub { margin-bottom: 40px; }
+      .app-mockup { padding: 32px 20px; }
+      .quote-box { padding: 28px 18px; }
+      .quote-text { font-size: 1rem; }
+      .whatsapp-btn { width: 100%; padding: 16px 20px; font-size: 0.95rem; }
     }
   </style>
 </head>

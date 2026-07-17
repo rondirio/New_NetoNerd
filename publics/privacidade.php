@@ -75,10 +75,11 @@
             </button>
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav ml-auto">
-                    <li class="nav-item"><a class="nav-link" href="index.php">Início</a></li>
+                    <li class="nav-item"><a class="nav-link" href="../index.php">Início</a></li>
                     <li class="nav-item"><a class="nav-link" href="atendimento.php">Atendimento</a></li>
                     <li class="nav-item"><a class="nav-link" href="planos.php">Planos</a></li>
                     <li class="nav-item"><a class="nav-link" href="contato.php">Contato</a></li>
+                    <li class="nav-item"><a class="nav-link" href="quemsomo.php">Sobre</a></li>
                     <li class="nav-item"><a class="nav-link btn btn-primary text-white ml-2" href="login.php">Entrar</a></li>
                 </ul>
             </div>
@@ -100,7 +101,7 @@
             <span class="update-badge"><i class="fas fa-calendar-alt mr-1"></i> Última atualização: março de 2026</span>
 
             <p>
-                A <strong>Neto Nerd Soluções Digitais LTDA</strong> ("NetoNerd"), CNPJ 65.663.425/0001-26, é a
+                A <strong>NetoNerd</strong>, CNPJ 65.663.425/0001-26, é a
                 controladora dos dados pessoais tratados no âmbito de seus produtos e serviços. Esta Política de
                 Privacidade descreve como coletamos, utilizamos, armazenamos e protegemos suas informações, em
                 conformidade com a <strong>Lei Geral de Proteção de Dados (LGPD – Lei nº 13.709/2018)</strong>.
@@ -250,8 +251,8 @@
             </p>
 
             <div class="mt-4 p-4" style="background:#f8f9fa; border-radius:10px;">
-                <p class="mb-1"><strong>Neto Nerd Soluções Digitais LTDA</strong></p>
-                <p class="mb-1 text-muted">CNPJ: 65.663.425/0001-26 &nbsp;|&nbsp; Araruama – RJ</p>
+                <p class="mb-1"><strong>NetoNerd</strong></p>
+                <p class="mb-1 text-muted">CNPJ: 65.663.425/0001-26 &nbsp;|&nbsp; Teresópolis – RJ</p>
                 <p class="mb-1"><i class="fas fa-envelope mr-1 text-primary"></i> <a href="mailto:privacidade@netonerd.com.br">privacidade@netonerd.com.br</a></p>
                 <p class="mb-1"><i class="fab fa-whatsapp mr-1 text-success"></i> <a href="https://wa.me/5521977395867" target="_blank">(21) 97739-5867</a></p>
                 <p class="mb-0 text-muted"><small>Atendimento: segunda a sexta, das 9h às 18h</small></p>
